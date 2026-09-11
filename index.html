@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi</title>
+    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (60 Sual)</title>
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -108,7 +108,6 @@
             background-color: #f8fafc;
         }
 
-        /* Düzgün cavab stili */
         .option-btn.correct {
             background-color: var(--correct-bg) !important;
             border-color: var(--correct-border) !important;
@@ -116,7 +115,6 @@
             font-weight: 600;
         }
 
-        /* Səhv cavab stili */
         .option-btn.wrong {
             background-color: var(--wrong-bg) !important;
             border-color: var(--wrong-border) !important;
@@ -147,13 +145,8 @@
         .prev-btn:hover:not([disabled]) { background-color: #4b5563; }
         .next-btn:hover:not([disabled]), .restart-btn:hover { background-color: var(--primary-hover); }
 
-        .review-btn {
-            background-color: #8b5cf6;
-        }
-
-        .review-btn:hover {
-            background-color: #7c3aed;
-        }
+        .review-btn { background-color: #8b5cf6; }
+        .review-btn:hover { background-color: #7c3aed; }
 
         .prev-btn:disabled, .next-btn:disabled {
             background-color: #d1d5db;
@@ -189,9 +182,7 @@
         }
 
         @media (max-width: 600px) {
-            .result-buttons {
-                flex-direction: column;
-            }
+            .result-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -242,42 +233,72 @@
 
 <script>
 const rawQuestions = [
-    { q: "Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
-    { q: "Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
-    { q: "Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
-    { q: "Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
-    { q: "Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
-    { q: "Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
-    { q: "Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
-    { q: "Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-    { q: "Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-    { q: "Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
-    { q: "Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 1 },
-    { q: "Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "büyük qrupda rəsmçəkmə"], answer: 3 },
-    { q: "Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi, ünsiyyət sferası", "işin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
-    { q: "Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 3 },
-    { q: "Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
-    { q: "Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
-    { q: "Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
-    { q: "Fransız dilindən tərcümədə \"nöqtə\" deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
-    { q: "Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə qabiliyyətini formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
-    { q: "Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
-    { q: "Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
-    { q: "Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
-    { q: "Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
-    { q: "Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
-    { q: "Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?\na) İlkin tapşırıqlar (tərbiyəçi hərəkətləri dəqiq göstərməlidir);\nb) Möhkəmləndirmə;\nc) Tərbiyəçi tərəfindən hərəkətlərin qeyri-dəqiq göstərilməsi;\nd) Hərəkətin icra texnikasının təkmilləşdirilməməsi (yaradıcılıq);\ne) Hərəkətin icra texnikasının təkmilləşdirilməsi (yaradıcılıq).", options: ["a, b, c", "a, d, e", "b, d, e", "a, b, e"], answer: 3 },
-    { q: "Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nezakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
-    { q: "Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
-    { q: "Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması.", "Tərbiyəçinin məşğələ planını hazırlaması.", "Təlim prosesində metodların seçilməsi.", "Tərbiyəçinin məşğələyə \"özünü hazırlaması\"."], answer: 2 },
-    { q: "Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 }
+    { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
+    { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
+    { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
+    { q: "4. Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
+    { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
+    { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
+    { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
+    { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "9. Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
+    { q: "11. Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 1 },
+    { q: "12. Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "böyük qrupda rəsmçəkmə"], answer: 3 },
+    { q: "13. Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi, ünsiyyət sferası", "işin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
+    { q: "14. Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 3 },
+    { q: "15. Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
+    { q: "16. Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
+    { q: "17. Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
+    { q: "18. Fransız dilindən tərcümədə \"nöqtə\" deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
+    { q: "19. Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə qabiliyyətini formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
+    { q: "20. Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
+    { q: "21. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
+    { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
+    { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
+    { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
+    { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
+    { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
+    { q: "29. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması.", "Tərbiyəçinin məşğələ planını hazırlaması.", "Təlim prosesində metodların seçilməsi.", "Tərbiyəçinin məşğələyə 'özünü hazırlaması'."], answer: 2 },
+    { q: "30. Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 },
+    { q: "31. Məktəbəqədər təhsil müəssisələrində hansı yaş qrupunda fiziki məşğələlərə daha çox oyun elementləri qatılır?", options: ["Kiçik qruplarda", "Yalnız məktəbəhazırlıq qrupunda", "Məktəbdən kənar dərslərdə", "Heç birində"], answer: 0 },
+    { q: "32. Uşaqların xırda motorikasını inkişaf etdirən təsviri fəaliyyət növü hansıdır?", options: ["Lepka və Applikasiya", "Yalnız qaçış", "Sıraya düzülmə", "Gimnastika"], answer: 0 },
+    { q: "33. Təsviri fəaliyyətdə qayçı ilə kəsmə bacarığı hansı yaş qrupundan etibarən sistemli öyrədilir?", options: ["Orta qrupdan", "1-ci kiçik qrupdan", "Körpələr qrupundan", "Yalnız İbtidai sinifdə"], answer: 0 },
+    { q: "34. Ştamplama texnikasında hansı materiallardan istifadə oluna bilər?", options: ["Kartof, yarpaq, xüsusi möhürlər", "Yalnız metal lövhələr", "Mərmər daşlar", "Yalnız plastik borular"], answer: 0 },
+    { q: "35. Uşaqlarda məkan anlayışını (sağ, sol, üst, alt) formalaşdıran fəaliyyət növü hansıdır?", options: ["Konstruksiyaetmə və Rəsm", "Yalnız musiqi dinləmə", "Sərbəst yuxu", "Yalnız şeir əzbərləmək"], answer: 0 },
+    { q: "36. Monotipiya texnikasının əsas məğzi nədir?", options: ["Hamar səthə çəkilmiş rəsmin kağıza çıxarılması (çapı)", "Nöqtələrlə rəsm çəkmək", "Şamla rəsm çəkmək", "Ləkəyə üfürmək"], answer: 0 },
+    { q: "37. Bədən tərbiyəsi məşğələlərində əsas hərəkətlərə hansılar daxildir?", options: ["Gəzmək, qaçmaq, tullanmaq, dırmanmaq", "Rəsm çəkmək, kəsmək", "Şeir demək, oxumaq", "Şahmat oynamaq"], answer: 0 },
+    { q: "38. Tərbiyəçinin təsviri fəaliyyət zamanı uşaqlara 'sərbəst mövzu' verməkdə məqsədi nədir?", options: ["Yaradıcı təxəyyülü və müstəqilliyi inkişaf etdirmək", "Vaxta qənaət etmək", "İşini asanlaşdırmaq", "Uşaqları sınaqdan çıxarmaq"], answer: 0 },
+    { q: "39. Hansı rəsm texnikasında pambıq çubuqlarından istifadə etmək daha əlverişlidir?", options: ["Puantilizm (nöqtə texnikası)", "Monotipiya", "Fotokopiya", "Klyaksoqrafiya"], answer: 0 },
+    { q: "40. Applikasiya məşğələlərində hansı materiallardan istifadə etmək olar?", options: ["Rəngli kağız, parça, quru yarpaqlar, dənli bitkilər", "Yalnız ağ kağız", "Yalnız plastilin", "Şüşə qırıqları"], answer: 0 },
+    { q: "41. Fiziki tərbiyə məşğələsində giriş hissəsinin əsas məqsədi nədir?", options: ["Orqanizmi fiziki yüklənməyə hazırlamaq (qızışdırıcı hərəkətlər)", "Uşaqları yatırtmaq", "Nəticələri qiymətləndirmək", "Sakit oyunlar oynamaq"], answer: 0 },
+    { q: "42. Fiziki tərbiyə məşğələsində yekun hissənin əsas məqsədi nədir?", options: ["Tənəffüsü və nəbzi bərpa etmək, orqanizmi sakitləşdirmək", "Yüksək sürətlə qaçmaq", "Yeni çətin hərəkətlər öyrətmək", "Qrupdan ayrılmaq"], answer: 0 },
+    { q: "43. Məktəbəqədər yaşlı uşaqların fiziki inkişafında hansı keyfiyyətlər tərbiyə olunur?", options: ["Sürət, çeviklik, güc, dözümlülük, müvazinət", "Yalnız oxumaq bacarığı", "Yalnız rəsm texnikası", "Məntiqi mühakimə"], answer: 0 },
+    { q: "44. Konstruksiyaetmə məşğələlərində hansı materiallardan istifadə olunur?", options: ["Tikinti materialları, Leqo, kağız, təbii materiallar", "Yalnız sulu boya", "Yalnız karandaş", "Səs yazıları"], answer: 0 },
+    { q: "45. Məktəbəhazırlıq qrupunda təsviri fəaliyyət məşğələsinin müddəti adətən nə qədər olur?", options: ["25-30 dəqiqə", "10 dəqiqə", "60 dəqiqə", "45 dəqiqə"], answer: 0 },
+    { q: "46. Uşaqların fiziki tərbiyəsində hərəkətli oyunların rolu nədir?", options: ["Hərəkət vərdişlərini möhkəmləndirir və emosional fon yaradır", "Yalnız intizamı pozur", "Vaxtı boşa verir", "Dərsi çətinləşdirir"], answer: 0 },
+    { q: "47. Təsviri fəaliyyətdə 'Relyefli lepka' ne deməkdir?", options: ["Müstəvi (lövhə) üzərində qabarıq təsvirin yaradılması", "Kağızı cırmaq", "Masa üzərində su tökmək", "Rəngləri qarışdırmaq"], answer: 0 },
+    { q: "48. Aşağıdakılardan hansı qeyri-ənənəvi rəsm texnikası DEYİL?", options: ["Adi karandaşla xətt çəkmək", "Barmaq boyakarlığı", "Klyaksoqrafiya", "Puantilizm"], answer: 0 },
+    { q: "49. Uşağa qayçı ilə işləmə qaydalarını öyrədərkən birinci növbədə nəyə diqqət yetirilməlidir?", options: ["Təhlükəsizlik qaydalarına", "Kəsmə sürətinə", "Kağızın rənginə", "Dərsin vaxtına"], answer: 0 },
+    { q: "50. Məktəbəqədər müəssisədə fiziki dəqiqələrin (fizkultminutka) keçirilməsində məqsəd nədir?", options: ["Yorğunluğu aradan qaldırmaq və diqqəti bərpa etmək", "Uşaqları cəzalandırmaq", "Məşğələni tez bitirmək", "Yalnız idman zalına getmək"], answer: 0 },
+    { q: "51. Plastilinlə iş zamanı istifadə olunan xüsusi plastik bıçaq necə adlanır?", options: ["Stek", "Palitra", "Molbert", "Şstamp"], answer: 0 },
+    { q: "52. Boyaları qarışdırmaq üçün istifadə olunan lövhə necə adlanır?", options: ["Palitra", "Molbert", "Stek", "Karkas"], answer: 0 },
+    { q: "53. Rəsm çəkmək üçün üzərində kağız və ya kətillər bərkidilən altlıq/stend necə adlanır?", options: ["Molbert", "Palitra", "Plandor", "Eskiz"], answer: 0 },
+    { q: "54. Uşaqlarda ritm və hərəkət koordinasiyasını inkişaf etdirən fiziki məşq növü hansıdır?", options: ["Musiqili-ritmik gimnastika", "Ağır atletika", "Şahmat", "Yalnız qaçış"], answer: 0 },
+    { q: "55. Kiçik qrupda lepkadan istifadə edərkən hansı sadə üsullar öyrədilir?", options: ["Yumrulama (kürəcik), yayma (çubuq/sosiska)", "Mürəkkəb heykəltəraşlıq", "Oymaçılıq", "Cilalama"], answer: 0 },
+    { q: "56. Təsviri fəaliyyətdə 'Kompozisiya' ne deməkdir?", options: ["Hissələrin müəyyən nizamla və bədii bütövlükdə birləşdirilməsi", "Yalnız rənglərin seçilməsi", "İstifadə olunan fırçaların sayı", "Kağızın ölçüsü"], answer: 0 },
+    { q: "57. Uşaqlarda fəza təfəkkürünü və mühəndislik rüşeymlərini inkişaf etdirən fəaliyyət hansıdır?", options: ["Konstruksiyaetmə", "Yalnız Mahnı oxumaq", "Şeir demək", "Yalnız Nağıl dinləmək"], answer: 0 },
+    { q: "58. Uşaq bağçasında səhər gimnastikasının müddəti kiçik qruplarda nə qədər olmalıdır?", options: ["5-6 dəqiqə", "20 dəqiqə", "30 dəqiqə", "1 dəqiqə"], answer: 0 },
+    { q: "59. Səhər gimnastikasının əsas pedaqoji məqsədi nədir?", options: ["Uşaq orqanizmini oyatmaq və günə gümrah başlamaq", "Uşaqları yormaq", "Səhər yeməyini gecikdirmək", "İntizamı sərtləşdirmək"], answer: 0 },
+    { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
 ];
 
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
-let isReviewMode = false; // Baxış rejimində olub-olmadığımızı saxlayır
+let isReviewMode = false;
 
 function shuffleArray(array) {
     let arr = [...array];
@@ -291,8 +312,9 @@ function shuffleArray(array) {
 function startQuiz() {
     isReviewMode = false;
     let shuffledQuestions = shuffleArray(rawQuestions);
-    // Hər imtahanda tam 60 sual seçilir
-    let selectedQuestions = shuffledQuestions.slice(0, Math.min(60, shuffledQuestions.length));
+    
+    // Tam 60 sual götürülür
+    let selectedQuestions = shuffledQuestions.slice(0, 60);
 
     currentQuestions = selectedQuestions.map(qObj => {
         let optionsWithFlag = qObj.options.map((opt, idx) => ({
@@ -347,7 +369,6 @@ function showQuestion() {
         let btn = document.createElement("button");
         btn.className = "option-btn";
         
-        // Baxış rejimində cavabların dəyişdirilməsini bloklayırıq
         if (isReviewMode) {
             btn.disabled = true;
             if (idx === correctIdx) {
@@ -360,7 +381,6 @@ function showQuestion() {
                 btn.innerHTML = `<span>${optText}</span>`;
             }
         } 
-        // Canlı test rejimi
         else {
             if (selectedIdx !== null) {
                 if (idx === correctIdx) {
@@ -383,7 +403,7 @@ function showQuestion() {
 }
 
 function selectOption(selectedIndex) {
-    if (isReviewMode) return; // Baxış rejimində dəyişməyə icazə vermirəm
+    if (isReviewMode) return;
 
     if (userAnswers[currentQuestionIndex] === selectedIndex) {
         userAnswers[currentQuestionIndex] = null;
@@ -433,7 +453,6 @@ function showResults() {
     document.getElementById("stat-total").innerText = total;
 }
 
-// Cavablara və Səhvlərə Baxmaq Funksiyası
 function reviewQuiz() {
     isReviewMode = true;
     currentQuestionIndex = 0;
