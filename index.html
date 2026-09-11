@@ -129,10 +129,11 @@
         .footer {
             margin-top: 30px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .next-btn, .restart-btn {
+        .prev-btn, .next-btn, .restart-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -144,12 +145,21 @@
             transition: background-color 0.2s ease;
         }
 
-        .next-btn:hover, .restart-btn:hover {
+        .prev-btn {
+            background-color: #6b7280;
+        }
+
+        .prev-btn:hover:not([disabled]) {
+            background-color: #4b5563;
+        }
+
+        .next-btn:hover:not([disabled]), .restart-btn:hover {
             background-color: var(--primary-hover);
         }
 
-        .next-btn:disabled {
-            background-color: #9ca3af;
+        .prev-btn:disabled, .next-btn:disabled {
+            background-color: #d1d5db;
+            color: #9ca3af;
             cursor: not-allowed;
         }
 
@@ -223,19 +233,20 @@
             </div>
         </div>
 
-        <div id="question-text" class="question-text">Sual məti yüklənir...</div>
+        <div id="question-text" class="question-text">Sual mətni yüklənir...</div>
 
         <div id="options-container" class="options-container"></div>
 
         <div class="footer">
-            <button id="next-btn" class="next-btn" onclick="nextQuestion()" disabled>Növbəti sual</button>
+            <button id="prev-btn" class="prev-btn" onclick="prevQuestion()" disabled>← Əvvəlki sual</button>
+            <button id="next-btn" class="next-btn" onclick="nextQuestion()" disabled>Növbəti sual →</button>
         </div>
     </div>
 
     <!-- Screen 2: Results -->
     <div id="result-screen" class="result-screen" style="display: none;">
         <h2 class="result-title">Test Yekunlaşdı!</h2>
-        <div class="score-box" id="final-score">47.75 / 60</div>
+        <div class="score-box" id="final-score">0.00</div>
 
         <div class="stats-grid">
             <div class="stat-card">Düzgün cavab: <span id="stat-correct" style="color: var(--correct-color);">0</span></div>
@@ -243,7 +254,7 @@
             <div class="stat-card">Cavabsız sual: <span id="stat-unanswered">0</span></div>
             <div class="stat-card">Nəticə (Faiz): <span id="stat-percent">0%</span></div>
             <div class="stat-card">Maksimum bal: <span>60</span></div>
-            <div class="stat-card">Ümumi sual: <span>60</span></div>
+            <div class="stat-card">Ümumi sual: <span id="stat-total">60</span></div>
         </div>
 
         <button class="restart-btn" onclick="startQuiz()">Testi yenidən başlat</button>
@@ -251,7 +262,7 @@
 </div>
 
 <script>
-// Fayldakı bütün suallar bazası
+// Suallar bazası
 const rawQuestions = [
     // Təsviri fəaliyyət
     { q: "Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
@@ -333,13 +344,11 @@ const rawQuestions = [
     { q: "Bədii təfəkkürün inkişafı zamanı uşaqlarda yaddaşı möhkəmləndirməyə hansı metod kömək edir?", options: ["əzbər öyrənmə", "yenidən danışma", "ifadəli oxu", "hekayələrin yenidən danışılması"], answer: 0 }
 ];
 
-// Qaydalar və dəyişənlər
 let currentQuestions = [];
 let currentQuestionIndex = 0;
-let userAnswers = []; // user answer history
-let isAnswered = false;
+let userAnswers = []; // İstifadəçinin seçdiyi cavablar
 
-// Təsadüfi qarışdırma funksiyası (Fisher-Yates)
+// Qarışdırma funksiyası
 function shuffleArray(array) {
     let arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -349,15 +358,11 @@ function shuffleArray(array) {
     return arr;
 }
 
-// Testi başla
+// Testi başladır
 function startQuiz() {
-    // Toplam sual sayından təsadüfi 60 sual seçək (faylda sual azdırsa, olanların hamısını təsadüfi ardıcıllıqla götürür)
     let shuffledQuestions = shuffleArray(rawQuestions);
-    
-    // Əgər bazadakı sual sayı 60-dan çoxdursa 60-nı götür; azdırsa, mövcud olanları götür.
     let selectedQuestions = shuffledQuestions.slice(0, Math.min(60, shuffledQuestions.length));
 
-    // Sualların cavab variantlarını da təsadüfi qarışdıraq, lakin düzgün cavabı saxlayaq
     currentQuestions = selectedQuestions.map(qObj => {
         let optionsWithFlag = qObj.options.map((opt, idx) => ({
             text: opt,
@@ -383,56 +388,70 @@ function startQuiz() {
 }
 
 function showQuestion() {
-    isAnswered = false;
     let q = currentQuestions[currentQuestionIndex];
     let total = currentQuestions.length;
 
-    // Yuxarı hissə güncəlləmələri
+    // Naviqasiya düymələri
+    document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
+    
+    // Növbəti düyməsinin vəziyyəti: Əgər bu sual artıq cavablandırılıbsa aktiv olsun
+    document.getElementById("next-btn").disabled = (userAnswers[currentQuestionIndex] === null);
+
+    // Yuxarı bar
     document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total}`;
     document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
-    document.getElementById("next-btn").disabled = true;
 
-    // Balın canlı göstərilməsi
     calculateLiveScore();
 
-    // Sual mətni
+    // Sual metni
     document.getElementById("question-text").innerText = q.q;
 
     // Variantlar
     let optionsContainer = document.getElementById("options-container");
     optionsContainer.innerHTML = "";
 
+    let hasSelected = userAnswers[currentQuestionIndex] !== null;
+    let selectedIdx = userAnswers[currentQuestionIndex];
+
     q.options.forEach((optText, idx) => {
         let btn = document.createElement("button");
         btn.className = "option-btn";
         btn.innerHTML = `<span>${optText}</span> <span class="status-icon"></span>`;
-        btn.onclick = () => selectOption(idx);
+        
+        // Əgər əvvəllər cavablandırılıbsa vəziyyəti göstər
+        if (hasSelected) {
+            btn.disabled = true;
+            if (idx === q.answer) {
+                btn.classList.add("correct");
+                btn.querySelector(".status-icon").innerText = "Düzgün cavab ✓";
+            }
+            if (idx === selectedIdx && selectedIdx !== q.answer) {
+                btn.classList.add("incorrect");
+                btn.querySelector(".status-icon").innerText = "Səhv cavab ✗";
+            }
+        } else {
+            btn.onclick = () => selectOption(idx);
+        }
+
         optionsContainer.appendChild(btn);
     });
 }
 
 function selectOption(selectedIndex) {
-    if (isAnswered) return;
-    isAnswered = true;
+    if (userAnswers[currentQuestionIndex] !== null) return;
 
     let q = currentQuestions[currentQuestionIndex];
     userAnswers[currentQuestionIndex] = selectedIndex;
 
     let buttons = document.querySelectorAll(".option-btn");
-    
-    // Düymələri deaktiv et
     buttons.forEach(btn => btn.disabled = true);
 
     if (selectedIndex === q.answer) {
-        // Düzgün cavab
         buttons[selectedIndex].classList.add("correct");
         buttons[selectedIndex].querySelector(".status-icon").innerText = "Düzgün cavab ✓";
     } else {
-        // Səhv cavab
         buttons[selectedIndex].classList.add("incorrect");
         buttons[selectedIndex].querySelector(".status-icon").innerText = "Səhv cavab ✗";
-        
-        // Düzgün olanı da göstər
         buttons[q.answer].classList.add("correct");
         buttons[q.answer].querySelector(".status-icon").innerText = "Düzgün cavab ✓";
     }
@@ -456,8 +475,16 @@ function calculateLiveScore() {
     });
 
     let score = (correct * 1) - (incorrect * 0.25);
+    if (score < 0) score = 0;
     document.getElementById("score-live").innerText = `Bal: ${score.toFixed(2)}`;
     return { correct, incorrect, score };
+}
+
+function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion();
+    }
 }
 
 function nextQuestion() {
@@ -489,6 +516,7 @@ function showResults() {
 
     let total = currentQuestions.length;
     let finalScore = (correct * 1) - (incorrect * 0.25);
+    if (finalScore < 0) finalScore = 0;
     let percentage = (correct / total) * 100;
 
     document.getElementById("final-score").innerText = `${finalScore.toFixed(2)} / ${total}`;
@@ -496,9 +524,9 @@ function showResults() {
     document.getElementById("stat-incorrect").innerText = incorrect;
     document.getElementById("stat-unanswered").innerText = unanswered;
     document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
+    document.getElementById("stat-total").innerText = total;
 }
 
-// Səhifə yüklənəndə testi avtomatik başlat
 window.onload = startQuiz;
 </script>
 
