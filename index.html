@@ -103,7 +103,7 @@
             line-height: 1.4;
         }
 
-        .option-btn:hover {
+        .option-btn:hover:not(:disabled) {
             border-color: var(--primary-color);
             background-color: #f8fafc;
         }
@@ -131,7 +131,7 @@
             gap: 10px;
         }
 
-        .prev-btn, .next-btn, .restart-btn {
+        .prev-btn, .next-btn, .restart-btn, .review-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -146,6 +146,14 @@
         .prev-btn { background-color: #6b7280; }
         .prev-btn:hover:not([disabled]) { background-color: #4b5563; }
         .next-btn:hover:not([disabled]), .restart-btn:hover { background-color: var(--primary-hover); }
+
+        .review-btn {
+            background-color: #8b5cf6;
+        }
+
+        .review-btn:hover {
+            background-color: #7c3aed;
+        }
 
         .prev-btn:disabled, .next-btn:disabled {
             background-color: #d1d5db;
@@ -173,11 +181,24 @@
         }
 
         .stat-card span { float: right; font-weight: 700; }
+
+        .result-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .result-buttons {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container" id="quiz-container">
+    <!-- Test Ekrani -->
     <div id="quiz-screen">
         <div class="header">
             <div class="progress-info">
@@ -198,6 +219,7 @@
         </div>
     </div>
 
+    <!-- Nəticə Ekranı -->
     <div id="result-screen" class="result-screen" style="display: none;">
         <h2 class="result-title">Test Yekunlaşdı!</h2>
         <div class="score-box" id="final-score">0.00</div>
@@ -211,7 +233,10 @@
             <div class="stat-card">Ümumi sual: <span id="stat-total">60</span></div>
         </div>
 
-        <button class="restart-btn" onclick="startQuiz()">Testi yenidən başlat</button>
+        <div class="result-buttons">
+            <button class="review-btn" onclick="reviewQuiz()">🔍 Cavablara Və Səhvlərə Bax</button>
+            <button class="restart-btn" onclick="startQuiz()">🔄 Yenidən Başla</button>
+        </div>
     </div>
 </div>
 
@@ -252,6 +277,7 @@ const rawQuestions = [
 let currentQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
+let isReviewMode = false; // Baxış rejimində olub-olmadığımızı saxlayır
 
 function shuffleArray(array) {
     let arr = [...array];
@@ -263,7 +289,9 @@ function shuffleArray(array) {
 }
 
 function startQuiz() {
+    isReviewMode = false;
     let shuffledQuestions = shuffleArray(rawQuestions);
+    // Hər imtahanda tam 60 sual seçilir
     let selectedQuestions = shuffledQuestions.slice(0, Math.min(60, shuffledQuestions.length));
 
     currentQuestions = selectedQuestions.map(qObj => {
@@ -294,7 +322,12 @@ function showQuestion() {
     let total = currentQuestions.length;
 
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
-    document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Testi Bitir ✓" : "Növbəti sual →";
+    
+    if (isReviewMode) {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Nəticələrə Qayıt 📊" : "Növbəti sual →";
+    } else {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Testi Bitir ✓" : "Növbəti sual →";
+    }
 
     document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total}`;
     
@@ -314,30 +347,44 @@ function showQuestion() {
         let btn = document.createElement("button");
         btn.className = "option-btn";
         
-        // Seçim edilibsə rəngləri tətbiq edirik
-        if (selectedIdx !== null) {
+        // Baxış rejimində cavabların dəyişdirilməsini bloklayırıq
+        if (isReviewMode) {
+            btn.disabled = true;
             if (idx === correctIdx) {
-                // Düzgün cavab HƏMİŞƏ yaşıl görünür
                 btn.classList.add("correct");
-                btn.innerHTML = `<span>${optText}</span> <span>✓</span>`;
+                btn.innerHTML = `<span>${optText}</span> <span>✓ (Düzgün Cavab)</span>`;
             } else if (idx === selectedIdx) {
-                // Əgər istifadəçinin seçdiyi cavab səhvdirsə, QIRMIZI yanır
                 btn.classList.add("wrong");
-                btn.innerHTML = `<span>${optText}</span> <span>✗</span>`;
+                btn.innerHTML = `<span>${optText}</span> <span>✗ (Sizin Cavabınız)</span>`;
             } else {
                 btn.innerHTML = `<span>${optText}</span>`;
             }
-        } else {
-            btn.innerHTML = `<span>${optText}</span>`;
+        } 
+        // Canlı test rejimi
+        else {
+            if (selectedIdx !== null) {
+                if (idx === correctIdx) {
+                    btn.classList.add("correct");
+                    btn.innerHTML = `<span>${optText}</span> <span>✓</span>`;
+                } else if (idx === selectedIdx) {
+                    btn.classList.add("wrong");
+                    btn.innerHTML = `<span>${optText}</span> <span>✗</span>`;
+                } else {
+                    btn.innerHTML = `<span>${optText}</span>`;
+                }
+            } else {
+                btn.innerHTML = `<span>${optText}</span>`;
+            }
+            btn.onclick = () => selectOption(idx);
         }
 
-        btn.onclick = () => selectOption(idx);
         optionsContainer.appendChild(btn);
     });
 }
 
 function selectOption(selectedIndex) {
-    // Əgər eyni düyməyə təkrar klikləsə seçimi sıfırlayırıq, yoxsa yenisi ilə dəyişirik
+    if (isReviewMode) return; // Baxış rejimində dəyişməyə icazə vermirəm
+
     if (userAnswers[currentQuestionIndex] === selectedIndex) {
         userAnswers[currentQuestionIndex] = null;
     } else {
@@ -384,6 +431,15 @@ function showResults() {
     document.getElementById("stat-unanswered").innerText = unanswered;
     document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
     document.getElementById("stat-total").innerText = total;
+}
+
+// Cavablara və Səhvlərə Baxmaq Funksiyası
+function reviewQuiz() {
+    isReviewMode = true;
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
 }
 
 window.onload = startQuiz;
