@@ -193,7 +193,7 @@
 <body>
 
 <div class="container" id="quiz-container">
-    <!-- Test Ekrani -->
+    <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
             <div class="progress-info">
@@ -230,7 +230,7 @@
 
         <div class="result-buttons">
             <button class="review-btn" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
-            <button class="wrong-only-btn" onclick="reviewWrongQuiz()">❌ Sırf Səhvlərə Bax</button>
+            <button class="wrong-only-btn" onclick="reviewWrongQuiz()">❌ Səhvlərə bax</button>
             <button class="restart-btn" onclick="startQuiz()">🔄 Yenidən Başla</button>
         </div>
     </div>
@@ -262,7 +262,7 @@ const rawQuestions = [
     { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
     { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
     { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
     { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
     { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
     { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
@@ -301,7 +301,7 @@ const rawQuestions = [
 ];
 
 let currentQuestions = [];
-let activeQuestionsList = []; // Baxış zamanı görünəcək aktiv suallar siyahısı
+let activeQuestionsList = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let isReviewMode = false;
@@ -462,7 +462,6 @@ function showResults() {
     document.getElementById("stat-total").innerText = total;
 }
 
-// Bütün cavablara baxış
 function reviewAllQuiz() {
     isReviewMode = true;
     activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
@@ -472,13 +471,11 @@ function reviewAllQuiz() {
     showQuestion();
 }
 
-// Sırf SƏHV cavablandırılmış suallara baxış
 function reviewWrongQuiz() {
     let wrongList = [];
 
     currentQuestions.forEach((q, idx) => {
         let ans = userAnswers[idx];
-        // Əgər cavab səhvdirsə (və cavabsız deyilsə)
         if (ans !== null && ans !== q.answer) {
             wrongList.push({ question: q, originalIndex: idx });
         }
