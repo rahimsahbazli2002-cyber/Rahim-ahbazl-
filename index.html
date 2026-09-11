@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --correct-color: #10b981;
+            --correct-bg: #d1fae5;
+            --incorrect-color: #ef4444;
+            --incorrect-bg: #fee2e2;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 750px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #4b5563;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 25px 0;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct-color) !important;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--incorrect-bg) !important;
+            border-color: var(--incorrect-color) !important;
+            color: #991b1b;
+            font-weight: 600;
+        }
+
+        .option-btn[disabled] {
+            cursor: not-allowed;
+        }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn, .restart-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .next-btn:hover, .restart-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .next-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .score-box {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .stat-card {
+            background-color: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .stat-card span {
+            float: right;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .question-text {
+                font-size: 1.05rem;
+            }
+            .option-btn {
+                padding: 12px 14px;
+                font-size: 0.95rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container">
+    <!-- Screen 1: Quiz -->
+    <div id="quiz-screen">
+        <div class="header">
+            <div class="progress-info">
+                <span id="question-number">Sual 1 / 60</span>
+                <span id="score-live">Bal: 0.00</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="question-text" class="question-text">Sual məti yüklənir...</div>
+
+        <div id="options-container" class="options-container"></div>
+
+        <div class="footer">
+            <button id="next-btn" class="next-btn" onclick="nextQuestion()" disabled>Növbəti sual</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Results -->
+    <div id="result-screen" class="result-screen" style="display: none;">
+        <h2 class="result-title">Test Yekunlaşdı!</h2>
+        <div class="score-box" id="final-score">47.75 / 60</div>
+
+        <div class="stats-grid">
+            <div class="stat-card">Düzgün cavab: <span id="stat-correct" style="color: var(--correct-color);">0</span></div>
+            <div class="stat-card">Səhv cavab: <span id="stat-incorrect" style="color: var(--incorrect-color);">0</span></div>
+            <div class="stat-card">Cavabsız sual: <span id="stat-unanswered">0</span></div>
+            <div class="stat-card">Nəticə (Faiz): <span id="stat-percent">0%</span></div>
+            <div class="stat-card">Maksimum bal: <span>60</span></div>
+            <div class="stat-card">Ümumi sual: <span>60</span></div>
+        </div>
+
+        <button class="restart-btn" onclick="startQuiz()">Testi yenidən başlat</button>
+    </div>
+</div>
+
+<script>
+// Fayldakı bütün suallar bazası
+const rawQuestions = [
+    // Təsviri fəaliyyət
+    { q: "Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
+    { q: "Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
+    { q: "Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
+    { q: "Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
+    { q: "Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
+    { q: "Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
+    { q: "Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
+    { q: "Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
+    { q: "Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 1 },
+    { q: "Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "büyük qrupda rəsmçəkmə"], answer: 3 },
+    { q: "Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi, ünsiyyət sferası", "işin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
+    { q: "Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 3 },
+    { q: "Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
+    { q: "Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
+    { q: "Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
+    { q: "Fransız dilindən tərcümədə \"nöqtə\" deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
+    { q: "Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə qabiliyyətini formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
+    { q: "Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
+
+    // Fiziki tərbiyə
+    { q: "Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
+    { q: "Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
+    { q: "Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
+    { q: "Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
+    { q: "Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?\na) İlkin tapşırıqlar (tərbiyəçi hərəkətləri dəqiq göstərməlidir);\nb) Möhkəmləndirmə;\nc) Tərbiyəçi tərəfindən hərəkətlərin qeyri-dəqiq göstərilməsi;\nd) Hərəkətin icra texnikasının təkmilləşdirilməməsi (yaradıcılıq);\ne) Hərəkətin icra texnikasının təkmilləşdirilməsi (yaradıcılıq).", options: ["a, b, c", "a, d, e", "b, d, e", "a, b, e"], answer: 3 },
+    { q: "Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nezakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
+    { q: "Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
+    { q: "Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması.", "Tərbiyəçinin məşğələ planını hazırlaması.", "Təlim prosesində metodların seçilməsi.", "Tərbiyəçinin məşğələyə \"özünü hazırlaması\"."], answer: 2 },
+    { q: "Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 },
+
+    // J. Piaje
+    { q: "Psixi inkişafın bu mərhələsində uşaqların ətraf mühitə reaksiyası reflekslərlə müəyyən edilir, yəni uşaqlar düşünmədən reaksiya verirlər.", options: ["İlkin əməliyyatlar", "Formal əməliyyatlar", "Sensor-motor", "Konkret əməliyyatlar", "Dəqiq əməliyyatlar"], answer: 2 },
+    { q: "1-2 yaşlı uşaq sorter ilə oynayır. O, yalnız sınaq-səhv üsulu ilə, uyğun yuvanı tapana qədər fiquru müxtəlif yuvalara daxil etməyə çalışaraq, xaos şəklində toplayır. Piajeyə görə idrak inkişafının uyğun mərhələsini seçin.", options: ["Sensor-motor mərhələ", "Əməliyyatöncəsi mərhələ", "Konkret əməliyyatlar mərhələsi", "Formal əməliyyatlar mərhələsi"], answer: 0 },
+    { q: "Uşaq oynayır, gözlərini əlləri ilə bağlayır, heç kimi görmür və düşünür ki, onu da heç kim görmür. Bu hansı mərhələdə baş verir?", options: ["İlkin əməliyyatlar", "Formal əməliyyatlar", "Sensor-motor", "Əməliyyatöncəsi", "Konkret əməliyyatlar"], answer: 2 },
+    { q: "J. Piaje nəzəriyyəsinə görə hansı fikirdə doğrudur?", options: ["Müəllim məlumatı hazır şəkildə verməlidir", "İnkişaf edərək uşaqlar müəyyən mərhələlərdən keçirlər", "Yeniyetməlik dövrünə qədər problemi həll etmə bacarığı keyfiyyət dəyişikliyi kimi təsvir olunur", "Əgər uşaqlar \"yəqin ki\" sualına cavab verirlərsə, bu onların ağıllı olduğunu göstərir", "Təlim düşüncənin inkişafından əvvəl gəlir"], answer: 1 },
+    { q: "J. Piaje düşüncənin inkişafında neçə mərhələ ayırır?", options: ["3", "5", "4", "2"], answer: 2 },
+
+    // Hovard Qardner
+    { q: "Hovard Qardner öz ilkin nəzəriyyəsində neçə intellekt növü ayırmışdır?", options: ["5", "7", "8", "6", "9"], answer: 1 },
+    { q: "Sadalanan intellekt növlərindən hansı uşaqların öz emosiyalarını anlamaq və ifadə etmək bacarığı ilə bağlıdır?", options: ["Qrumdaxili (Fərdlərarası)", "Məntiqi-riyazi", "Fərdidaxili (Fərdi)", "Naturalistik", "Bədən-kinestetik"], answer: 2 },
+    { q: "Hansı intellekt növü musiqi və ritmə olan sevgi ilə özünü göstərir?", options: ["Məkan-vizual", "Bədən-kinestetik", "Musiqili-ritmik", "Qrumdaxili (Fərdlərarası)", "Linqvistik"], answer: 2 },
+    { q: "First nəzəriyyədən sonra əlavə edilən intellekt növü hansıdır?", options: ["Bədən-kinestetik", "Fərdidaxili", "Naturalistik", "Linqvistik", "Qrumdaxili (Fərdlərarası)"], answer: 2 },
+    { q: "Qardner nəzəriyyəsinin əsasında hansı əsas prinsip dayanır?", options: ["Hər bir uşağın uğurunu müəyyən edən bir üstün intellekti var", "Bütün uşaqlar eyni cür inkişaf edir, sadəcə müxtəlif sürətlə", "Hər bir insan müxtəlif cür inkişaf edə bilən çoxlu intellekt növünə malikdir", "Yalnız uşağın güclü tərəflərini inkişaf etdirmək vacibdir", "İntellekti yalnız IQ testi vasitəsilə ölçmək olar"], answer: 2 },
+
+    // Lev Vıqotski
+    { q: "Hansı nəzəriyyə Vıqotskiyə aiddir?", options: ["\"Koqnitiv taksonomiya\"", "\"Zihni inkişafın mərhələləri\"", "\"Yaxın inkişaf zonası\"", "\"Çoxnövlü intellekt nəzəriyyəsi\""], answer: 2 },
+    { q: "Vıqotskiyə görə dərketmənin inkişafında əsas nədir?", options: ["Uşağın ətraf mühitlə tanışlığı", "Sosial münasibətlər", "Mental sxemlərin harmonizasiyası", "Oyun əsasında təlim"], answer: 1 },
+    { q: "Sadalananlardan hansı Lev Vıqotskinin fikrincə idrakın inkişafının əsas səbəbidir?", options: ["Sosial münasibətlər", "Mental sxemlərin razılaşdırılması", "Balans", "Uşağın istedadı"], answer: 0 },
+
+    // Nitqin inkişafı
+    { q: "Nitqin inkişafı üzrə vəzifələrə nə aid deyil?", options: ["nitqin qrammatik quruluşunun formalaşdırılması", "nitqin leksik quruluşunun formalaşdırılması", "nağıletmənin (monoloji nitqin) formalaşdırılması", "səs mədəniyyəti tərbiyəsi"], answer: 1 },
+    { q: "...... özünə eyni zamanda eşitmək və anlamaq, söhbəti davam etdirmək, suallara cavab vermək və sual vermək kimi komponentləri daxil edir.", options: ["dialoji nitq", "monoloji nitq", "bədii ədəbiyyatla tanışlıq", "nitq səs mədəniyyətinin tərbiyəsi"], answer: 0 },
+    { q: "Əyani metodlara daxildir:", options: ["müşahidə, ekskursiya, illüstrasiyalar, nümayiş", "müşahidə, söhbət, ekskursiya", "şəkillər, illüstrasiyalar, nümayiş", "müşahidə, ekskursiya, yazılı təsvirlər"], answer: 0 },
+
+    // Ətraf aləmlə tanışlıq
+    { q: "Ətraf aləmlə tanışlıq metodikasında ictimai-siyasi həyatla tanışlıq zamanı hansı prinsipə əməl olunmalıdır?", options: ["yaxından uzağa prinsipi", "mürəkkəbdən sadəyə prinsipi", "Tələb prinsipi", "Əməkdaşlıq prinsipi"], answer: 0 },
+    { q: "Ekskursiyalarda ən geniş istifadə olunan metod hansıdır?", options: ["Təhlil", "Ümumiləşdirmə", "Sintez", "Müşahidə"], answer: 3 },
+
+    // Fridrix Fröbel
+    { q: "Fridrix Fröbel kimdir?", options: ["İntellekt nəzəriyyəsini işləyib hazırlamış psixoloq", "Müasir pedaqogikanın banisi", "Uşaq bağçası konsepsiyasının yaradıcısı", "Koqnitiv inkişaf nəzəriyyəsinin müəllifi", "Uşaq psixologiyası tədqiqatçısı"], answer: 2 },
+    { q: "Fridrix Fröbel hansı termini dövriyyəyə daxil etmişdir?", options: ["İbtidai məktəb", "Məktəbəqədər təhsil", "Uşaq bağçası", "Oyun fəaliyyəti", "İnkişafetdirici təlim"], answer: 2 },
+
+    // Montessori və Redjo Emilio
+    { q: "Redjo Emilio metodikasında müəllim hansı rolu oynayır?", options: ["Tapşırıqları diktə edən avtoritar təlimatçı", "Uşaqla təkbətək işləyən fərdi mentor", "Uşağın hər addımına nəzarət edən sərt rəhbər", "Uşağın tədqiqat prosesini müşahidə və müşayiət edən"], answer: 3 },
+    { q: "Montessori metodikasının əsasında hansı əsas prinsiplər dayanır?", options: ["Standart tapşırıqlar və eynitipli tədris materialları", "Proqrama sərt əməl olunması və məcburi qiymətləndirmə", "İntizam və uşaqların davranışına sərt nəzarət", "Seçim azadlığı, müstəqillik və fərdilik"], answer: 3 },
+
+    // Savad təliminə hazırlıq
+    { q: "Savad təliminə hazırlıq dedikdə nə nəzərdə tutulmur?", options: ["Uşağa oxu və yazının öyrədilməsi", "Fonematik eşitmənin inkişafı", "Cümlə qurmaq, onu sözlərə bölmək bacarığının inkişafı", "Nitelik səslərini düzgün tələffüz etmək bacarığının inkişafı"], answer: 0 },
+    { q: "Oxunun öyrədilməsi zamanı ilk işin məhz səs təhlili üzərində aparılması ideyasını kim ileri sürmüşdür?", options: ["Uşinski", "Elkonin", "Komenski", "Suxomlinski"], answer: 0 },
+
+    // Əlavə Riyaziyyat & Bədii təfəkkür
+    { q: "M. Montessori didaktik materialı nəyin inkişafına yönəlib?", options: ["uşaqların idrak fəallığının və əqli qabiliyyətlərinin", "sensor qabiliyyətlərin", "rabitəli nitqin", "konstruktiv qabiliyyətlərin", "oyun fəaliyyətinin"], answer: 2 },
+    { q: "Matryoşkaları boy sırasına görə düzərkən uşaq hansı məntiqi üsulu reallaşdırır?", options: ["Sintez", "Analiz", "Ümumiləşdirmə", "Seriasiya (ardıcıllıqla düzmə)"], answer: 2 },
+    { q: "Bədii təfəkkürün inkişafı zamanı uşaqlarda yaddaşı möhkəmləndirməyə hansı metod kömək edir?", options: ["əzbər öyrənmə", "yenidən danışma", "ifadəli oxu", "hekayələrin yenidən danışılması"], answer: 0 }
+];
+
+// Qaydalar və dəyişənlər
+let currentQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = []; // user answer history
+let isAnswered = false;
+
+// Təsadüfi qarışdırma funksiyası (Fisher-Yates)
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// Testi başla
+function startQuiz() {
+    // Toplam sual sayından təsadüfi 60 sual seçək (faylda sual azdırsa, olanların hamısını təsadüfi ardıcıllıqla götürür)
+    let shuffledQuestions = shuffleArray(rawQuestions);
+    
+    // Əgər bazadakı sual sayı 60-dan çoxdursa 60-nı götür; azdırsa, mövcud olanları götür.
+    let selectedQuestions = shuffledQuestions.slice(0, Math.min(60, shuffledQuestions.length));
+
+    // Sualların cavab variantlarını da təsadüfi qarışdıraq, lakin düzgün cavabı saxlayaq
+    currentQuestions = selectedQuestions.map(qObj => {
+        let optionsWithFlag = qObj.options.map((opt, idx) => ({
+            text: opt,
+            isCorrect: idx === qObj.answer
+        }));
+        optionsWithFlag = shuffleArray(optionsWithFlag);
+        
+        let newAnswerIndex = optionsWithFlag.findIndex(o => o.isCorrect);
+        return {
+            q: qObj.q,
+            options: optionsWithFlag.map(o => o.text),
+            answer: newAnswerIndex
+        };
+    });
+
+    currentQuestionIndex = 0;
+    userAnswers = new Array(currentQuestions.length).fill(null);
+    
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    
+    showQuestion();
+}
+
+function showQuestion() {
+    isAnswered = false;
+    let q = currentQuestions[currentQuestionIndex];
+    let total = currentQuestions.length;
+
+    // Yuxarı hissə güncəlləmələri
+    document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total}`;
+    document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+    document.getElementById("next-btn").disabled = true;
+
+    // Balın canlı göstərilməsi
+    calculateLiveScore();
+
+    // Sual mətni
+    document.getElementById("question-text").innerText = q.q;
+
+    // Variantlar
+    let optionsContainer = document.getElementById("options-container");
+    optionsContainer.innerHTML = "";
+
+    q.options.forEach((optText, idx) => {
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span>${optText}</span> <span class="status-icon"></span>`;
+        btn.onclick = () => selectOption(idx);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+function selectOption(selectedIndex) {
+    if (isAnswered) return;
+    isAnswered = true;
+
+    let q = currentQuestions[currentQuestionIndex];
+    userAnswers[currentQuestionIndex] = selectedIndex;
+
+    let buttons = document.querySelectorAll(".option-btn");
+    
+    // Düymələri deaktiv et
+    buttons.forEach(btn => btn.disabled = true);
+
+    if (selectedIndex === q.answer) {
+        // Düzgün cavab
+        buttons[selectedIndex].classList.add("correct");
+        buttons[selectedIndex].querySelector(".status-icon").innerText = "Düzgün cavab ✓";
+    } else {
+        // Səhv cavab
+        buttons[selectedIndex].classList.add("incorrect");
+        buttons[selectedIndex].querySelector(".status-icon").innerText = "Səhv cavab ✗";
+        
+        // Düzgün olanı da göstər
+        buttons[q.answer].classList.add("correct");
+        buttons[q.answer].querySelector(".status-icon").innerText = "Düzgün cavab ✓";
+    }
+
+    calculateLiveScore();
+    document.getElementById("next-btn").disabled = false;
+}
+
+function calculateLiveScore() {
+    let correct = 0;
+    let incorrect = 0;
+
+    userAnswers.forEach((ans, idx) => {
+        if (ans !== null) {
+            if (ans === currentQuestions[idx].answer) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        }
+    });
+
+    let score = (correct * 1) - (incorrect * 0.25);
+    document.getElementById("score-live").innerText = `Bal: ${score.toFixed(2)}`;
+    return { correct, incorrect, score };
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < currentQuestions.length - 1) {
+        currentQuestionIndex++;
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+
+    let correct = 0;
+    let incorrect = 0;
+    let unanswered = 0;
+
+    userAnswers.forEach((ans, idx) => {
+        if (ans === null) {
+            unanswered++;
+        } else if (ans === currentQuestions[idx].answer) {
+            correct++;
+        } else {
+            incorrect++;
+        }
+    });
+
+    let total = currentQuestions.length;
+    let finalScore = (correct * 1) - (incorrect * 0.25);
+    let percentage = (correct / total) * 100;
+
+    document.getElementById("final-score").innerText = `${finalScore.toFixed(2)} / ${total}`;
+    document.getElementById("stat-correct").innerText = correct;
+    document.getElementById("stat-incorrect").innerText = incorrect;
+    document.getElementById("stat-unanswered").innerText = unanswered;
+    document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
+}
+
+// Səhifə yüklənəndə testi avtomatik başlat
+window.onload = startQuiz;
+</script>
+
+</body>
+</html>
