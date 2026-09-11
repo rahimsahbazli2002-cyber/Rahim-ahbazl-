@@ -129,13 +129,13 @@
             gap: 10px;
         }
 
-        .prev-btn, .next-btn, .restart-btn, .review-btn {
+        .prev-btn, .next-btn, .restart-btn, .review-btn, .wrong-only-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 1rem;
+            padding: 12px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s ease;
@@ -147,6 +147,9 @@
 
         .review-btn { background-color: #8b5cf6; }
         .review-btn:hover { background-color: #7c3aed; }
+
+        .wrong-only-btn { background-color: #ef4444; }
+        .wrong-only-btn:hover { background-color: #dc2626; }
 
         .prev-btn:disabled, .next-btn:disabled {
             background-color: #d1d5db;
@@ -177,8 +180,9 @@
 
         .result-buttons {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         @media (max-width: 600px) {
@@ -225,7 +229,8 @@
         </div>
 
         <div class="result-buttons">
-            <button class="review-btn" onclick="reviewQuiz()">🔍 Cavablara Və Səhvlərə Bax</button>
+            <button class="review-btn" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
+            <button class="wrong-only-btn" onclick="reviewWrongQuiz()">❌ Sırf Səhvlərə Bax</button>
             <button class="restart-btn" onclick="startQuiz()">🔄 Yenidən Başla</button>
         </div>
     </div>
@@ -257,7 +262,7 @@ const rawQuestions = [
     { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
     { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
     { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
     { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
     { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
     { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
@@ -277,7 +282,7 @@ const rawQuestions = [
     { q: "42. Fiziki tərbiyə məşğələsində yekun hissənin əsas məqsədi nədir?", options: ["Tənəffüsü və nəbzi bərpa etmək, orqanizmi sakitləşdirmək", "Yüksək sürətlə qaçmaq", "Yeni çətin hərəkətlər öyrətmək", "Qrupdan ayrılmaq"], answer: 0 },
     { q: "43. Məktəbəqədər yaşlı uşaqların fiziki inkişafında hansı keyfiyyətlər tərbiyə olunur?", options: ["Sürət, çeviklik, güc, dözümlülük, müvazinət", "Yalnız oxumaq bacarığı", "Yalnız rəsm texnikası", "Məntiqi mühakimə"], answer: 0 },
     { q: "44. Konstruksiyaetmə məşğələlərində hansı materiallardan istifadə olunur?", options: ["Tikinti materialları, Leqo, kağız, təbii materiallar", "Yalnız sulu boya", "Yalnız karandaş", "Səs yazıları"], answer: 0 },
-    { q: "45. Məktəbəhazırlıq qrupunda təsviri fəaliyyət məşğələsinin müddəti adətən nə qədər olur?", options: ["25-30 dəqiqə", "10 dəqiqə", "60 dəqiqə", "45 dəqiqə"], answer: 0 },
+    { q: "45. Məktəbəhazırlıq qrupunda təsviri fəaliyyət məşğələsinin müddəti adətən nə qədər olmalıdır?", options: ["25-30 dəqiqə", "10 dəqiqə", "60 dəqiqə", "45 dəqiqə"], answer: 0 },
     { q: "46. Uşaqların fiziki tərbiyəsində hərəkətli oyunların rolu nədir?", options: ["Hərəkət vərdişlərini möhkəmləndirir və emosional fon yaradır", "Yalnız intizamı pozur", "Vaxtı boşa verir", "Dərsi çətinləşdirir"], answer: 0 },
     { q: "47. Təsviri fəaliyyətdə 'Relyefli lepka' ne deməkdir?", options: ["Müstəvi (lövhə) üzərində qabarıq təsvirin yaradılması", "Kağızı cırmaq", "Masa üzərində su tökmək", "Rəngləri qarışdırmaq"], answer: 0 },
     { q: "48. Aşağıdakılardan hansı qeyri-ənənəvi rəsm texnikası DEYİL?", options: ["Adi karandaşla xətt çəkmək", "Barmaq boyakarlığı", "Klyaksoqrafiya", "Puantilizm"], answer: 0 },
@@ -296,6 +301,7 @@ const rawQuestions = [
 ];
 
 let currentQuestions = [];
+let activeQuestionsList = []; // Baxış zamanı görünəcək aktiv suallar siyahısı
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let isReviewMode = false;
@@ -312,8 +318,6 @@ function shuffleArray(array) {
 function startQuiz() {
     isReviewMode = false;
     let shuffledQuestions = shuffleArray(rawQuestions);
-    
-    // Tam 60 sual götürülür
     let selectedQuestions = shuffledQuestions.slice(0, 60);
 
     currentQuestions = selectedQuestions.map(qObj => {
@@ -330,6 +334,7 @@ function startQuiz() {
         };
     });
 
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
     currentQuestionIndex = 0;
     userAnswers = new Array(currentQuestions.length).fill(null);
     
@@ -340,8 +345,10 @@ function startQuiz() {
 }
 
 function showQuestion() {
-    let q = currentQuestions[currentQuestionIndex];
-    let total = currentQuestions.length;
+    let item = activeQuestionsList[currentQuestionIndex];
+    let q = item.question;
+    let originalIdx = item.originalIndex;
+    let total = activeQuestionsList.length;
 
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
     
@@ -351,10 +358,10 @@ function showQuestion() {
         document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Testi Bitir ✓" : "Növbəti sual →";
     }
 
-    document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total}`;
+    document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total} (Əsl №: ${originalIdx + 1})`;
     
     let answeredCount = userAnswers.filter(a => a !== null).length;
-    document.getElementById("answered-count").innerText = `Cavablandırıldı: ${answeredCount}/${total}`;
+    document.getElementById("answered-count").innerText = `Cavablandırıldı: ${answeredCount}/${currentQuestions.length}`;
     document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
 
     document.getElementById("question-text").innerText = q.q;
@@ -362,7 +369,7 @@ function showQuestion() {
     let optionsContainer = document.getElementById("options-container");
     optionsContainer.innerHTML = "";
 
-    let selectedIdx = userAnswers[currentQuestionIndex];
+    let selectedIdx = userAnswers[originalIdx];
     let correctIdx = q.answer;
 
     q.options.forEach((optText, idx) => {
@@ -405,10 +412,12 @@ function showQuestion() {
 function selectOption(selectedIndex) {
     if (isReviewMode) return;
 
-    if (userAnswers[currentQuestionIndex] === selectedIndex) {
-        userAnswers[currentQuestionIndex] = null;
+    let originalIdx = activeQuestionsList[currentQuestionIndex].originalIndex;
+
+    if (userAnswers[originalIdx] === selectedIndex) {
+        userAnswers[originalIdx] = null;
     } else {
-        userAnswers[currentQuestionIndex] = selectedIndex;
+        userAnswers[originalIdx] = selectedIndex;
     }
     showQuestion();
 }
@@ -421,7 +430,7 @@ function prevQuestion() {
 }
 
 function nextQuestion() {
-    if (currentQuestionIndex < currentQuestions.length - 1) {
+    if (currentQuestionIndex < activeQuestionsList.length - 1) {
         currentQuestionIndex++;
         showQuestion();
     } else {
@@ -453,8 +462,35 @@ function showResults() {
     document.getElementById("stat-total").innerText = total;
 }
 
-function reviewQuiz() {
+// Bütün cavablara baxış
+function reviewAllQuiz() {
     isReviewMode = true;
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
+}
+
+// Sırf SƏHV cavablandırılmış suallara baxış
+function reviewWrongQuiz() {
+    let wrongList = [];
+
+    currentQuestions.forEach((q, idx) => {
+        let ans = userAnswers[idx];
+        // Əgər cavab səhvdirsə (və cavabsız deyilsə)
+        if (ans !== null && ans !== q.answer) {
+            wrongList.push({ question: q, originalIndex: idx });
+        }
+    });
+
+    if (wrongList.length === 0) {
+        alert("Təbrik edirik! Sizin heç bir səhv cavabınız yoxdur. 🎉");
+        return;
+    }
+
+    isReviewMode = true;
+    activeQuestionsList = wrongList;
     currentQuestionIndex = 0;
     document.getElementById("result-screen").style.display = "none";
     document.getElementById("quiz-screen").style.display = "block";
