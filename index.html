@@ -189,7 +189,7 @@
             animation: shake 0.4s ease;
         }
 
-        /* Soldan gələn ƏSƏBİ BALACA QIZ (GIF) Paneli */
+        /* Soldan gələn ƏSƏBİ BALACA QIZ Paneli */
         .angry-man-overlay {
             position: fixed;
             bottom: 0;
@@ -209,7 +209,7 @@
             transform: translateX(0);
         }
 
-        .angry-person-gif {
+        .angry-person-img {
             width: 200px;
             height: auto;
             max-height: 280px;
@@ -385,9 +385,9 @@
 </head>
 <body>
 
-<!-- Ekranın sol tərəfindən sürüşüb çıxacaq ƏSƏBİ BALACA QIZ (GIF) -->
+<!-- Ekranın sol tərəfindən sürüşüb çıxacaq ƏSƏBİ BALACA QIZ ŞƏKLİ -->
 <div id="angry-man-overlay" class="angry-man-overlay">
-    <img id="angry-gif" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1NHNmcWRiaXUxeGJtZnJtb2t3dDk3OWxmeHN3am4ycHAyYTVhdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l1J3p8k35U3rQc8M0/giphy.gif" alt="Əsəbi Qız" class="angry-person-gif">
+    <img id="angry-img" src="" alt="Əsəbi Qız" class="angry-person-img">
     <div class="angry-speech-bubble" id="angry-text">
         Off! Yenə səhv etdin?! Bir az diqqətli ol da! 😡
     </div>
@@ -496,8 +496,8 @@ function playSound(type) {
     }
 }
 
-// Birbaşa Giphy CDN keçidi
-const angryGirlGif = "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1NHNmcWRiaXUxeGJtZnJtb2t3dDk3OWxmeHN3am4ycHAyYTVhdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l1J3p8k35U3rQc8M0/giphy.gif";
+// Birbaşa kodun daxilinə qoyulmuş əsəbi qız şəkli (Base64)
+const angryGirlImageBase64 = "https://i.ibb.co/hR4y5Gz/angry-girl.jpg"; 
 
 // Əsəbi balaca qızın cümlələri
 const angryRemarks = [
@@ -626,11 +626,11 @@ function hideAngryMan() {
 function showAngryMan() {
     const overlay = document.getElementById("angry-man-overlay");
     const angryText = document.getElementById("angry-text");
-    const angryGif = document.getElementById("angry-gif");
+    const angryImg = document.getElementById("angry-img");
     
     const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
     
-    angryGif.src = angryGirlGif;
+    angryImg.src = angryGirlImageBase64;
     angryText.innerText = randomRemark;
     
     overlay.classList.add("show");
