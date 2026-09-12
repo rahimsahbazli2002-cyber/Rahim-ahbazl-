@@ -189,8 +189,8 @@
             animation: shake 0.4s ease;
         }
 
-        /* Soldan gələn ƏSƏBİ EMOJİ Paneli */
-        .angry-overlay {
+        /* Soldan gələn EMOJİ Paneli (Düz/Səhv üçün ortaq) */
+        .feedback-overlay {
             position: fixed;
             bottom: 30px;
             left: 20px;
@@ -203,29 +203,45 @@
             pointer-events: none;
         }
 
-        .angry-overlay.show {
+        .feedback-overlay.show {
             transform: translateX(0);
         }
 
-        .angry-emoji {
+        .feedback-emoji {
             font-size: 5rem;
             line-height: 1;
             filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+        }
+
+        .feedback-emoji.angry {
             animation: shake 0.4s ease infinite alternate;
         }
 
-        /* Əsəbi emojinin danışıq balonu */
-        .angry-speech-bubble {
-            background: #ff4b4b;
+        .feedback-emoji.happy {
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        /* Danışıq balonu */
+        .speech-bubble {
             color: white;
             font-size: 1.05rem;
             font-weight: 900;
             padding: 16px 20px;
             border-radius: 20px;
             border-bottom-left-radius: 2px;
-            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             max-width: 260px;
             position: relative;
+        }
+
+        .speech-bubble.angry {
+            background: #ff4b4b;
+            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .speech-bubble.happy {
+            background: #58cc02;
+            box-shadow: 0 6px 0 #46a302, 0 10px 20px rgba(0,0,0,0.15);
         }
 
         /* Alt Düymələr */
@@ -355,7 +371,7 @@
 
         @keyframes bounce {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
+            50% { transform: scale(1.08); }
         }
 
         @keyframes shake {
@@ -377,11 +393,11 @@
 </head>
 <body>
 
-<!-- Ekranın sol tərəfindən sürüşüb çıxacaq SƏDƏCƏ ƏSƏBİ EMOJİ -->
-<div id="angry-overlay" class="angry-overlay">
-    <div class="angry-emoji">😡</div>
-    <div class="angry-speech-bubble" id="angry-text">
-        Off! Yenə səhv etdin?! Bir az diqqətli ol da!
+<!-- Ekranın sol tərəfindən sürüşüb çıxan EMOJİ PANELSİ (Həm düz, həm səhv üçün) -->
+<div id="feedback-overlay" class="feedback-overlay">
+    <div id="feedback-emoji" class="feedback-emoji">😊</div>
+    <div id="feedback-text" class="speech-bubble happy">
+        Əla! Tamamilə doğru cavab!
     </div>
 </div>
 
@@ -488,13 +504,22 @@ function playSound(type) {
     }
 }
 
-// Əsəbi emojinin sözləri
+// Səhv cavab üçün əsəbi emojinin replikaları
 const angryRemarks = [
     "Off! Yenə səhv etdin?! Bir az diqqətli ol da!",
     "Eyy! Sualı düzgün oxu, hirslənirəm haa!",
     "Bunu məktəbli də bilərdi! Necə səhv etdin ki?!",
     "Aaa! Səhv cavab! İndi nə edəcəyik?!",
     "Bax yenə tələsdin! Bir də yaxşı-yaxşı oxu!"
+];
+
+// Düzgün cavab üçün sevincli emojinin replikaları
+const happyRemarks = [
+    "Əla! Halaldır sənə, tamamilə düz tapdın! 🎉",
+    "Möhtəşəmsən! Belə də davam et! ⭐",
+    "Afərin! Səndən əsl müəllim olar! 👏",
+    "Bəli! Bax elə cavab belə olar! 🚀",
+    "Super! Sualı bir anlıq darmadağın etdin! 🔥"
 ];
 
 const rawQuestions = [
@@ -607,17 +632,27 @@ function startQuiz() {
     showQuestion();
 }
 
-function hideAngryOverlay() {
-    const overlay = document.getElementById("angry-overlay");
+function hideFeedbackOverlay() {
+    const overlay = document.getElementById("feedback-overlay");
     overlay.classList.remove("show");
 }
 
-function showAngryOverlay() {
-    const overlay = document.getElementById("angry-overlay");
-    const angryText = document.getElementById("angry-text");
+function showFeedbackOverlay(type) {
+    const overlay = document.getElementById("feedback-overlay");
+    const emojiEl = document.getElementById("feedback-emoji");
+    const textEl = document.getElementById("feedback-text");
     
-    const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
-    angryText.innerText = randomRemark;
+    if (type === 'happy') {
+        emojiEl.innerText = "😊";
+        emojiEl.className = "feedback-emoji happy";
+        textEl.className = "speech-bubble happy";
+        textEl.innerText = happyRemarks[Math.floor(Math.random() * happyRemarks.length)];
+    } else {
+        emojiEl.innerText = "😡";
+        emojiEl.className = "feedback-emoji angry";
+        textEl.className = "speech-bubble angry";
+        textEl.innerText = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+    }
     
     overlay.classList.add("show");
 }
@@ -628,7 +663,7 @@ function showQuestion() {
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
-    hideAngryOverlay();
+    hideFeedbackOverlay();
 
     const qBox = document.getElementById("question-box");
     qBox.style.animation = 'none';
@@ -694,8 +729,12 @@ function showQuestion() {
         optionsContainer.appendChild(btn);
     });
 
-    if (selectedIdx !== null && selectedIdx !== correctIdx && !isReviewMode) {
-        showAngryOverlay();
+    if (selectedIdx !== null && !isReviewMode) {
+        if (selectedIdx === correctIdx) {
+            showFeedbackOverlay('happy');
+        } else {
+            showFeedbackOverlay('angry');
+        }
     }
 }
 
@@ -708,15 +747,15 @@ function selectOption(selectedIndex) {
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
         playSound('click');
-        hideAngryOverlay();
+        hideFeedbackOverlay();
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
             playSound('correct');
-            hideAngryOverlay();
+            showFeedbackOverlay('happy');
         } else {
             playSound('wrong');
-            showAngryOverlay();
+            showFeedbackOverlay('angry');
         }
     }
     showQuestion();
@@ -742,7 +781,7 @@ function nextQuestion() {
 
 function showResults() {
     playSound('win');
-    hideAngryOverlay();
+    hideFeedbackOverlay();
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
 
