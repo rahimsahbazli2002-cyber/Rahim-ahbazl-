@@ -257,7 +257,7 @@ const rawQuestions = [
     { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
     { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
     { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və gösterilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
     { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
     { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
     { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
@@ -311,16 +311,14 @@ function shuffleArray(array) {
 
 function startQuiz() {
     isReviewMode = false;
-    let shuffledQuestions = shuffleArray(rawQuestions);
     
-    // Tam 60 sual götürülür
-    let selectedQuestions = shuffledQuestions.slice(0, 60);
-
-    currentQuestions = selectedQuestions.map(qObj => {
+    // Suallar ardıcıl saxlanılır
+    currentQuestions = rawQuestions.map(qObj => {
         let optionsWithFlag = qObj.options.map((opt, idx) => ({
             text: opt,
             isCorrect: idx === qObj.answer
         }));
+        // Yalnız cavab variantları qarışdırılır
         optionsWithFlag = shuffleArray(optionsWithFlag);
         
         return {
