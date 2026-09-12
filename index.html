@@ -39,6 +39,7 @@
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            position: relative;
         }
 
         .container {
@@ -50,7 +51,7 @@
             padding: 32px;
             position: relative;
             box-shadow: 0 8px 0 var(--duo-gray);
-            transition: transform 0.2s ease;
+            z-index: 1;
         }
 
         /* Yuxarı Panel */
@@ -188,29 +189,48 @@
             animation: shake 0.4s ease;
         }
 
-        /* Əsəbi Adam Paneli */
-        .angry-critic-box {
-            display: none;
-            background-color: #fff2f2;
-            border: 2px solid var(--duo-red);
-            border-radius: 16px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            align-items: center;
+        /* Soldan gələn Real Əsəbi Adam Paneli */
+        .angry-man-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: flex-end;
             gap: 15px;
-            animation: shake 0.4s ease;
+            z-index: 999;
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            padding-bottom: 10px;
+            padding-left: 20px;
         }
 
-        .angry-avatar {
-            font-size: 2.5rem;
-            animation: angryPulse 0.5s infinite alternate;
+        .angry-man-overlay.show {
+            transform: translateX(0);
         }
 
-        .angry-speech {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--duo-red-shadow);
-            line-height: 1.3;
+        .angry-person-img {
+            width: 220px;
+            height: auto;
+            max-height: 350px;
+            object-fit: contain;
+            filter: drop-shadow(4px 4px 15px rgba(0,0,0,0.3));
+        }
+
+        /* Əsəbi adamın danışıq balonu */
+        .angry-speech-bubble {
+            background: #ff4b4b;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 900;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.2);
+            max-width: 280px;
+            position: relative;
+            margin-bottom: 100px;
+            animation: shake 0.5s ease;
         }
 
         /* Alt Düymələr */
@@ -327,7 +347,7 @@
             flex-wrap: wrap;
         }
 
-        /* Animasiya Keyframe-ləri */
+        /* Animasiyalar */
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(30px); }
             to { opacity: 1; transform: translateX(0); }
@@ -349,11 +369,6 @@
             40%, 80% { transform: translateX(8px); }
         }
 
-        @keyframes angryPulse {
-            from { transform: scale(1) rotate(-5deg); }
-            to { transform: scale(1.15) rotate(5deg); }
-        }
-
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-12px); }
@@ -366,6 +381,14 @@
     </style>
 </head>
 <body>
+
+<!-- Ekranın sol tərəfindən sürüşüb çıxacaq REAL ƏSƏBİ ADAM -->
+<div id="angry-man-overlay" class="angry-man-overlay">
+    <img src="https://images.unsplash.com/photo-1541577141970-eebc83ebe30e?q=80&w=600&auto=format&fit=crop" alt="Əsəbi Adam" class="angry-person-img">
+    <div class="angry-speech-bubble" id="angry-text">
+        Bu nə cavabdır?! Bir az diqqətli ol! 😡
+    </div>
+</div>
 
 <div class="container">
     <!-- Test Ekranı -->
@@ -382,12 +405,6 @@
             <div class="question-title" id="question-number">SUAL 1 / 60</div>
             <div id="question-text" class="question-text">Sual yüklənir...</div>
             <div id="options-container" class="options-container"></div>
-        </div>
-
-        <!-- Əsəbi Tənqidçi Bölməsi -->
-        <div id="angry-critic" class="angry-critic-box">
-            <div class="angry-avatar">🤬</div>
-            <div class="angry-speech" id="angry-text">Bu nə cavabdır?! Bir az diqqətli ol!</div>
         </div>
 
         <div class="footer">
@@ -477,12 +494,12 @@ function playSound(type) {
 }
 
 const angryRemarks = [
-    "Bu nə cavabdır?! Sualı tam oxudun heç?! 😡",
-    "Ciddi ola bilməzsən! Bu sualın cavabı bu deyildi! 🤦‍♂️",
-    "Ay müəllim, bir az diqqətli ol! Belə də səhv olar?! 😤",
-    "Gözüyumulu seçirsən variantları?! Yenidən fikir ver! 😠",
-    "Gedib proqramı bir də oxumalısan, bu nə bərbad seçimdir! 💣",
-    "Xeyr! Səhvdir! Kitabı aç, bir də oxu! ❌"
+    "Bu nə cavabdır?! Sualı tam oxudun ki?! 😡",
+    "Ciddi ola bilməzsən! Cavab bu deyildi! 🤦‍♂️",
+    "Bir az diqqətli ol! Belə də səhv olar?! 😤",
+    "Gözüyumulu seçirsən variantları?! 😠",
+    "Gedib proqramı bir də oxymalısan! 💣",
+    "Xeyr! Tamamilə səhvdir! Bir də düşün! ❌"
 ];
 
 const rawQuestions = [
@@ -595,16 +612,31 @@ function startQuiz() {
     showQuestion();
 }
 
+function hideAngryMan() {
+    const overlay = document.getElementById("angry-man-overlay");
+    overlay.classList.remove("show");
+}
+
+function showAngryMan() {
+    const overlay = document.getElementById("angry-man-overlay");
+    const angryText = document.getElementById("angry-text");
+    
+    // Təsadüfi sərt tənqid seç
+    const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+    angryText.innerText = randomRemark;
+    
+    // Soldan sağa ekrana çıxır
+    overlay.classList.add("show");
+}
+
 function showQuestion() {
     let item = activeQuestionsList[currentQuestionIndex];
     let q = item.question;
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
-    // Əsəbi adam pəncərəsini gizlət
-    document.getElementById("angry-critic").style.display = "none";
+    hideAngryMan();
 
-    // Sual animasiyasını sıfırla
     const qBox = document.getElementById("question-box");
     qBox.style.animation = 'none';
     qBox.offsetHeight; 
@@ -669,21 +701,9 @@ function showQuestion() {
         optionsContainer.appendChild(btn);
     });
 
-    // Əgər artıq səhv cavab seçilibsə, əsəbi adamı saxla
     if (selectedIdx !== null && selectedIdx !== correctIdx && !isReviewMode) {
-        showAngryCritic();
+        showAngryMan();
     }
-}
-
-function showAngryCritic() {
-    const criticBox = document.getElementById("angry-critic");
-    const criticText = document.getElementById("angry-text");
-    
-    // Təsadüfi əsəbi söz seç
-    const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
-    criticText.innerText = randomRemark;
-    
-    criticBox.style.display = "flex";
 }
 
 function selectOption(selectedIndex) {
@@ -695,15 +715,15 @@ function selectOption(selectedIndex) {
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
         playSound('click');
-        document.getElementById("angry-critic").style.display = "none";
+        hideAngryMan();
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
             playSound('correct');
-            document.getElementById("angry-critic").style.display = "none";
+            hideAngryMan();
         } else {
             playSound('wrong');
-            showAngryCritic();
+            showAngryMan();
         }
     }
     showQuestion();
@@ -729,6 +749,7 @@ function nextQuestion() {
 
 function showResults() {
     playSound('win');
+    hideAngryMan();
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
 
