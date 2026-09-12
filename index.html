@@ -189,38 +189,32 @@
             animation: shake 0.4s ease;
         }
 
-        /* Soldan gələn ƏSƏBİ BALACA QIZ Paneli */
-        .angry-girl-overlay {
+        /* Soldan gələn ƏSƏBİ EMOJİ Paneli */
+        .angry-overlay {
             position: fixed;
-            bottom: 0;
-            left: 0;
+            bottom: 30px;
+            left: 20px;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             gap: 15px;
             z-index: 999;
-            transform: translateX(-100%);
+            transform: translateX(-150%);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
-            padding-bottom: 10px;
-            padding-left: 20px;
         }
 
-        .angry-girl-overlay.show {
+        .angry-overlay.show {
             transform: translateX(0);
         }
 
-        .angry-girl-img {
-            width: 200px;
-            height: auto;
-            max-height: 280px;
-            border-radius: 20px;
-            border: 4px solid var(--duo-red);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            background-color: #fff;
-            object-fit: cover;
+        .angry-emoji {
+            font-size: 5rem;
+            line-height: 1;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+            animation: shake 0.4s ease infinite alternate;
         }
 
-        /* Əsəbi qızın danışıq balonu */
+        /* Əsəbi emojinin danışıq balonu */
         .angry-speech-bubble {
             background: #ff4b4b;
             color: white;
@@ -229,11 +223,9 @@
             padding: 16px 20px;
             border-radius: 20px;
             border-bottom-left-radius: 2px;
-            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.15);
             max-width: 260px;
             position: relative;
-            margin-bottom: 80px;
-            animation: shake 0.5s ease;
         }
 
         /* Alt Düymələr */
@@ -368,8 +360,8 @@
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
         }
 
         @keyframes float {
@@ -385,11 +377,11 @@
 </head>
 <body>
 
-<!-- Ekranın sol tərəfindən sürüşüb çıxacaq ƏSƏBİ BALACA QIZ ŞƏKLİ -->
-<div id="angry-girl-overlay" class="angry-girl-overlay">
-    <img id="angry-img" src="" alt="Əsəbi Qız" class="angry-girl-img">
+<!-- Ekranın sol tərəfindən sürüşüb çıxacaq SƏDƏCƏ ƏSƏBİ EMOJİ -->
+<div id="angry-overlay" class="angry-overlay">
+    <div class="angry-emoji">😡</div>
     <div class="angry-speech-bubble" id="angry-text">
-        Off! Yenə səhv etdin?! Bir az diqqətli ol da! 😡
+        Off! Yenə səhv etdin?! Bir az diqqətli ol da!
     </div>
 </div>
 
@@ -496,16 +488,13 @@ function playSound(type) {
     }
 }
 
-// Şəklinizi zəmanətlə açılacaq CDN linkinə çevirib qoydum
-const angryGirlImageBase64 = "https://i.postimg.cc/mDkxD3B3/images.jpg"; 
-
-// Əsəbi balaca qızın cümlələri
+// Əsəbi emojinin sözləri
 const angryRemarks = [
-    "Off! Yenə səhv etdin?! Bir az diqqətli ol da! 😤",
-    "Eyy! Sualı düzgün oxu, küsəcəyəm haa! 😡",
-    "Bunu mən də bilirdim! Necə səhv etdin ki?! 👧💣",
-    "Aaa! Səhv cavab! İndi mən nə deyim sənə?! 🤦‍♀️",
-    "Bax yenə tələsdin! Bir də yaxşı-yaxşı oxu! ❌"
+    "Off! Yenə səhv etdin?! Bir az diqqətli ol da!",
+    "Eyy! Sualı düzgün oxu, hirslənirəm haa!",
+    "Bunu məktəbli də bilərdi! Necə səhv etdin ki?!",
+    "Aaa! Səhv cavab! İndi nə edəcəyik?!",
+    "Bax yenə tələsdin! Bir də yaxşı-yaxşı oxu!"
 ];
 
 const rawQuestions = [
@@ -618,19 +607,16 @@ function startQuiz() {
     showQuestion();
 }
 
-function hideAngryGirl() {
-    const overlay = document.getElementById("angry-girl-overlay");
+function hideAngryOverlay() {
+    const overlay = document.getElementById("angry-overlay");
     overlay.classList.remove("show");
 }
 
-function showAngryGirl() {
-    const overlay = document.getElementById("angry-girl-overlay");
+function showAngryOverlay() {
+    const overlay = document.getElementById("angry-overlay");
     const angryText = document.getElementById("angry-text");
-    const angryImg = document.getElementById("angry-img");
     
     const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
-    
-    angryImg.src = angryGirlImageBase64;
     angryText.innerText = randomRemark;
     
     overlay.classList.add("show");
@@ -642,7 +628,7 @@ function showQuestion() {
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
-    hideAngryGirl();
+    hideAngryOverlay();
 
     const qBox = document.getElementById("question-box");
     qBox.style.animation = 'none';
@@ -709,7 +695,7 @@ function showQuestion() {
     });
 
     if (selectedIdx !== null && selectedIdx !== correctIdx && !isReviewMode) {
-        showAngryGirl();
+        showAngryOverlay();
     }
 }
 
@@ -722,15 +708,15 @@ function selectOption(selectedIndex) {
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
         playSound('click');
-        hideAngryGirl();
+        hideAngryOverlay();
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
             playSound('correct');
-            hideAngryGirl();
+            hideAngryOverlay();
         } else {
             playSound('wrong');
-            showAngryGirl();
+            showAngryOverlay();
         }
     }
     showQuestion();
@@ -756,7 +742,7 @@ function nextQuestion() {
 
 function showResults() {
     playSound('win');
-    hideAngryGirl();
+    hideAngryOverlay();
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
 
