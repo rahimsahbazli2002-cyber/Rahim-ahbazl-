@@ -4,32 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (60 Sual)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Feather:wght@700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-            --correct-bg: #d1fae5;
-            --correct-border: #10b981;
-            --correct-text: #065f46;
-            --wrong-bg: #fee2e2;
-            --wrong-border: #ef4444;
-            --wrong-text: #991b1b;
+            --duo-green: #58cc02;
+            --duo-green-shadow: #46a302;
+            --duo-gray: #e5e5e5;
+            --duo-gray-shadow: #cecece;
+            --duo-text: #3c3c3c;
+            --duo-blue: #1cb0f6;
+            --duo-blue-shadow: #1899d6;
+            --duo-red: #ff4b4b;
+            --duo-red-shadow: #ea2b2b;
+            --duo-purple: #ce82ff;
+            --duo-purple-shadow: #a559d6;
+            --correct-bg: #d7ffb8;
+            --correct-border: #58cc02;
+            --correct-text: #2b7000;
+            --wrong-bg: #ffdfe0;
+            --wrong-border: #ff4b4b;
+            --wrong-text: #ea2b2b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #ffffff;
+            color: var(--duo-text);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,65 +45,95 @@
         }
 
         .container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 750px;
-            padding: 30px;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
             position: relative;
         }
 
-        .header { margin-bottom: 20px; }
-
-        .progress-info {
+        /* Top Header & Progress Bar */
+        .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: #4b5563;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #afafaf;
+            cursor: pointer;
+            font-weight: 800;
         }
 
         .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background-color: var(--border-color);
-            border-radius: 5px;
+            flex-grow: 1;
+            height: 16px;
+            background-color: var(--duo-gray);
+            border-radius: 12px;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-bar {
             height: 100%;
             width: 0%;
-            background-color: var(--primary-color);
-            transition: width 0.3s ease;
+            background-color: var(--duo-green);
+            border-radius: 12px;
+            transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
         }
 
-        .question-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 25px 0;
-            line-height: 1.5;
-            white-space: pre-line;
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
         }
 
+        .stats-badge {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #afafaf;
+            white-space: nowrap;
+        }
+
+        /* Question Section */
+        .question-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--duo-text);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* Options */
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 30px;
         }
 
         .option-btn {
-            background-color: #fff;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px 18px;
-            font-size: 1rem;
+            background-color: #ffffff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray-shadow);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--duo-text);
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.1s ease;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -104,89 +141,206 @@
         }
 
         .option-btn:hover:not(:disabled) {
-            border-color: var(--primary-color);
-            background-color: #f8fafc;
+            background-color: #f7f7f7;
+            border-color: #cecece;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            margin-bottom: 2px;
+        }
+
+        .option-prefix {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 8px;
+            margin-right: 12px;
+            font-weight: 800;
+            color: #afafaf;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.selected {
+            background-color: #ddf4ff;
+            border-color: var(--duo-blue);
+            border-bottom-color: var(--duo-blue-shadow);
+            color: #1899d6;
+        }
+
+        .option-btn.selected .option-prefix {
+            border-color: var(--duo-blue);
+            color: var(--duo-blue);
+            background-color: #ffffff;
         }
 
         .option-btn.correct {
             background-color: var(--correct-bg) !important;
             border-color: var(--correct-border) !important;
+            border-bottom-color: var(--duo-green-shadow) !important;
             color: var(--correct-text) !important;
-            font-weight: 600;
+        }
+
+        .option-btn.correct .option-prefix {
+            border-color: var(--duo-green);
+            background-color: var(--duo-green);
+            color: white;
         }
 
         .option-btn.wrong {
             background-color: var(--wrong-bg) !important;
             border-color: var(--wrong-border) !important;
+            border-bottom-color: var(--duo-red-shadow) !important;
             color: var(--wrong-text) !important;
-            font-weight: 600;
         }
 
+        .option-btn.wrong .option-prefix {
+            border-color: var(--duo-red);
+            background-color: var(--duo-red);
+            color: white;
+        }
+
+        /* Footer & Actions */
         .footer {
-            margin-top: 30px;
+            border-top: 2px solid var(--duo-gray);
+            padding-top: 20px;
             display: flex;
             justify-content: space-between;
-            gap: 10px;
+            gap: 15px;
         }
 
-        .prev-btn, .next-btn, .restart-btn, .review-btn, .wrong-only-btn {
-            background-color: var(--primary-color);
-            color: white;
+        .duo-btn {
             border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .prev-btn { background-color: #6b7280; }
-        .prev-btn:hover:not([disabled]) { background-color: #4b5563; }
-        .next-btn:hover:not([disabled]), .restart-btn:hover { background-color: var(--primary-hover); }
+        .duo-btn-green {
+            background-color: var(--duo-green);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+        }
 
-        .review-btn { background-color: #8b5cf6; }
-        .review-btn:hover { background-color: #7c3aed; }
+        .duo-btn-green:hover:not(:disabled) {
+            filter: brightness(1.05);
+        }
 
-        .wrong-only-btn { background-color: #ef4444; }
-        .wrong-only-btn:hover { background-color: #dc2626; }
+        .duo-btn-green:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--duo-green-shadow);
+        }
 
-        .prev-btn:disabled, .next-btn:disabled {
-            background-color: #d1d5db;
-            color: #9ca3af;
+        .duo-btn-gray {
+            background-color: #ffffff;
+            color: #afafaf;
+            border: 2px solid var(--duo-gray);
+            box-shadow: 0 4px 0 var(--duo-gray-shadow);
+        }
+
+        .duo-btn-gray:hover:not(:disabled) {
+            background-color: #f7f7f7;
+            color: var(--duo-text);
+        }
+
+        .duo-btn-gray:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 var(--duo-gray-shadow);
+        }
+
+        .duo-btn-purple {
+            background-color: var(--duo-purple);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-purple-shadow);
+        }
+
+        .duo-btn-purple:hover:not(:disabled) { filter: brightness(1.05); }
+        .duo-btn-purple:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-purple-shadow); }
+
+        .duo-btn-red {
+            background-color: var(--duo-red);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-red-shadow);
+        }
+
+        .duo-btn-red:hover:not(:disabled) { filter: brightness(1.05); }
+        .duo-btn-red:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-red-shadow); }
+
+        .duo-btn:disabled {
+            background-color: var(--duo-gray);
+            color: #afafaf;
+            box-shadow: none;
             cursor: not-allowed;
+            border: none;
         }
 
-        .result-screen { text-align: center; }
-        .result-title { font-size: 1.8rem; margin-bottom: 20px; }
-        .score-box { font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 25px; }
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ffc800;
+            margin-bottom: 10px;
+        }
+
+        .score-box {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--duo-green);
+            margin-bottom: 30px;
+        }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 30px;
-            text-align: left;
+            margin-bottom: 35px;
         }
 
         .stat-card {
-            background-color: var(--bg-color);
+            background-color: #ffffff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray-shadow);
+            border-radius: 16px;
             padding: 15px;
-            border-radius: 8px;
-            font-weight: 500;
+            font-weight: 800;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        .stat-card span { float: right; font-weight: 700; }
 
         .result-buttons {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 12px;
         }
 
         @media (max-width: 600px) {
-            .result-buttons { flex-direction: column; }
+            .footer { flex-direction: column; }
+            .duo-btn { width: 100%; }
         }
     </style>
 </head>
@@ -196,42 +350,39 @@
     <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
-            <div class="progress-info">
-                <span id="question-number">Sual 1 / 60</span>
-                <span id="answered-count">Cavablandırıldı: 0/60</span>
-            </div>
+            <button class="close-btn">✕</button>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
+            <div class="stats-badge" id="question-number">1 / 60</div>
         </div>
 
-        <div id="question-text" class="question-text">Sual mətni yüklənir...</div>
+        <div id="question-text" class="question-title">Sual mətni yüklənir...</div>
         <div id="options-container" class="options-container"></div>
 
         <div class="footer">
-            <button id="prev-btn" class="prev-btn" onclick="prevQuestion()" disabled>← Əvvəlki sual</button>
-            <button id="next-btn" class="next-btn" onclick="nextQuestion()">Növbəti sual →</button>
+            <button id="prev-btn" class="duo-btn duo-btn-gray" onclick="prevQuestion()" disabled>ƏVVƏLKİ</button>
+            <button id="next-btn" class="duo-btn duo-btn-green" onclick="nextQuestion()">NÖVBƏTİ</button>
         </div>
     </div>
 
     <!-- Nəticə Ekranı -->
     <div id="result-screen" class="result-screen" style="display: none;">
-        <h2 class="result-title">Test Yekunlaşdı!</h2>
+        <div class="result-icon">🎉</div>
+        <h2 class="result-title">DƏRS TAMAMLANDI!</h2>
         <div class="score-box" id="final-score">0.00</div>
 
         <div class="stats-grid">
-            <div class="stat-card">Düzgün cavab: <span id="stat-correct" style="color: #10b981;">0</span></div>
-            <div class="stat-card">Səhv cavab: <span id="stat-incorrect" style="color: #ef4444;">0</span></div>
-            <div class="stat-card">Cavabsız sual: <span id="stat-unanswered">0</span></div>
-            <div class="stat-card">Nəticə (Faiz): <span id="stat-percent">0%</span></div>
-            <div class="stat-card">Maksimum bal: <span>60</span></div>
-            <div class="stat-card">Ümumi sual: <span id="stat-total">60</span></div>
+            <div class="stat-card">Düzgün: <span id="stat-correct" style="color: var(--duo-green);">0</span></div>
+            <div class="stat-card">Səhv: <span id="stat-incorrect" style="color: var(--duo-red);">0</span></div>
+            <div class="stat-card">Cavabsız: <span id="stat-unanswered" style="color: #afafaf;">0</span></div>
+            <div class="stat-card">Dəqiqlik: <span id="stat-percent" style="color: var(--duo-blue);">0%</span></div>
         </div>
 
         <div class="result-buttons">
-            <button class="review-btn" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
-            <button class="wrong-only-btn" onclick="reviewWrongQuiz()">❌ Səhvlərə bax</button>
-            <button class="restart-btn" onclick="startQuiz()">🔄 Yenidən Başla</button>
+            <button class="duo-btn duo-btn-purple" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
+            <button class="duo-btn duo-btn-red" onclick="reviewWrongQuiz()">❌ Səhvlərə Bax</button>
+            <button class="duo-btn duo-btn-green" onclick="startQuiz()">🔄 YENİDƏN BAŞLA</button>
         </div>
     </div>
 </div>
@@ -300,7 +451,7 @@ const rawQuestions = [
     { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
 ];
 
-const optionPrefixes = ["A) ", "B) ", "C) ", "D) "];
+const optionPrefixes = ["A", "B", "C", "D"];
 let currentQuestions = [];
 let activeQuestionsList = [];
 let currentQuestionIndex = 0;
@@ -309,7 +460,6 @@ let isReviewMode = false;
 
 function startQuiz() {
     isReviewMode = false;
-    // Sıra dəyişdirilmədən olduğu kimi götürülür
     currentQuestions = rawQuestions.map(qObj => ({
         q: qObj.q,
         options: [...qObj.options],
@@ -335,15 +485,12 @@ function showQuestion() {
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
     
     if (isReviewMode) {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Nəticələrə Qayıt 📊" : "Növbəti sual →";
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
     } else {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "Testi Bitir ✓" : "Növbəti sual →";
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TАMАMLА" : "NÖVBƏTİ";
     }
 
-    document.getElementById("question-number").innerText = `Sual ${currentQuestionIndex + 1} / ${total}`;
-    
-    let answeredCount = userAnswers.filter(a => a !== null).length;
-    document.getElementById("answered-count").innerText = `Cavablandırıldı: ${answeredCount}/${currentQuestions.length}`;
+    document.getElementById("question-number").innerText = `${currentQuestionIndex + 1} / ${total}`;
     document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
 
     document.getElementById("question-text").innerText = q.q;
@@ -363,27 +510,31 @@ function showQuestion() {
             btn.disabled = true;
             if (idx === correctIdx) {
                 btn.classList.add("correct");
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✓ (Düzgün Cavab)</span>`;
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
             } else if (idx === selectedIdx) {
                 btn.classList.add("wrong");
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✗ (Sizin Cavabınız)</span>`;
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
             } else {
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
             }
         } 
         else {
+            if (selectedIdx === idx) {
+                btn.classList.add("selected");
+            }
+
             if (selectedIdx !== null) {
                 if (idx === correctIdx) {
                     btn.classList.add("correct");
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✓</span>`;
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
                 } else if (idx === selectedIdx) {
                     btn.classList.add("wrong");
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✗</span>`;
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
                 } else {
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
                 }
             } else {
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
             }
             btn.onclick = () => selectOption(idx);
         }
@@ -442,7 +593,6 @@ function showResults() {
     document.getElementById("stat-incorrect").innerText = incorrect;
     document.getElementById("stat-unanswered").innerText = unanswered;
     document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
-    document.getElementById("stat-total").innerText = total;
 }
 
 function reviewAllQuiz() {
