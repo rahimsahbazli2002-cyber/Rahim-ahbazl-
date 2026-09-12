@@ -29,7 +29,6 @@
             user-select: none;
         }
 
-        /* HƏRƏKƏTLİ ARXA PLAN ANIMASIYASI */
         body {
             background: linear-gradient(-45deg, #e6f7ff, #e8fcdb, #f3e8ff, #fff2db);
             background-size: 400% 400%;
@@ -44,7 +43,6 @@
             position: relative;
         }
 
-        /* Arxa planda dinamik hərəkət edən işıqlı dairələr */
         body::before {
             content: '';
             position: absolute;
@@ -86,7 +84,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Yuxarı Panel */
         .header {
             display: flex;
             align-items: center;
@@ -141,11 +138,9 @@
             gap: 6px;
             font-weight: 800;
             font-size: 1.1rem;
-            color: var(--duo-yellow);
-            animation: pulse 1.5s infinite alternate;
+            color: var(--duo-blue);
         }
 
-        /* Sual Sahəsi Animasiyası */
         .question-box {
             animation: slideIn 0.3s ease-out;
         }
@@ -168,7 +163,6 @@
             white-space: pre-line;
         }
 
-        /* Variantlar */
         .options-container {
             display: flex;
             flex-direction: column;
@@ -204,7 +198,6 @@
             margin-bottom: 3px;
         }
 
-        /* Seçilmiş variant halları */
         .option-btn.correct {
             background-color: #d7ffb8 !important;
             border-color: var(--duo-green) !important;
@@ -221,7 +214,6 @@
             animation: shake 0.4s ease;
         }
 
-        /* Soldan gələn EMOJİ Paneli (Düz/Səhv üçün ortaq) */
         .feedback-overlay {
             position: fixed;
             bottom: 30px;
@@ -239,30 +231,14 @@
             transform: translateX(0);
         }
 
-        .feedback-emoji {
-            font-size: 5rem;
-            line-height: 1;
-            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
-        }
-
-        .feedback-emoji.angry {
-            animation: shake 0.4s ease infinite alternate;
-        }
-
-        .feedback-emoji.happy {
-            animation: bounce 0.6s ease infinite alternate;
-        }
-
-        /* Danışıq balonu */
         .speech-bubble {
             color: white;
             font-size: 1.05rem;
             font-weight: 900;
             padding: 16px 20px;
-            border-radius: 20px;
-            border-bottom-left-radius: 2px;
+            border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            max-width: 260px;
+            max-width: 280px;
             position: relative;
         }
 
@@ -276,7 +252,6 @@
             box-shadow: 0 6px 0 #46a302, 0 10px 20px rgba(0,0,0,0.15);
         }
 
-        /* Alt Düymələr */
         .footer {
             display: flex;
             justify-content: space-between;
@@ -333,18 +308,10 @@
             transform: none;
         }
 
-        /* Nəticə Ekranı */
         .result-screen {
             text-align: center;
             padding: 20px 0;
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .result-icon {
-            font-size: 5rem;
-            margin-bottom: 10px;
-            display: inline-block;
-            animation: float 2s infinite ease-in-out;
         }
 
         .result-title {
@@ -390,7 +357,6 @@
             flex-wrap: wrap;
         }
 
-        /* Animasiyalar */
         @keyframes animatedBg {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -422,37 +388,24 @@
             20%, 60% { transform: translateX(-6px); }
             40%, 80% { transform: translateX(6px); }
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
-        }
     </style>
 </head>
 <body>
 
-<!-- Ekranın sol tərəfindən sürüşüb çıxan EMOJİ PANELSİ (Həm düz, həm səhv üçün) -->
 <div id="feedback-overlay" class="feedback-overlay">
-    <div id="feedback-emoji" class="feedback-emoji">😊</div>
     <div id="feedback-text" class="speech-bubble happy">
         Əla! Tamamilə doğru cavab!
     </div>
 </div>
 
 <div class="container">
-    <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
             <div class="close-btn" onclick="startQuiz()">✕</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
-            <div class="stats-badge">⚡ <span id="answered-count">0/60</span></div>
+            <div class="stats-badge"><span id="answered-count">0/60</span></div>
         </div>
 
         <div class="question-box" id="question-box">
@@ -467,10 +420,8 @@
         </div>
     </div>
 
-    <!-- Nəticə Ekranı -->
     <div id="result-screen" class="result-screen" style="display: none;">
-        <div class="result-icon">🏆</div>
-        <h2 class="result-title">Möhtəşəm İş!</h2>
+        <h2 class="result-title">İmtahan Başa Çatdı</h2>
 
         <div class="stats-grid">
             <div class="stat-card" style="color: var(--duo-green);">
@@ -547,22 +498,18 @@ function playSound(type) {
     }
 }
 
-// Səhv cavab üçün əsəbi emojinin replikaları
 const angryRemarks = [
-    "Off! Yenə səhv etdin?! Bir az diqqətli ol da!",
-    "Eyy! Sualı düzgün oxu, hirslənirəm haa!",
-    "Bunu məktəbli də bilərdi! Necə səhv etdin ki?!",
-    "Aaa! Səhv cavab! İndi nə edəcəyik?!",
-    "Bax yenə tələsdin! Bir də yaxşı-yaxşı oxu!"
+    "Səhv cavab verdiniz! Bir az diqqətli olun.",
+    "Sualı diqqətlə oxuyun.",
+    "Cavab yanlışdır. Diqqəti artırın.",
+    "Tələsmədən bir də oxuyun."
 ];
 
-// Düzgün cavab üçün sevincli emojinin replikaları
 const happyRemarks = [
-    "Əla! Halaldır sənə, tamamilə düz tapdın! 🎉",
-    "Möhtəşəmsən! Belə də davam et! ⭐",
-    "Afərin! Səndən əsl müəllim olar! 👏",
-    "Bəli! Bax elə cavab belə olar! 🚀",
-    "Super! Sualı bir anlıq darmadağın etdin! 🔥"
+    "Əla! Tamamilə düzgün cavabdır.",
+    "Möhtəşəm! Doğru cavab verdiniz.",
+    "Afərin! Doğru seçimdi.",
+    "Təbrik edirik, düzgün cavab!"
 ];
 
 const rawQuestions = [
@@ -682,17 +629,12 @@ function hideFeedbackOverlay() {
 
 function showFeedbackOverlay(type) {
     const overlay = document.getElementById("feedback-overlay");
-    const emojiEl = document.getElementById("feedback-emoji");
     const textEl = document.getElementById("feedback-text");
     
     if (type === 'happy') {
-        emojiEl.innerText = "😊";
-        emojiEl.className = "feedback-emoji happy";
         textEl.className = "speech-bubble happy";
         textEl.innerText = happyRemarks[Math.floor(Math.random() * happyRemarks.length)];
     } else {
-        emojiEl.innerText = "😡";
-        emojiEl.className = "feedback-emoji angry";
         textEl.className = "speech-bubble angry";
         textEl.innerText = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
     }
@@ -744,10 +686,10 @@ function showQuestion() {
             btn.disabled = true;
             if (idx === correctIdx) {
                 btn.classList.add("correct");
-                btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span> <span>[Düzgün]</span>`;
             } else if (idx === selectedIdx) {
                 btn.classList.add("wrong");
-                btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span> <span>[Səhv]</span>`;
             } else {
                 btn.innerHTML = `<span>${prefixedText}</span>`;
             }
@@ -756,10 +698,10 @@ function showQuestion() {
             if (selectedIdx !== null) {
                 if (idx === correctIdx) {
                     btn.classList.add("correct");
-                    btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>[Düzgün]</span>`;
                 } else if (idx === selectedIdx) {
                     btn.classList.add("wrong");
-                    btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>[Səhv]</span>`;
                 } else {
                     btn.innerHTML = `<span>${prefixedText}</span>`;
                 }
@@ -868,7 +810,7 @@ function reviewWrongQuiz() {
     });
 
     if (wrongList.length === 0) {
-        alert("Təbrik edirik! Sizin heç bir səhv cavabınız yoxdur. 🎉");
+        alert("Sizin heç bir səhv cavabınız yoxdur.");
         return;
     }
 
