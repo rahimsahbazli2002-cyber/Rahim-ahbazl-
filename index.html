@@ -189,7 +189,7 @@
 <body>
 
 <div class="container" id="quiz-container">
-    <!-- Test Ekranı -->
+    <!-- Test Ekrani -->
     <div id="quiz-screen">
         <div class="header">
             <div class="progress-info">
@@ -232,7 +232,7 @@
 </div>
 
 <script>
-const questions = [
+const rawQuestions = [
     { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
     { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
     { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
@@ -295,15 +295,41 @@ const questions = [
     { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
 ];
 
-const optionPrefixes = ["A) ", "B) ", "C) ", "D) "];
+let currentQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let isReviewMode = false;
 
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
 function startQuiz() {
     isReviewMode = false;
+    
+    // Suallar ardıcıl saxlanılır
+    currentQuestions = rawQuestions.map(qObj => {
+        let optionsWithFlag = qObj.options.map((opt, idx) => ({
+            text: opt,
+            isCorrect: idx === qObj.answer
+        }));
+        // Yalnız cavab variantları qarışdırılır
+        optionsWithFlag = shuffleArray(optionsWithFlag);
+        
+        return {
+            q: qObj.q,
+            options: optionsWithFlag.map(o => o.text),
+            answer: optionsWithFlag.findIndex(o => o.isCorrect)
+        };
+    });
+
     currentQuestionIndex = 0;
-    userAnswers = new Array(questions.length).fill(null);
+    userAnswers = new Array(currentQuestions.length).fill(null);
     
     document.getElementById("result-screen").style.display = "none";
     document.getElementById("quiz-screen").style.display = "block";
@@ -312,8 +338,8 @@ function startQuiz() {
 }
 
 function showQuestion() {
-    let q = questions[currentQuestionIndex];
-    let total = questions.length;
+    let q = currentQuestions[currentQuestionIndex];
+    let total = currentQuestions.length;
 
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
     
@@ -340,33 +366,32 @@ function showQuestion() {
     q.options.forEach((optText, idx) => {
         let btn = document.createElement("button");
         btn.className = "option-btn";
-        let prefix = optionPrefixes[idx] || "";
         
         if (isReviewMode) {
             btn.disabled = true;
             if (idx === correctIdx) {
                 btn.classList.add("correct");
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✓ (Düzgün Cavab)</span>`;
+                btn.innerHTML = `<span>${optText}</span> <span>✓ (Düzgün Cavab)</span>`;
             } else if (idx === selectedIdx) {
                 btn.classList.add("wrong");
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✗ (Sizin Cavabınız)</span>`;
+                btn.innerHTML = `<span>${optText}</span> <span>✗ (Sizin Cavabınız)</span>`;
             } else {
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                btn.innerHTML = `<span>${optText}</span>`;
             }
         } 
         else {
             if (selectedIdx !== null) {
                 if (idx === correctIdx) {
                     btn.classList.add("correct");
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✓</span>`;
+                    btn.innerHTML = `<span>${optText}</span> <span>✓</span>`;
                 } else if (idx === selectedIdx) {
                     btn.classList.add("wrong");
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span> <span>✗</span>`;
+                    btn.innerHTML = `<span>${optText}</span> <span>✗</span>`;
                 } else {
-                    btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                    btn.innerHTML = `<span>${optText}</span>`;
                 }
             } else {
-                btn.innerHTML = `<span><b>${prefix}</b>${optText}</span>`;
+                btn.innerHTML = `<span>${optText}</span>`;
             }
             btn.onclick = () => selectOption(idx);
         }
@@ -394,7 +419,7 @@ function prevQuestion() {
 }
 
 function nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < currentQuestions.length - 1) {
         currentQuestionIndex++;
         showQuestion();
     } else {
@@ -410,11 +435,11 @@ function showResults() {
 
     userAnswers.forEach((ans, idx) => {
         if (ans === null) unanswered++;
-        else if (ans === questions[idx].answer) correct++;
+        else if (ans === currentQuestions[idx].answer) correct++;
         else incorrect++;
     });
 
-    let total = questions.length;
+    let total = currentQuestions.length;
     let finalScore = Math.max(0, (correct * 1) - (incorrect * 0.25));
     let percentage = (correct / total) * 100;
 
@@ -439,8 +464,3 @@ window.onload = startQuiz;
 
 </body>
 </html>
-```eof
-
-Dəyişikliklər tətbiq edildi:
-- Variantlar **A), B), C), D)** şəklində sıralandı.
-- Variantların təsadüfi qarışdırılması (randomization) ləğv edildi. Həm suallar, həm də variantlar hər zaman sabit sırada göstəriləcək.
