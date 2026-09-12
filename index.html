@@ -3,100 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Səsli Cavab Reaksiyalı Viktorina</title>
+    <title>Qışqıran Viktorina</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-15px); }
+            40%, 80% { transform: translateX(15px); }
+        }
+        .shake-screen {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes flashRed {
+            0% { background-color: rgba(239, 68, 68, 0.8); }
+            100% { background-color: transparent; }
+        }
+        .flash-red {
+            animation: flashRed 0.6s ease-out;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4 transition-colors duration-300" id="body">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-lg w-full text-center">
-        <h1 class="text-2xl font-bold text-slate-800 mb-6">İnteraktiv Viktorina</h1>
-        
-        <div id="question-box" class="mb-6">
-            <p id="question-text" class="text-lg font-medium text-slate-700 mb-4">Suil yüklənir...</p>
-            <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+    <!-- Flash Overlay -->
+    <div id="overlay" class="fixed inset-0 pointer-events-none z-50"></div>
+
+    <div class="max-w-xl w-full bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-700 relative overflow-hidden" id="quiz-card">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <span class="text-xs font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/30">
+                Sual <span id="current-question">1</span> / <span id="total-questions">5</span>
+            </span>
+            <span class="text-sm font-medium text-slate-400">
+                Xal: <span id="score" class="text-emerald-400 font-bold">0</span>
+            </span>
         </div>
 
-        <div id="feedback" class="mt-4 text-lg font-semibold h-8"></div>
+        <!-- Question -->
+        <h2 id="question-text" class="text-xl sm:text-2xl font-bold mb-6 text-slate-100 min-h-[60px] flex items-center">
+            Sual yüklənir...
+        </h2>
+
+        <!-- Options Container -->
+        <div id="options-container" class="space-y-3 mb-6">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <!-- Feedback Box -->
+        <div id="feedback" class="hidden p-4 rounded-xl font-bold text-center mb-6 transition-all duration-300 text-lg"></div>
+
+        <!-- Next Button -->
+        <button id="next-btn" onclick="nextQuestion()" class="hidden w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-200 shadow-lg shadow-indigo-600/30">
+            Növbəti Sual &rarr;
+        </button>
+
+        <!-- Final Score View -->
+        <div id="result-screen" class="hidden text-center py-6">
+            <div class="text-5xl mb-4" id="result-emoji">🎉</div>
+            <h3 class="text-2xl font-bold mb-2">Viktorina Başa Çatdı!</h3>
+            <p class="text-slate-400 mb-6 text-lg">Topladığınız xal: <span id="final-score" class="text-indigo-400 font-bold">0</span> / <span id="final-total">5</span></p>
+            <button onclick="restartQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl transition shadow-lg">
+                Yenidən Başla
+            </button>
+        </div>
     </div>
 
     <script>
-        const quizData = [
+        const questions = [
             {
-                question: "Azərbaycanın paytaxtı hansı şəhərdir?",
-                options: ["Gəncə", "Bakı", "Sumqayıt", "Şəki"],
-                correct: 1,
-                wrongMessage: "Səhv cavab verdiniz! Yenidən cəhd edin və ya fikirləşin."
+                question: "Azərbaycan Respublikasının paytaxtı hansı şəhərdir?",
+                options: ["Gəncə", "Sumqayıt", "Bakı", "Şəki"],
+                correct: 2
             },
             {
-                question: "2 + 2 * 2 neçəyə bərabərdir?",
-                options: ["6", "8", "4", "10"],
-                correct: 0,
-                wrongMessage: "Təəssüf ki, cavab yanlışdır! Əməliyyatlar sırasına diqqət yetirin."
+                question: "Dünyanın ən böyük gölü hansıdır?",
+                options: ["Xəzər dənizi", "Baykal", "Viktoriya", "Mişiqan"],
+                correct: 0
+            },
+            {
+                question: "Hansı rəng əsas rənglərdən biri DEYİL?",
+                options: ["Qırmızı", "Yaşıl", "Mavi", "Bənövşəyi"],
+                correct: 3
+            },
+            {
+                question: "Gündəlik həyatda istifadə etdiyimiz 'Kompüter' sözünün mənşəyi nəyə söykənir?",
+                options: ["Hesablamaq", "Yazmaq", "Göstərmək", "Əlaqə saxlamaq"],
+                correct: 0
+            },
+            {
+                question: "Şah İsmayıl Xətai hansı dövlətin banisidir?",
+                options: ["Qarabağ xanlığı", "Səfəvilər dövləti", "Qazan xanlığı", "Səlcuqlular"],
+                correct: 1
             }
         ];
 
-        let currentQuestion = 0;
+        let currentIdx = 0;
+        let score = 0;
+        let answered = false;
 
-        // Metni sesli oxuyan funksiya (SpeechSynthesis)
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                // Əgər əvvəlki oxuma davam edirsə, dayandır
-                window.speechSynthesis.cancel();
+        const questionTxt = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const currentQEl = document.getElementById('current-question');
+        const totalQEl = document.getElementById('total-questions');
+        const scoreEl = document.getElementById('score');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const quizCard = document.getElementById('quiz-card');
+        const overlay = document.getElementById('overlay');
+        const resultScreen = document.getElementById('result-screen');
 
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'az-AZ'; // Azərbaycan dilini təyin edirik
-                utterance.rate = 1.0;     // Oxuma sürəti
-                utterance.pitch = 1.0;    // Səs tonu
+        totalQEl.textContent = questions.length;
 
-                window.speechSynthesis.speak(utterance);
-            } else {
-                console.log("Brauzeriniz səs sintezini dəstəkləmir.");
+        // Web Audio API to produce a harsh, realistic scream synthesizer sound
+        function playScreamSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+
+                // Noise buffer for realistic throat scream texture
+                const bufferSize = ctx.sampleRate * 0.8;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                // High pitch oscillator for vocal cord pitch
+                const osc = ctx.createOscillator();
+                osc.type = 'sawtooth';
+
+                // Pitch envelope - pitch drops drastically like a panic scream
+                osc.frequency.setValueAtTime(900, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.7);
+
+                // Filter to create vocal resonance
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(1500, ctx.currentTime);
+                filter.Q.setValueAtTime(3.0, ctx.currentTime);
+
+                // Distortion Gain
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(1.0, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+
+                // Connect nodes
+                noise.connect(filter);
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+
+                noise.start();
+                osc.start();
+                noise.stop(ctx.currentTime + 0.8);
+                osc.stop(ctx.currentTime + 0.8);
+            } catch (e) {
+                console.error("Audio block", e);
             }
+        }
+
+        function playSuccessSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.4);
+            } catch (e) {}
         }
 
         function loadQuestion() {
-            const data = quizData[currentQuestion];
-            document.getElementById('question-text').innerText = data.question;
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            document.getElementById('feedback').innerText = '';
+            answered = false;
+            feedbackEl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            
+            const q = questions[currentIdx];
+            currentQEl.textContent = currentIdx + 1;
+            questionTxt.textContent = q.question;
+            optionsContainer.innerHTML = '';
 
-            data.options.forEach((option, index) => {
+            q.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.innerText = option;
-                btn.className = 'w-full py-3 px-4 bg-slate-50 border-2 border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-indigo-50 hover:border-indigo-400 transition-all';
-                btn.onclick = () => checkAnswer(index);
-                container.appendChild(btn);
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-700/60 hover:bg-slate-700 border border-slate-600/50 hover:border-indigo-500 font-medium transition duration-200 flex justify-between items-center group";
+                btn.innerHTML = `<span>${opt}</span> <span class="w-6 h-6 rounded-full border border-slate-500 group-hover:border-indigo-400 flex items-center justify-center text-xs text-slate-400">?</span>`;
+                btn.onclick = () => selectOption(idx);
+                optionsContainer.appendChild(btn);
             });
         }
 
-        function checkAnswer(selectedIndex) {
-            const data = quizData[currentQuestion];
-            const feedbackEl = document.getElementById('feedback');
+        function selectOption(selectedIdx) {
+            if (answered) return;
+            answered = true;
 
-            if (selectedIndex === data.correct) {
-                feedbackEl.innerText = "Düzgün cavab! 🎉";
-                feedbackEl.className = "mt-4 text-lg font-semibold text-green-600";
+            const q = questions[currentIdx];
+            const buttons = optionsContainer.children;
+
+            if (selectedIdx === q.correct) {
+                score++;
+                scoreEl.textContent = score;
+                buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl bg-emerald-600/30 border-2 border-emerald-500 text-emerald-200 font-medium flex justify-between items-center";
                 
-                setTimeout(() => {
-                    currentQuestion = (currentQuestion + 1) % quizData.length;
-                    loadQuestion();
-                }, 1500);
+                feedbackEl.textContent = "✅ Əla! Düzgün cavab!";
+                feedbackEl.className = "p-4 rounded-xl font-bold text-center mb-6 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 block";
+                playSuccessSound();
             } else {
-                feedbackEl.innerText = "Səhv cavab! ❌";
-                feedbackEl.className = "mt-4 text-lg font-semibold text-red-600";
-                
-                // Səhv cavab veriləndə səsli oxutmaq
-                speakText(data.wrongMessage);
+                // Wrong Answer -> SCREAM + VISUAL SHAKE
+                playScreamSound();
+
+                buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl bg-rose-600/30 border-2 border-rose-500 text-rose-200 font-medium flex justify-between items-center";
+                buttons[q.correct].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500/50 text-emerald-300 font-medium flex justify-between items-center";
+
+                feedbackEl.textContent = "😱 YANLIŞ CAVAB! (AAAAAAHHH!)";
+                feedbackEl.className = "p-4 rounded-xl font-bold text-center mb-6 bg-rose-500/20 text-rose-400 border border-rose-500/30 block";
+
+                // Shake screen and flash red
+                quizCard.classList.remove('shake-screen');
+                void quizCard.offsetWidth; // Trigger reflow
+                quizCard.classList.add('shake-screen');
+
+                overlay.classList.remove('flash-red');
+                void overlay.offsetWidth;
+                overlay.classList.add('flash-red');
+            }
+
+            // Disable all buttons
+            Array.from(buttons).forEach(btn => btn.disabled = true);
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
             }
         }
 
+        function showResults() {
+            questionTxt.classList.add('hidden');
+            optionsContainer.classList.add('hidden');
+            feedbackEl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-total').textContent = questions.length;
+            document.getElementById('result-emoji').textContent = score === questions.length ? "🏆" : (score > 2 ? "👍" : "😱");
+        }
+
+        function restartQuiz() {
+            currentIdx = 0;
+            score = 0;
+            scoreEl.textContent = 0;
+            resultScreen.classList.add('hidden');
+            questionTxt.classList.remove('hidden');
+            optionsContainer.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Initialize quiz
         loadQuestion();
     </script>
 </body>
 </html>
 ```eof
 
-Hazırladığım bu faylda `SpeechSynthesisUtterance` texnologiyasından istifadə olunub. İstifadəçi səhv cavab düyməsini sıxdıqda sistem müəyyən olunmuş mesajı səsli olaraq sesləndirir. 
+Səhv cavab verildikdə Web Audio API vasitəsilə qışqırıq səsi çıxaran və ekranı titrədən viktorina tətbiqini hazırladım.
 
-İstədiyiniz xüsusi cavab səsini və ya mətnini dəyişmək üçün kod daxilindəki `wrongMessage` hissəsini redaktə edə bilərsiniz.
+### Xüsusiyyətlər:
+- **Qışqırıq effekti:** Səhv cavab seçildikdə dinamik şəkildə formalaşan kəskin və uca qışqırıq səsi effekti çalınır.
+- **Vizual reaksiya:** Səhv cavab zamanı viktorina kartı titrəyir və ekran qırmızı rəngdə parlayır.
+- **Interaktiv viktorina:** Düzgün cavablar yaşıl, səhv cavablar qırmızı rənglə işarələnir və yekun nəticə göstərilir.
