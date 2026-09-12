@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
+    <!-- STREAMING_CHUNK: Setting up head metadata and styles -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi</title>
@@ -82,6 +83,7 @@
             box-shadow: 0 12px 24px rgba(0,0,0,0.06), 0 8px 0 var(--duo-gray);
             z-index: 2;
             backdrop-filter: blur(10px);
+            transition: transform 0.1s;
         }
 
         .header {
@@ -155,18 +157,18 @@
         }
 
         .question-text {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: #3c3c3c;
-            margin-bottom: 28px;
-            line-height: 1.4;
+            margin-bottom: 24px;
+            line-height: 1.45;
             white-space: pre-line;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             margin-bottom: 30px;
         }
 
@@ -176,7 +178,7 @@
             border-bottom: 5px solid var(--duo-gray);
             border-radius: 16px;
             padding: 16px 20px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #4b4b4b;
             text-align: left;
@@ -211,7 +213,6 @@
             border-color: var(--duo-red) !important;
             border-bottom-color: var(--duo-red-shadow) !important;
             color: var(--duo-red-shadow) !important;
-            animation: shake 0.4s ease;
         }
 
         .feedback-overlay {
@@ -238,7 +239,7 @@
             padding: 16px 20px;
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            max-width: 280px;
+            max-width: 320px;
             position: relative;
         }
 
@@ -357,6 +358,19 @@
             flex-wrap: wrap;
         }
 
+        /* Screen shake animation for wrong answers */
+        @keyframes shakeHard {
+            0%, 100% { transform: translateX(0); }
+            15%, 75% { transform: translateX(-16px) rotate(-1deg); }
+            30%, 90% { transform: translateX(16px) rotate(1deg); }
+            45% { transform: translateX(-8px); }
+            60% { transform: translateX(8px); }
+        }
+
+        .shake-screen {
+            animation: shakeHard 0.5s ease-in-out !important;
+        }
+
         @keyframes animatedBg {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -380,28 +394,23 @@
 
         @keyframes bounce {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
 <body>
 
+<!-- STREAMING_CHUNK: Layout structure and elements -->
 <div id="feedback-overlay" class="feedback-overlay">
     <div id="feedback-text" class="speech-bubble happy">
         Əla! Tamamilə doğru cavab!
     </div>
 </div>
 
-<div class="container">
+<div class="container" id="quiz-container">
     <div id="quiz-screen">
         <div class="header">
-            <div class="close-btn" onclick="startQuiz()">✕</div>
+            <div class="close-btn" onclick="startQuiz()">X</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
@@ -444,113 +453,132 @@
 
         <div class="result-buttons">
             <button class="btn btn-purple" onclick="reviewAllQuiz()">BÜTÜN CAVABLARA BAX</button>
-            <button class="btn btn-red" onclick="reviewWrongQuiz()">Səhvlərə bax</button>
+            <button class="btn btn-red" onclick="reviewWrongQuiz()">SƏHVLƏRƏ BAX</button>
             <button class="btn btn-green" onclick="startQuiz()">YENİDƏN BAŞLA</button>
         </div>
     </div>
 </div>
 
 <script>
+/* STREAMING_CHUNK: Audio Synthesizer logic for screaming sound */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playSound(type) {
+function playScreamSound() {
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
-    
+    try {
+        const bufferSize = audioCtx.sampleRate * 0.8;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(950, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(280, audioCtx.currentTime + 0.75);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1600, audioCtx.currentTime);
+        filter.Q.setValueAtTime(3.5, audioCtx.currentTime);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+
+        noise.connect(filter);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        noise.start();
+        osc.start();
+        noise.stop(audioCtx.currentTime + 0.8);
+        osc.stop(audioCtx.currentTime + 0.8);
+    } catch (e) {}
+}
+
+function playCorrectSound() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
-    if (type === 'correct') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.35);
-    } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-    } else if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.05);
-    } else if (type === 'win') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.15);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.6);
-    }
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.35);
 }
 
-const angryRemarks = [
-    "Səhv cavab verdiniz! Bir az diqqətli olun.",
-    "Sualı diqqətlə oxuyun.",
-    "Cavab yanlışdır. Diqqəti artırın.",
-    "Tələsmədən bir də oxuyun."
-];
+function playClickSound() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-const happyRemarks = [
-    "Əla! Tamamilə düzgün cavabdır.",
-    "Möhtəşəm! Doğru cavab verdiniz.",
-    "Afərin! Doğru seçimdi.",
-    "Təbrik edirik, düzgün cavab!"
-];
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+}
 
+/* STREAMING_CHUNK: Sequential array of 60 questions with NO shuffling */
 const rawQuestions = [
-    { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
-    { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
-    { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
-    { q: "4. Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
-    { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
-    { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
-    { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
-    { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-    { q: "9. Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-    { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
-    { q: "11. Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 1 },
-    { q: "12. Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "böyük qrupda rəsmçəkmə"], answer: 3 },
-    { q: "13. Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi, ünsiyyət sferası", "işin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
-    { q: "14. Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 3 },
-    { q: "15. Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
-    { q: "16. Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
-    { q: "17. Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
-    { q: "18. Fransız dilindən tərcümədə \"nöqtə\" deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
-    { q: "19. Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə qabiliyyətini formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
-    { q: "20. Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
-    { q: "21. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
+    { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["Lepkaya", "Konstruksiyaetməyə", "Rəsmçəkməyə", "Applikasiyaya"], answer: 2 },
+    { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["Rəsmçəkmə", "Lepka", "Konstruksiyaetmə", "Applikasiya"], answer: 0 },
+    { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["Ştamplama texnikası", "Barmaq boyakarlığı", "Puantilizm texnikası", "Monotipiya texnikası"], answer: 1 },
+    { q: "4. Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["Ştamplama texnikası", "Barmaq boyakarlığı", "Puantilizm texnikası", "Monotipiya texnikası"], answer: 2 },
+    { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["Ştamplama texnikası", "Barmaq boyakarlığı", "Puantilizm texnikası", "Monotipiya texnikası"], answer: 0 },
+    { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["Ştamplama texnikası", "Barmaq boyakarlığı", "Puantilizm texnikası", "Klyaksoqrafiya texnikası"], answer: 3 },
+    { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["Ştamplama texnikası", "Barmaq boyakarlığı", "Puantilizm texnikası", "Fotokopiya"], answer: 3 },
+    { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["Lepka", "Konstruksiyaetmə", "Rəsmçəkmə", "Applikasiya"], answer: 3 },
+    { q: "9. Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["Lepka", "Konstruksiyaetmə", "Rəsmçəkmə", "Applikasiya"], answer: 3 },
+    { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "Məktəbəhazırlıq qrupunda rəsmçəkmə", "Orta qrupda rəsmçəkmə"], answer: 0 },
+    { q: "11. Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "Məktəbəhazırlıq qrupunda rəsmçəkmə", "Orta qrupda rəsmçəkmə"], answer: 1 },
+    { q: "12. Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "Məktəbəhazırlıq qrupunda rəsmçəkmə", "Böyük qrupda rəsmçəkmə"], answer: 3 },
+    { q: "13. Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["Obrazların ifadəliliyi", "Texniki savadlılığın yüksək səviyyəsi", "Düşüncənin dərinliyi, ünsiyyət sferası", "İşin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
+    { q: "14. Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "Məktəbəhazırlıq qrupunda rəsmçəkmə", "Orta qrupda rəsmçəkmə"], answer: 3 },
+    { q: "15. Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "Orta qrupda applikasiya", "Böyük qrupda applikasiya", "Məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
+    { q: "16. Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "Orta qrupda applikasiya", "Böyük qrupda applikasiya", "Məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
+    { q: "17. Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "Orta qrupda applikasiya", "Böyük qrupda applikasiya", "Məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
+    { q: "18. Fransız dilindən tərcümədə 'nöqtə' deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["Kopiyalama texnikası", "Klyaksoqrafiya texnikası", "Puantilizm texnikası", "Sürtmə texnikası"], answer: 2 },
+    { q: "19. Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["Özünəqiymətləndirmə qabiliyyətini formalaşdırır", "Ünsiyyət bacarıqlarını inkişaf etdirir", "Özünəinamı formalaşdırır", "İdrak bacarıqlarını inkişaf etdirir"], answer: 2 },
+    { q: "20. Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "Orta qrupa", "Böyük qrupa", "Məktəbəhazırlıq qrupuna"], answer: 2 },
+    { q: "21. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["Uşaqlarda yüksək fiziki dözümlülük mövcuddur", "Uşaqlarda yalnız iri motorika inkişaf edir", "Uşaq orqanizminin sağlamlığını qorumağa kömək edir", "Psixoloji gərginliyi aradan qaldırır"], answer: 1 },
     { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
     { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
     { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və gösterilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
-    { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
-    { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["Hərəkətlərin yalnız bir dəfə göstərilməsi", "Hərəkətin izahı və göstərilməsi", "Hərəkətlərin möhkəmləndirilməsi", "Konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq göstərilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
+    { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır"], answer: 0 },
     { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
-    { q: "29. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması.", "Tərbiyəçinin məşğələ planını hazırlaması.", "Təlim prosesində metodların seçilməsi.", "Tərbiyəçinin məşğələyə 'özünü hazırlaması'."], answer: 2 },
+    { q: "29. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması", "Tərbiyəçinin məşğələ planını hazırlaması", "Təlim prosesində metodların seçilməsi", "Tərbiyəçinin məşğələyə özünü hazırlaması"], answer: 2 },
     { q: "30. Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 },
     { q: "31. Məktəbəqədər təhsil müəssisələrində hansı yaş qrupunda fiziki məşğələlərə daha çox oyun elementləri qatılır?", options: ["Kiçik qruplarda", "Yalnız məktəbəhazırlıq qrupunda", "Məktəbdən kənar dərslərdə", "Heç birində"], answer: 0 },
     { q: "32. Uşaqların xırda motorikasını inkişaf etdirən təsviri fəaliyyət növü hansıdır?", options: ["Lepka və Applikasiya", "Yalnız qaçış", "Sıraya düzülmə", "Gimnastika"], answer: 0 },
-    { q: "33. Təsviri fəaliyyətdə qayçı ilə kəsmə bacarığı hansı yaş qrupundan etibarən sistemli öyrədilir?", options: ["Orta qrupdan", "1-ci kiçik qrupdan", "Körpələr qrupundan", "Yalnız İbtidai sinifdə"], answer: 0 },
+    { q: "33. Təsviri fəaliyyətdə qayçı ilə kəsmə bacarığı hansı yaş qrupundan etibarən sistemli öyrədilir?", options: ["Orta qrupdan", "1-ci kiçik qrupdan", "Körpələr qrupundan", "Yalnız ibtidai sinifdə"], answer: 0 },
     { q: "34. Ştamplama texnikasında hansı materiallardan istifadə oluna bilər?", options: ["Kartof, yarpaq, xüsusi möhürlər", "Yalnız metal lövhələr", "Mərmər daşlar", "Yalnız plastik borular"], answer: 0 },
     { q: "35. Uşaqlarda məkan anlayışını (sağ, sol, üst, alt) formalaşdıran fəaliyyət növü hansıdır?", options: ["Konstruksiyaetmə və Rəsm", "Yalnız musiqi dinləmə", "Sərbəst yuxu", "Yalnız şeir əzbərləmək"], answer: 0 },
     { q: "36. Monotipiya texnikasının əsas məğzi nədir?", options: ["Hamar səthə çəkilmiş rəsmin kağıza çıxarılması (çapı)", "Nöqtələrlə rəsm çəkmək", "Şamla rəsm çəkmək", "Ləkəyə üfürmək"], answer: 0 },
     { q: "37. Bədən tərbiyəsi məşğələlərində əsas hərəkətlərə hansılar daxildir?", options: ["Gəzmək, qaçmaq, tullanmaq, dırmanmaq", "Rəsm çəkmək, kəsmək", "Şeir demək, oxumaq", "Şahmat oynamaq"], answer: 0 },
-    { q: "38. Tərbiyəçinin təsviri fəaliyyət zamanı uşaqlara 'sərbəst mövzu' verməkdə məqsədi nədir?", options: ["Yaradıcı təxəyyülü və müstəqilliyi inkişaf etdirmək", "Vaxta qənaət etmək", "İşini asanlaşdırmaq", "Uşaqları sınaqdan çıxarmaq"], answer: 0 },
+    { q: "38. Tərbiyəçinin təsviri fəaliyyət zamanı uşaqlara sərbəst mövzu verməkdə məqsədi nədir?", options: ["Yaradıcı təxəyyülü və müstəqilliyi inkişaf etdirmək", "Vaxta qənaət etmək", "İşini asanlaşdırmaq", "Uşaqları sınaqdan çıxarmaq"], answer: 0 },
     { q: "39. Hansı rəsm texnikasında pambıq çubuqlarından istifadə etmək daha əlverişlidir?", options: ["Puantilizm (nöqtə texnikası)", "Monotipiya", "Fotokopiya", "Klyaksoqrafiya"], answer: 0 },
     { q: "40. Applikasiya məşğələlərində hansı materiallardan istifadə etmək olar?", options: ["Rəngli kağız, parça, quru yarpaqlar, dənli bitkilər", "Yalnız ağ kağız", "Yalnız plastilin", "Şüşə qırıqları"], answer: 0 },
     { q: "41. Fiziki tərbiyə məşğələsində giriş hissəsinin əsas məqsədi nədir?", options: ["Orqanizmi fiziki yüklənməyə hazırlamaq (qızışdırıcı hərəkətlər)", "Uşaqları yatırtmaq", "Nəticələri qiymətləndirmək", "Sakit oyunlar oynamaq"], answer: 0 },
@@ -559,17 +587,17 @@ const rawQuestions = [
     { q: "44. Konstruksiyaetmə məşğələlərində hansı materiallardan istifadə olunur?", options: ["Tikinti materialları, Leqo, kağız, təbii materiallar", "Yalnız sulu boya", "Yalnız karandaş", "Səs yazıları"], answer: 0 },
     { q: "45. Məktəbəhazırlıq qrupunda təsviri fəaliyyət məşğələsinin müddəti adətən nə qədər olmalıdır?", options: ["25-30 dəqiqə", "10 dəqiqə", "60 dəqiqə", "45 dəqiqə"], answer: 0 },
     { q: "46. Uşaqların fiziki tərbiyəsində hərəkətli oyunların rolu nədir?", options: ["Hərəkət vərdişlərini möhkəmləndirir və emosional fon yaradır", "Yalnız intizamı pozur", "Vaxtı boşa verir", "Dərsi çətinləşdirir"], answer: 0 },
-    { q: "47. Təsviri fəaliyyətdə 'Relyefli lepka' ne deməkdir?", options: ["Müstəvi (lövhə) üzərində qabarıq təsvirin yaradılması", "Kağızı cırmaq", "Masa üzərində su tökmək", "Rəngləri qarışdırmaq"], answer: 0 },
+    { q: "47. Təsviri fəaliyyətdə relyefli lepka ne deməkdir?", options: ["Müstəvi (lövhə) üzərində qabarıq təsvirin yaradılması", "Kağızı cırmaq", "Masa üzərində su tökmək", "Rəngləri qarışdırmaq"], answer: 0 },
     { q: "48. Aşağıdakılardan hansı qeyri-ənənəvi rəsm texnikası DEYİL?", options: ["Adi karandaşla xətt çəkmək", "Barmaq boyakarlığı", "Klyaksoqrafiya", "Puantilizm"], answer: 0 },
     { q: "49. Uşağa qayçı ilə işləmə qaydalarını öyrədərkən birinci növbədə nəyə diqqət yetirilməlidir?", options: ["Təhlükəsizlik qaydalarına", "Kəsmə sürətinə", "Kağızın rənginə", "Dərsin vaxtına"], answer: 0 },
     { q: "50. Məktəbəqədər müəssisədə fiziki dəqiqələrin (fizkultminutka) keçirilməsində məqsəd nədir?", options: ["Yorğunluğu aradan qaldırmaq və diqqəti bərpa etmək", "Uşaqları cəzalandırmaq", "Məşğələni tez bitirmək", "Yalnız idman zalına getmək"], answer: 0 },
     { q: "51. Plastilinlə iş zamanı istifadə olunan xüsusi plastik bıçaq necə adlanır?", options: ["Stek", "Palitra", "Molbert", "Şstamp"], answer: 0 },
     { q: "52. Boyaları qarışdırmaq üçün istifadə olunan lövhə necə adlanır?", options: ["Palitra", "Molbert", "Stek", "Karkas"], answer: 0 },
-    { q: "53. Rəsm çəkmək üçün üzərində kağız və ya kətillər bərkidilən altlıq/stend necə adlanır?", options: ["Molbert", "Palitra", "Plandor", "Eskiz"], answer: 0 },
+    { q: "53. Rəsm çəkmək üçün üzərində kağız bərkidilən stend necə adlanır?", options: ["Molbert", "Palitra", "Plandor", "Eskiz"], answer: 0 },
     { q: "54. Uşaqlarda ritm və hərəkət koordinasiyasını inkişaf etdirən fiziki məşq növü hansıdır?", options: ["Musiqili-ritmik gimnastika", "Ağır atletika", "Şahmat", "Yalnız qaçış"], answer: 0 },
     { q: "55. Kiçik qrupda lepkadan istifadə edərkən hansı sadə üsullar öyrədilir?", options: ["Yumrulama (kürəcik), yayma (çubuq/sosiska)", "Mürəkkəb heykəltəraşlıq", "Oymaçılıq", "Cilalama"], answer: 0 },
-    { q: "56. Təsviri fəaliyyətdə 'Kompozisiya' ne deməkdir?", options: ["Hissələrin müəyyən nizamla və bədii bütövlükdə birləşdirilməsi", "Yalnız rənglərin seçilməsi", "İstifadə olunan fırçaların sayı", "Kağızın ölçüsü"], answer: 0 },
-    { q: "57. Uşaqlarda fəza təfəkkürünü və mühəndislik rüşeymlərini inkişaf etdirən fəaliyyət hansıdır?", options: ["Konstruksiyaetmə", "Yalnız Mahnı oxumaq", "Şeir demək", "Yalnız Nağıl dinləmək"], answer: 0 },
+    { q: "56. Təsviri fəaliyyətdə kompozisiya ne deməkdir?", options: ["Hissələrin müəyyən nizamla və bədii bütövlükdə birləşdirilməsi", "Yalnız rənglərin seçilməsi", "İstifadə olunan fırçaların sayı", "Kağızın ölçüsü"], answer: 0 },
+    { q: "57. Uşaqlarda fəza təfəkkürünü və mühəndislik rüşeymlərini inkişaf etdirən fəaliyyət hansıdır?", options: ["Konstruksiyaetmə", "Yalnız mahnı oxumaq", "Şeir demək", "Yalnız nağıl dinləmək"], answer: 0 },
     { q: "58. Uşaq bağçasında səhər gimnastikasının müddəti kiçik qruplarda nə qədər olmalıdır?", options: ["5-6 dəqiqə", "20 dəqiqə", "30 dəqiqə", "1 dəqiqə"], answer: 0 },
     { q: "59. Səhər gimnastikasının əsas pedaqoji məqsədi nədir?", options: ["Uşaq orqanizmini oyatmaq və günə gümrah başlamaq", "Uşaqları yormaq", "Səhər yeməyini gecikdirmək", "İntizamı sərtləşdirmək"], answer: 0 },
     { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
@@ -583,34 +611,13 @@ let currentQuestionIndex = 0;
 let userAnswers = [];
 let isReviewMode = false;
 
-function shuffleArray(array) {
-    let arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
-
+/* STREAMING_CHUNK: Quiz Controller Functions */
 function startQuiz() {
-    playSound('click');
+    playClickSound();
     isReviewMode = false;
-    let shuffledQuestions = shuffleArray(rawQuestions);
-    let selectedQuestions = shuffledQuestions.slice(0, 60);
-
-    currentQuestions = selectedQuestions.map(qObj => {
-        let optionsWithFlag = qObj.options.map((opt, idx) => ({
-            text: opt,
-            isCorrect: idx === qObj.answer
-        }));
-        optionsWithFlag = shuffleArray(optionsWithFlag);
-        
-        return {
-            q: qObj.q,
-            options: optionsWithFlag.map(o => o.text),
-            answer: optionsWithFlag.findIndex(o => o.isCorrect)
-        };
-    });
+    
+    // Strict requirement: DO NOT SHUFFLE, keep exact sequence 1-60
+    currentQuestions = JSON.parse(JSON.stringify(rawQuestions));
 
     activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
     currentQuestionIndex = 0;
@@ -633,10 +640,10 @@ function showFeedbackOverlay(type) {
     
     if (type === 'happy') {
         textEl.className = "speech-bubble happy";
-        textEl.innerText = happyRemarks[Math.floor(Math.random() * happyRemarks.length)];
+        textEl.innerText = "Əla! Tamamilə doğru cavabdır.";
     } else {
         textEl.className = "speech-bubble angry";
-        textEl.innerText = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+        textEl.innerText = "SƏHV CAVAB! (AAAAAAHHH!)";
     }
     
     overlay.classList.add("show");
@@ -660,10 +667,10 @@ function showQuestion() {
     if (isReviewMode) {
         document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
     } else {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TƏSTİ BİTİR" : "NÖVBƏTİ";
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TESTİ BİTİR" : "NÖVBƏTİ";
     }
 
-    document.getElementById("question-number").innerText = `SUAL ${currentQuestionIndex + 1} / ${total}`;
+    document.getElementById("question-number").innerText = `SUAL ${originalIdx + 1} / ${currentQuestions.length}`;
     
     let answeredCount = userAnswers.filter(a => a !== null).length;
     document.getElementById("answered-count").innerText = `${answeredCount}/${currentQuestions.length}`;
@@ -731,23 +738,29 @@ function selectOption(selectedIndex) {
 
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
-        playSound('click');
+        playClickSound();
         hideFeedbackOverlay();
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
-            playSound('correct');
+            playCorrectSound();
             showFeedbackOverlay('happy');
         } else {
-            playSound('wrong');
+            // Scream and Shake container on wrong answer
+            playScreamSound();
             showFeedbackOverlay('angry');
+
+            const quizContainer = document.getElementById("quiz-container");
+            quizContainer.classList.remove('shake-screen');
+            void quizContainer.offsetWidth; // Force reflow
+            quizContainer.classList.add('shake-screen');
         }
     }
     showQuestion();
 }
 
 function prevQuestion() {
-    playSound('click');
+    playClickSound();
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         showQuestion();
@@ -755,7 +768,7 @@ function prevQuestion() {
 }
 
 function nextQuestion() {
-    playSound('click');
+    playClickSound();
     if (currentQuestionIndex < activeQuestionsList.length - 1) {
         currentQuestionIndex++;
         showQuestion();
@@ -765,7 +778,7 @@ function nextQuestion() {
 }
 
 function showResults() {
-    playSound('win');
+    playCorrectSound();
     hideFeedbackOverlay();
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
@@ -789,7 +802,7 @@ function showResults() {
 }
 
 function reviewAllQuiz() {
-    playSound('click');
+    playClickSound();
     isReviewMode = true;
     activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
     currentQuestionIndex = 0;
@@ -799,7 +812,7 @@ function reviewAllQuiz() {
 }
 
 function reviewWrongQuiz() {
-    playSound('click');
+    playClickSound();
     let wrongList = [];
 
     currentQuestions.forEach((q, idx) => {
@@ -824,6 +837,11 @@ function reviewWrongQuiz() {
 
 window.onload = startQuiz;
 </script>
-
 </body>
 </html>
+```eof
+
+Tətbiq yeniləndi:
+1. **Sual ardıcıllığı korlanmır:** Suallar və variantlar qarışdırılmır, 1-dən 60-a kimi tam ardıcıllıqla təqdim olunur.
+2. **Emojisiz interfeys:** Bütün emojilər tamamilə silindi.
+3. **Səs və titrəmə effekti:** Səhv cavab seçildikdə uca qışqırıq səs effekti verilir və pəncərə güclü şəkildə titrəyir.
