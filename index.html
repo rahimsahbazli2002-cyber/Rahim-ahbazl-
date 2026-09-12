@@ -3,290 +3,885 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qışqıran Viktorina</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-shadow: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-blue-shadow: #1899d6;
+            --duo-red: #ff4b4b;
+            --duo-red-shadow: #ea2b2b;
+            --duo-purple: #ce82ff;
+            --duo-purple-shadow: #b759f2;
+            --duo-yellow: #ffc800;
+            --duo-gray: #e5e5e5;
+            --duo-dark-gray: #777;
+            --duo-text: #4b4b4b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+        }
+
+        /* HƏRƏKƏTLİ ARXA PLAN ANIMASIYASI */
+        body {
+            background: linear-gradient(-45deg, #e6f7ff, #e8fcdb, #f3e8ff, #fff2db);
+            background-size: 400% 400%;
+            animation: animatedBg 12s ease infinite;
+            color: var(--duo-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Arxa planda dinamik hərəkət edən işıqlı dairələr */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(88, 204, 2, 0.15);
+            border-radius: 50%;
+            top: 10%;
+            left: 15%;
+            filter: blur(50px);
+            animation: floatBubble 8s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: rgba(28, 176, 246, 0.15);
+            border-radius: 50%;
+            bottom: 10%;
+            right: 15%;
+            filter: blur(60px);
+            animation: floatBubble 10s ease-in-out infinite alternate-reverse;
+            z-index: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border: 3px solid var(--duo-gray);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 750px;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06), 0 8px 0 var(--duo-gray);
+            z-index: 2;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Yuxarı Panel */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            color: var(--duo-dark-gray);
+            cursor: pointer;
+            font-weight: 900;
+            transition: transform 0.2s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 18px;
+            background-color: var(--duo-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--duo-green), #78de19);
+            border-radius: 12px;
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
+        }
+
+        .stats-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--duo-yellow);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        /* Sual Sahəsi Animasiyası */
+        .question-box {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .question-title {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--duo-dark-gray);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #3c3c3c;
+            margin-bottom: 28px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        /* Variantlar */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            background-color: #fff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 5px solid var(--duo-gray);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #4b4b4b;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+            margin-bottom: 3px;
+        }
+
+        /* Seçilmiş variant halları */
+        .option-btn.correct {
+            background-color: #d7ffb8 !important;
+            border-color: var(--duo-green) !important;
+            border-bottom-color: var(--duo-green-shadow) !important;
+            color: var(--duo-green-shadow) !important;
+            animation: bounce 0.4s ease;
+        }
+
+        .option-btn.wrong {
+            background-color: #ffdbe9 !important;
+            border-color: var(--duo-red) !important;
+            border-bottom-color: var(--duo-red-shadow) !important;
+            color: var(--duo-red-shadow) !important;
+            animation: shake 0.4s ease;
+        }
+
+        /* Soldan gələn EMOJİ Paneli (Düz/Səhv üçün ortaq) */
+        .feedback-overlay {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 999;
+            transform: translateX(-150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .feedback-overlay.show {
+            transform: translateX(0);
+        }
+
+        .feedback-emoji {
+            font-size: 5rem;
+            line-height: 1;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+        }
+
+        .feedback-emoji.angry {
+            animation: shake 0.4s ease infinite alternate;
+        }
+
+        .feedback-emoji.happy {
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        /* Danışıq balonu */
+        .speech-bubble {
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 900;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            max-width: 260px;
+            position: relative;
+        }
+
+        .speech-bubble.angry {
+            background: #ff4b4b;
+            box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .speech-bubble.happy {
+            background: #58cc02;
+            box-shadow: 0 6px 0 #46a302, 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Alt Düymələr */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            border-top: 2px solid var(--duo-gray);
+            padding-top: 24px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none !important;
+        }
+
+        .btn-gray {
+            background-color: var(--duo-gray);
+            color: var(--duo-dark-gray);
+            box-shadow: 0 4px 0 #ccc;
+        }
+
+        .btn-green {
+            background-color: var(--duo-green);
+            color: white;
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+        }
+
+        .btn-purple {
+            background-color: var(--duo-purple);
+            color: white;
+            box-shadow: 0 4px 0 var(--duo-purple-shadow);
+        }
+
+        .btn-red {
+            background-color: var(--duo-red);
+            color: white;
+            box-shadow: 0 4px 0 var(--duo-red-shadow);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Nəticə Ekranı */
+        .result-screen {
+            text-align: center;
+            padding: 20px 0;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: float 2s infinite ease-in-out;
+        }
+
+        .result-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--duo-green);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: #fff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray);
+            border-radius: 16px;
+            padding: 18px;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Animasiyalar */
+        @keyframes animatedBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatBubble {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-40px) scale(1.1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-15px); }
-            40%, 80% { transform: translateX(15px); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
         }
-        .shake-screen {
-            animation: shake 0.5s ease-in-out;
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
         }
-        @keyframes flashRed {
-            0% { background-color: rgba(239, 68, 68, 0.8); }
-            100% { background-color: transparent; }
-        }
-        .flash-red {
-            animation: flashRed 0.6s ease-out;
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
         }
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4 transition-colors duration-300" id="body">
+<body>
 
-    <!-- Flash Overlay -->
-    <div id="overlay" class="fixed inset-0 pointer-events-none z-50"></div>
+<!-- Ekranın sol tərəfindən sürüşüb çıxan EMOJİ PANELSİ (Həm düz, həm səhv üçün) -->
+<div id="feedback-overlay" class="feedback-overlay">
+    <div id="feedback-emoji" class="feedback-emoji">😊</div>
+    <div id="feedback-text" class="speech-bubble happy">
+        Əla! Tamamilə doğru cavab!
+    </div>
+</div>
 
-    <div class="max-w-xl w-full bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-700 relative overflow-hidden" id="quiz-card">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <span class="text-xs font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/30">
-                Sual <span id="current-question">1</span> / <span id="total-questions">5</span>
-            </span>
-            <span class="text-sm font-medium text-slate-400">
-                Xal: <span id="score" class="text-emerald-400 font-bold">0</span>
-            </span>
+<div class="container">
+    <!-- Test Ekranı -->
+    <div id="quiz-screen">
+        <div class="header">
+            <div class="close-btn" onclick="startQuiz()">✕</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="stats-badge">⚡ <span id="answered-count">0/60</span></div>
         </div>
 
-        <!-- Question -->
-        <h2 id="question-text" class="text-xl sm:text-2xl font-bold mb-6 text-slate-100 min-h-[60px] flex items-center">
-            Sual yüklənir...
-        </h2>
-
-        <!-- Options Container -->
-        <div id="options-container" class="space-y-3 mb-6">
-            <!-- Buttons injected by JS -->
+        <div class="question-box" id="question-box">
+            <div class="question-title" id="question-number">SUAL 1 / 60</div>
+            <div id="question-text" class="question-text">Sual yüklənir...</div>
+            <div id="options-container" class="options-container"></div>
         </div>
 
-        <!-- Feedback Box -->
-        <div id="feedback" class="hidden p-4 rounded-xl font-bold text-center mb-6 transition-all duration-300 text-lg"></div>
-
-        <!-- Next Button -->
-        <button id="next-btn" onclick="nextQuestion()" class="hidden w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-200 shadow-lg shadow-indigo-600/30">
-            Növbəti Sual &rarr;
-        </button>
-
-        <!-- Final Score View -->
-        <div id="result-screen" class="hidden text-center py-6">
-            <div class="text-5xl mb-4" id="result-emoji">🎉</div>
-            <h3 class="text-2xl font-bold mb-2">Viktorina Başa Çatdı!</h3>
-            <p class="text-slate-400 mb-6 text-lg">Topladığınız xal: <span id="final-score" class="text-indigo-400 font-bold">0</span> / <span id="final-total">5</span></p>
-            <button onclick="restartQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl transition shadow-lg">
-                Yenidən Başla
-            </button>
+        <div class="footer">
+            <button id="prev-btn" class="btn btn-gray" onclick="prevQuestion()" disabled>GERİ</button>
+            <button id="next-btn" class="btn btn-green" onclick="nextQuestion()">NÖVBƏTİ</button>
         </div>
     </div>
 
-    <script>
-        const questions = [
-            {
-                question: "Azərbaycan Respublikasının paytaxtı hansı şəhərdir?",
-                options: ["Gəncə", "Sumqayıt", "Bakı", "Şəki"],
-                correct: 2
-            },
-            {
-                question: "Dünyanın ən böyük gölü hansıdır?",
-                options: ["Xəzər dənizi", "Baykal", "Viktoriya", "Mişiqan"],
-                correct: 0
-            },
-            {
-                question: "Hansı rəng əsas rənglərdən biri DEYİL?",
-                options: ["Qırmızı", "Yaşıl", "Mavi", "Bənövşəyi"],
-                correct: 3
-            },
-            {
-                question: "Gündəlik həyatda istifadə etdiyimiz 'Kompüter' sözünün mənşəyi nəyə söykənir?",
-                options: ["Hesablamaq", "Yazmaq", "Göstərmək", "Əlaqə saxlamaq"],
-                correct: 0
-            },
-            {
-                question: "Şah İsmayıl Xətai hansı dövlətin banisidir?",
-                options: ["Qarabağ xanlığı", "Səfəvilər dövləti", "Qazan xanlığı", "Səlcuqlular"],
-                correct: 1
+    <!-- Nəticə Ekranı -->
+    <div id="result-screen" class="result-screen" style="display: none;">
+        <div class="result-icon">🏆</div>
+        <h2 class="result-title">Möhtəşəm İş!</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card" style="color: var(--duo-green);">
+                <span>ÜMUMİ BAL</span>
+                <span class="stat-value" id="final-score">0.00</span>
+            </div>
+            <div class="stat-card" style="color: var(--duo-blue);">
+                <span>NƏTİCƏ</span>
+                <span class="stat-value" id="stat-percent">0%</span>
+            </div>
+            <div class="stat-card" style="color: var(--duo-green);">
+                <span>DÜZGÜN</span>
+                <span class="stat-value" id="stat-correct">0</span>
+            </div>
+            <div class="stat-card" style="color: var(--duo-red);">
+                <span>SƏHV</span>
+                <span class="stat-value" id="stat-incorrect">0</span>
+            </div>
+        </div>
+
+        <div class="result-buttons">
+            <button class="btn btn-purple" onclick="reviewAllQuiz()">BÜTÜN CAVABLARA BAX</button>
+            <button class="btn btn-red" onclick="reviewWrongQuiz()">Səhvlərə bax</button>
+            <button class="btn btn-green" onclick="startQuiz()">YENİDƏN BAŞLA</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+    } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+    }
+}
+
+// Səhv cavab üçün əsəbi emojinin replikaları
+const angryRemarks = [
+    "Off! Yenə səhv etdin?! Bir az diqqətli ol da!",
+    "Eyy! Sualı düzgün oxu, hirslənirəm haa!",
+    "Bunu məktəbli də bilərdi! Necə səhv etdin ki?!",
+    "Aaa! Səhv cavab! İndi nə edəcəyik?!",
+    "Bax yenə tələsdin! Bir də yaxşı-yaxşı oxu!"
+];
+
+// Düzgün cavab üçün sevincli emojinin replikaları
+const happyRemarks = [
+    "Əla! Halaldır sənə, tamamilə düz tapdın! 🎉",
+    "Möhtəşəmsən! Belə də davam et! ⭐",
+    "Afərin! Səndən əsl müəllim olar! 👏",
+    "Bəli! Bax elə cavab belə olar! 🚀",
+    "Super! Sualı bir anlıq darmadağın etdin! 🔥"
+];
+
+const rawQuestions = [
+    { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
+    { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
+    { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
+    { q: "4. Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
+    { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
+    { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
+    { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
+    { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "9. Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+    { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
+    { q: "11. Tərbiyəçi tərbiyəçi-müəllimi dinləmək, gördüyünü və ya uşaqların düşündüyü rəsmi çəkmək, nəticəni qiymətləndirmək bacarığını formalaşdırır. Bu, hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 1 },
+    { q: "12. Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Bu, rəsmçəkmənin hansı mərhələsinə aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "böyük qrupda rəsmçəkmə"], answer: 3 },
+    { q: "13. Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi, ünsiyyət sferası", "işin yerinə yetirilməsinə analitik yanaşma"], answer: 0 },
+    { q: "14. Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, təsviri, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq lazımdır:", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 3 },
+    { q: "15. Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 0 },
+    { q: "16. Bu, gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 2 },
+    { q: "17. Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq və idarəolunan olur. Tərbiyəçi-müəllim əşyaya baxarkən uşaqları aktivləşdirir, əşyanı təsvir etməyi xahiş edir. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda applikasiya"], answer: 1 },
+    { q: "18. Fransız dilindən tərcümədə \"nöqtə\" deməkdir. Müvafiq olaraq, bu texnikanın xüsusiyyətlərindən biri təmiz rənglərin istifadə olunmasıdır. Bu xüsusiyyətlər hansı texnikaya aiddir?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
+    { q: "19. Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə qabiliyyətini formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
+    { q: "20. Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Bu, applikasiyanın hansı mərhələsinə aiddir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
+    { q: "21. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
+    { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
+    { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
+    { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və gösterilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
+    { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
+    { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
+    { q: "29. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması.", "Tərbiyəçinin məşğələ planını hazırlaması.", "Təlim prosesində metodların seçilməsi.", "Tərbiyəçinin məşğələyə 'özünü hazırlaması'."], answer: 2 },
+    { q: "30. Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 },
+    { q: "31. Məktəbəqədər təhsil müəssisələrində hansı yaş qrupunda fiziki məşğələlərə daha çox oyun elementləri qatılır?", options: ["Kiçik qruplarda", "Yalnız məktəbəhazırlıq qrupunda", "Məktəbdən kənar dərslərdə", "Heç birində"], answer: 0 },
+    { q: "32. Uşaqların xırda motorikasını inkişaf etdirən təsviri fəaliyyət növü hansıdır?", options: ["Lepka və Applikasiya", "Yalnız qaçış", "Sıraya düzülmə", "Gimnastika"], answer: 0 },
+    { q: "33. Təsviri fəaliyyətdə qayçı ilə kəsmə bacarığı hansı yaş qrupundan etibarən sistemli öyrədilir?", options: ["Orta qrupdan", "1-ci kiçik qrupdan", "Körpələr qrupundan", "Yalnız İbtidai sinifdə"], answer: 0 },
+    { q: "34. Ştamplama texnikasında hansı materiallardan istifadə oluna bilər?", options: ["Kartof, yarpaq, xüsusi möhürlər", "Yalnız metal lövhələr", "Mərmər daşlar", "Yalnız plastik borular"], answer: 0 },
+    { q: "35. Uşaqlarda məkan anlayışını (sağ, sol, üst, alt) formalaşdıran fəaliyyət növü hansıdır?", options: ["Konstruksiyaetmə və Rəsm", "Yalnız musiqi dinləmə", "Sərbəst yuxu", "Yalnız şeir əzbərləmək"], answer: 0 },
+    { q: "36. Monotipiya texnikasının əsas məğzi nədir?", options: ["Hamar səthə çəkilmiş rəsmin kağıza çıxarılması (çapı)", "Nöqtələrlə rəsm çəkmək", "Şamla rəsm çəkmək", "Ləkəyə üfürmək"], answer: 0 },
+    { q: "37. Bədən tərbiyəsi məşğələlərində əsas hərəkətlərə hansılar daxildir?", options: ["Gəzmək, qaçmaq, tullanmaq, dırmanmaq", "Rəsm çəkmək, kəsmək", "Şeir demək, oxumaq", "Şahmat oynamaq"], answer: 0 },
+    { q: "38. Tərbiyəçinin təsviri fəaliyyət zamanı uşaqlara 'sərbəst mövzu' verməkdə məqsədi nədir?", options: ["Yaradıcı təxəyyülü və müstəqilliyi inkişaf etdirmək", "Vaxta qənaət etmək", "İşini asanlaşdırmaq", "Uşaqları sınaqdan çıxarmaq"], answer: 0 },
+    { q: "39. Hansı rəsm texnikasında pambıq çubuqlarından istifadə etmək daha əlverişlidir?", options: ["Puantilizm (nöqtə texnikası)", "Monotipiya", "Fotokopiya", "Klyaksoqrafiya"], answer: 0 },
+    { q: "40. Applikasiya məşğələlərində hansı materiallardan istifadə etmək olar?", options: ["Rəngli kağız, parça, quru yarpaqlar, dənli bitkilər", "Yalnız ağ kağız", "Yalnız plastilin", "Şüşə qırıqları"], answer: 0 },
+    { q: "41. Fiziki tərbiyə məşğələsində giriş hissəsinin əsas məqsədi nədir?", options: ["Orqanizmi fiziki yüklənməyə hazırlamaq (qızışdırıcı hərəkətlər)", "Uşaqları yatırtmaq", "Nəticələri qiymətləndirmək", "Sakit oyunlar oynamaq"], answer: 0 },
+    { q: "42. Fiziki tərbiyə məşğələsində yekun hissənin əsas məqsədi nədir?", options: ["Tənəffüsü və nəbzi bərpa etmək, orqanizmi sakitləşdirmək", "Yüksək sürətlə qaçmaq", "Yeni çətin hərəkətlər öyrətmək", "Qrupdan ayrılmaq"], answer: 0 },
+    { q: "43. Məktəbəqədər yaşlı uşaqların fiziki inkişafında hansı keyfiyyətlər tərbiyə olunur?", options: ["Sürət, çeviklik, güc, dözümlülük, müvazinət", "Yalnız oxumaq bacarığı", "Yalnız rəsm texnikası", "Məntiqi mühakimə"], answer: 0 },
+    { q: "44. Konstruksiyaetmə məşğələlərində hansı materiallardan istifadə olunur?", options: ["Tikinti materialları, Leqo, kağız, təbii materiallar", "Yalnız sulu boya", "Yalnız karandaş", "Səs yazıları"], answer: 0 },
+    { q: "45. Məktəbəhazırlıq qrupunda təsviri fəaliyyət məşğələsinin müddəti adətən nə qədər olmalıdır?", options: ["25-30 dəqiqə", "10 dəqiqə", "60 dəqiqə", "45 dəqiqə"], answer: 0 },
+    { q: "46. Uşaqların fiziki tərbiyəsində hərəkətli oyunların rolu nədir?", options: ["Hərəkət vərdişlərini möhkəmləndirir və emosional fon yaradır", "Yalnız intizamı pozur", "Vaxtı boşa verir", "Dərsi çətinləşdirir"], answer: 0 },
+    { q: "47. Təsviri fəaliyyətdə 'Relyefli lepka' ne deməkdir?", options: ["Müstəvi (lövhə) üzərində qabarıq təsvirin yaradılması", "Kağızı cırmaq", "Masa üzərində su tökmək", "Rəngləri qarışdırmaq"], answer: 0 },
+    { q: "48. Aşağıdakılardan hansı qeyri-ənənəvi rəsm texnikası DEYİL?", options: ["Adi karandaşla xətt çəkmək", "Barmaq boyakarlığı", "Klyaksoqrafiya", "Puantilizm"], answer: 0 },
+    { q: "49. Uşağa qayçı ilə işləmə qaydalarını öyrədərkən birinci növbədə nəyə diqqət yetirilməlidir?", options: ["Təhlükəsizlik qaydalarına", "Kəsmə sürətinə", "Kağızın rənginə", "Dərsin vaxtına"], answer: 0 },
+    { q: "50. Məktəbəqədər müəssisədə fiziki dəqiqələrin (fizkultminutka) keçirilməsində məqsəd nədir?", options: ["Yorğunluğu aradan qaldırmaq və diqqəti bərpa etmək", "Uşaqları cəzalandırmaq", "Məşğələni tez bitirmək", "Yalnız idman zalına getmək"], answer: 0 },
+    { q: "51. Plastilinlə iş zamanı istifadə olunan xüsusi plastik bıçaq necə adlanır?", options: ["Stek", "Palitra", "Molbert", "Şstamp"], answer: 0 },
+    { q: "52. Boyaları qarışdırmaq üçün istifadə olunan lövhə necə adlanır?", options: ["Palitra", "Molbert", "Stek", "Karkas"], answer: 0 },
+    { q: "53. Rəsm çəkmək üçün üzərində kağız və ya kətillər bərkidilən altlıq/stend necə adlanır?", options: ["Molbert", "Palitra", "Plandor", "Eskiz"], answer: 0 },
+    { q: "54. Uşaqlarda ritm və hərəkət koordinasiyasını inkişaf etdirən fiziki məşq növü hansıdır?", options: ["Musiqili-ritmik gimnastika", "Ağır atletika", "Şahmat", "Yalnız qaçış"], answer: 0 },
+    { q: "55. Kiçik qrupda lepkadan istifadə edərkən hansı sadə üsullar öyrədilir?", options: ["Yumrulama (kürəcik), yayma (çubuq/sosiska)", "Mürəkkəb heykəltəraşlıq", "Oymaçılıq", "Cilalama"], answer: 0 },
+    { q: "56. Təsviri fəaliyyətdə 'Kompozisiya' ne deməkdir?", options: ["Hissələrin müəyyən nizamla və bədii bütövlükdə birləşdirilməsi", "Yalnız rənglərin seçilməsi", "İstifadə olunan fırçaların sayı", "Kağızın ölçüsü"], answer: 0 },
+    { q: "57. Uşaqlarda fəza təfəkkürünü və mühəndislik rüşeymlərini inkişaf etdirən fəaliyyət hansıdır?", options: ["Konstruksiyaetmə", "Yalnız Mahnı oxumaq", "Şeir demək", "Yalnız Nağıl dinləmək"], answer: 0 },
+    { q: "58. Uşaq bağçasında səhər gimnastikasının müddəti kiçik qruplarda nə qədər olmalıdır?", options: ["5-6 dəqiqə", "20 dəqiqə", "30 dəqiqə", "1 dəqiqə"], answer: 0 },
+    { q: "59. Səhər gimnastikasının əsas pedaqoji məqsədi nədir?", options: ["Uşaq orqanizmini oyatmaq və günə gümrah başlamaq", "Uşaqları yormaq", "Səhər yeməyini gecikdirmək", "İntizamı sərtləşdirmək"], answer: 0 },
+    { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
+];
+
+const optionPrefixes = ["A) ", "B) ", "C) ", "D) "];
+
+let currentQuestions = [];
+let activeQuestionsList = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+let isReviewMode = false;
+
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startQuiz() {
+    playSound('click');
+    isReviewMode = false;
+    let shuffledQuestions = shuffleArray(rawQuestions);
+    let selectedQuestions = shuffledQuestions.slice(0, 60);
+
+    currentQuestions = selectedQuestions.map(qObj => {
+        let optionsWithFlag = qObj.options.map((opt, idx) => ({
+            text: opt,
+            isCorrect: idx === qObj.answer
+        }));
+        optionsWithFlag = shuffleArray(optionsWithFlag);
+        
+        return {
+            q: qObj.q,
+            options: optionsWithFlag.map(o => o.text),
+            answer: optionsWithFlag.findIndex(o => o.isCorrect)
+        };
+    });
+
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
+    currentQuestionIndex = 0;
+    userAnswers = new Array(currentQuestions.length).fill(null);
+    
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    
+    showQuestion();
+}
+
+function hideFeedbackOverlay() {
+    const overlay = document.getElementById("feedback-overlay");
+    overlay.classList.remove("show");
+}
+
+function showFeedbackOverlay(type) {
+    const overlay = document.getElementById("feedback-overlay");
+    const emojiEl = document.getElementById("feedback-emoji");
+    const textEl = document.getElementById("feedback-text");
+    
+    if (type === 'happy') {
+        emojiEl.innerText = "😊";
+        emojiEl.className = "feedback-emoji happy";
+        textEl.className = "speech-bubble happy";
+        textEl.innerText = happyRemarks[Math.floor(Math.random() * happyRemarks.length)];
+    } else {
+        emojiEl.innerText = "😡";
+        emojiEl.className = "feedback-emoji angry";
+        textEl.className = "speech-bubble angry";
+        textEl.innerText = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+    }
+    
+    overlay.classList.add("show");
+}
+
+function showQuestion() {
+    let item = activeQuestionsList[currentQuestionIndex];
+    let q = item.question;
+    let originalIdx = item.originalIndex;
+    let total = activeQuestionsList.length;
+
+    hideFeedbackOverlay();
+
+    const qBox = document.getElementById("question-box");
+    qBox.style.animation = 'none';
+    qBox.offsetHeight; 
+    qBox.style.animation = 'slideIn 0.3s ease-out';
+
+    document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
+    
+    if (isReviewMode) {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
+    } else {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TƏSTİ BİTİR" : "NÖVBƏTİ";
+    }
+
+    document.getElementById("question-number").innerText = `SUAL ${currentQuestionIndex + 1} / ${total}`;
+    
+    let answeredCount = userAnswers.filter(a => a !== null).length;
+    document.getElementById("answered-count").innerText = `${answeredCount}/${currentQuestions.length}`;
+    document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+
+    document.getElementById("question-text").innerText = q.q;
+
+    let optionsContainer = document.getElementById("options-container");
+    optionsContainer.innerHTML = "";
+
+    let selectedIdx = userAnswers[originalIdx];
+    let correctIdx = q.answer;
+
+    q.options.forEach((optText, idx) => {
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        let prefixedText = optionPrefixes[idx] + optText;
+        
+        if (isReviewMode) {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+                btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
+            } else if (idx === selectedIdx) {
+                btn.classList.add("wrong");
+                btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
+            } else {
+                btn.innerHTML = `<span>${prefixedText}</span>`;
             }
-        ];
-
-        let currentIdx = 0;
-        let score = 0;
-        let answered = false;
-
-        const questionTxt = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const currentQEl = document.getElementById('current-question');
-        const totalQEl = document.getElementById('total-questions');
-        const scoreEl = document.getElementById('score');
-        const feedbackEl = document.getElementById('feedback');
-        const nextBtn = document.getElementById('next-btn');
-        const quizCard = document.getElementById('quiz-card');
-        const overlay = document.getElementById('overlay');
-        const resultScreen = document.getElementById('result-screen');
-
-        totalQEl.textContent = questions.length;
-
-        // Web Audio API to produce a harsh, realistic scream synthesizer sound
-        function playScreamSound() {
-            try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioCtx();
-
-                // Noise buffer for realistic throat scream texture
-                const bufferSize = ctx.sampleRate * 0.8;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
+        } 
+        else {
+            if (selectedIdx !== null) {
+                if (idx === correctIdx) {
+                    btn.classList.add("correct");
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
+                } else if (idx === selectedIdx) {
+                    btn.classList.add("wrong");
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
+                } else {
+                    btn.innerHTML = `<span>${prefixedText}</span>`;
                 }
-
-                const noise = ctx.createBufferSource();
-                noise.buffer = buffer;
-
-                // High pitch oscillator for vocal cord pitch
-                const osc = ctx.createOscillator();
-                osc.type = 'sawtooth';
-
-                // Pitch envelope - pitch drops drastically like a panic scream
-                osc.frequency.setValueAtTime(900, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.7);
-
-                // Filter to create vocal resonance
-                const filter = ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(1500, ctx.currentTime);
-                filter.Q.setValueAtTime(3.0, ctx.currentTime);
-
-                // Distortion Gain
-                const gain = ctx.createGain();
-                gain.gain.setValueAtTime(1.0, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-
-                // Connect nodes
-                noise.connect(filter);
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(ctx.destination);
-
-                noise.start();
-                osc.start();
-                noise.stop(ctx.currentTime + 0.8);
-                osc.stop(ctx.currentTime + 0.8);
-            } catch (e) {
-                console.error("Audio block", e);
-            }
-        }
-
-        function playSuccessSound() {
-            try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioCtx();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
-
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.4);
-            } catch (e) {}
-        }
-
-        function loadQuestion() {
-            answered = false;
-            feedbackEl.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            
-            const q = questions[currentIdx];
-            currentQEl.textContent = currentIdx + 1;
-            questionTxt.textContent = q.question;
-            optionsContainer.innerHTML = '';
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 rounded-xl bg-slate-700/60 hover:bg-slate-700 border border-slate-600/50 hover:border-indigo-500 font-medium transition duration-200 flex justify-between items-center group";
-                btn.innerHTML = `<span>${opt}</span> <span class="w-6 h-6 rounded-full border border-slate-500 group-hover:border-indigo-400 flex items-center justify-center text-xs text-slate-400">?</span>`;
-                btn.onclick = () => selectOption(idx);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function selectOption(selectedIdx) {
-            if (answered) return;
-            answered = true;
-
-            const q = questions[currentIdx];
-            const buttons = optionsContainer.children;
-
-            if (selectedIdx === q.correct) {
-                score++;
-                scoreEl.textContent = score;
-                buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl bg-emerald-600/30 border-2 border-emerald-500 text-emerald-200 font-medium flex justify-between items-center";
-                
-                feedbackEl.textContent = "✅ Əla! Düzgün cavab!";
-                feedbackEl.className = "p-4 rounded-xl font-bold text-center mb-6 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 block";
-                playSuccessSound();
             } else {
-                // Wrong Answer -> SCREAM + VISUAL SHAKE
-                playScreamSound();
-
-                buttons[selectedIdx].className = "w-full text-left p-4 rounded-xl bg-rose-600/30 border-2 border-rose-500 text-rose-200 font-medium flex justify-between items-center";
-                buttons[q.correct].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500/50 text-emerald-300 font-medium flex justify-between items-center";
-
-                feedbackEl.textContent = "😱 YANLIŞ CAVAB! (AAAAAAHHH!)";
-                feedbackEl.className = "p-4 rounded-xl font-bold text-center mb-6 bg-rose-500/20 text-rose-400 border border-rose-500/30 block";
-
-                // Shake screen and flash red
-                quizCard.classList.remove('shake-screen');
-                void quizCard.offsetWidth; // Trigger reflow
-                quizCard.classList.add('shake-screen');
-
-                overlay.classList.remove('flash-red');
-                void overlay.offsetWidth;
-                overlay.classList.add('flash-red');
+                btn.innerHTML = `<span>${prefixedText}</span>`;
             }
-
-            // Disable all buttons
-            Array.from(buttons).forEach(btn => btn.disabled = true);
-            nextBtn.classList.remove('hidden');
+            btn.onclick = () => selectOption(idx);
         }
 
-        function nextQuestion() {
-            currentIdx++;
-            if (currentIdx < questions.length) {
-                loadQuestion();
-            } else {
-                showResults();
-            }
+        optionsContainer.appendChild(btn);
+    });
+
+    if (selectedIdx !== null && !isReviewMode) {
+        if (selectedIdx === correctIdx) {
+            showFeedbackOverlay('happy');
+        } else {
+            showFeedbackOverlay('angry');
         }
+    }
+}
 
-        function showResults() {
-            questionTxt.classList.add('hidden');
-            optionsContainer.classList.add('hidden');
-            feedbackEl.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
+function selectOption(selectedIndex) {
+    if (isReviewMode) return;
 
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('final-total').textContent = questions.length;
-            document.getElementById('result-emoji').textContent = score === questions.length ? "🏆" : (score > 2 ? "👍" : "😱");
+    let originalIdx = activeQuestionsList[currentQuestionIndex].originalIndex;
+    let correctIdx = activeQuestionsList[currentQuestionIndex].question.answer;
+
+    if (userAnswers[originalIdx] === selectedIndex) {
+        userAnswers[originalIdx] = null;
+        playSound('click');
+        hideFeedbackOverlay();
+    } else {
+        userAnswers[originalIdx] = selectedIndex;
+        if (selectedIndex === correctIdx) {
+            playSound('correct');
+            showFeedbackOverlay('happy');
+        } else {
+            playSound('wrong');
+            showFeedbackOverlay('angry');
         }
+    }
+    showQuestion();
+}
 
-        function restartQuiz() {
-            currentIdx = 0;
-            score = 0;
-            scoreEl.textContent = 0;
-            resultScreen.classList.add('hidden');
-            questionTxt.classList.remove('hidden');
-            optionsContainer.classList.remove('hidden');
-            loadQuestion();
+function prevQuestion() {
+    playSound('click');
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion();
+    }
+}
+
+function nextQuestion() {
+    playSound('click');
+    if (currentQuestionIndex < activeQuestionsList.length - 1) {
+        currentQuestionIndex++;
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    playSound('win');
+    hideFeedbackOverlay();
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+
+    let correct = 0, incorrect = 0, unanswered = 0;
+
+    userAnswers.forEach((ans, idx) => {
+        if (ans === null) unanswered++;
+        else if (ans === currentQuestions[idx].answer) correct++;
+        else incorrect++;
+    });
+
+    let total = currentQuestions.length;
+    let finalScore = Math.max(0, (correct * 1) - (incorrect * 0.25));
+    let percentage = (correct / total) * 100;
+
+    document.getElementById("final-score").innerText = `${finalScore.toFixed(2)}`;
+    document.getElementById("stat-correct").innerText = correct;
+    document.getElementById("stat-incorrect").innerText = incorrect;
+    document.getElementById("stat-percent").innerText = `${percentage.toFixed(0)}%`;
+}
+
+function reviewAllQuiz() {
+    playSound('click');
+    isReviewMode = true;
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
+}
+
+function reviewWrongQuiz() {
+    playSound('click');
+    let wrongList = [];
+
+    currentQuestions.forEach((q, idx) => {
+        let ans = userAnswers[idx];
+        if (ans !== null && ans !== q.answer) {
+            wrongList.push({ question: q, originalIndex: idx });
         }
+    });
 
-        // Initialize quiz
-        loadQuestion();
-    </script>
+    if (wrongList.length === 0) {
+        alert("Təbrik edirik! Sizin heç bir səhv cavabınız yoxdur. 🎉");
+        return;
+    }
+
+    isReviewMode = true;
+    activeQuestionsList = wrongList;
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
+}
+
+window.onload = startQuiz;
+</script>
+
 </body>
 </html>
-```eof
-
-Səhv cavab verildikdə Web Audio API vasitəsilə qışqırıq səsi çıxaran və ekranı titrədən viktorina tətbiqini hazırladım.
-
-### Xüsusiyyətlər:
-- **Qışqırıq effekti:** Səhv cavab seçildikdə dinamik şəkildə formalaşan kəskin və uca qışqırıq səsi effekti çalınır.
-- **Vizual reaksiya:** Səhv cavab zamanı viktorina kartı titrəyir və ekran qırmızı rəngdə parlayır.
-- **Interaktiv viktorina:** Düzgün cavablar yaşıl, səhv cavablar qırmızı rənglə işarələnir və yekun nəticə göstərilir.
