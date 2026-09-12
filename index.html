@@ -188,6 +188,31 @@
             animation: shake 0.4s ease;
         }
 
+        /* Əsəbi Adam Paneli */
+        .angry-critic-box {
+            display: none;
+            background-color: #fff2f2;
+            border: 2px solid var(--duo-red);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 15px;
+            animation: shake 0.4s ease;
+        }
+
+        .angry-avatar {
+            font-size: 2.5rem;
+            animation: angryPulse 0.5s infinite alternate;
+        }
+
+        .angry-speech {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--duo-red-shadow);
+            line-height: 1.3;
+        }
+
         /* Alt Düymələr */
         .footer {
             display: flex;
@@ -324,6 +349,11 @@
             40%, 80% { transform: translateX(8px); }
         }
 
+        @keyframes angryPulse {
+            from { transform: scale(1) rotate(-5deg); }
+            to { transform: scale(1.15) rotate(5deg); }
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-12px); }
@@ -352,6 +382,12 @@
             <div class="question-title" id="question-number">SUAL 1 / 60</div>
             <div id="question-text" class="question-text">Sual yüklənir...</div>
             <div id="options-container" class="options-container"></div>
+        </div>
+
+        <!-- Əsəbi Tənqidçi Bölməsi -->
+        <div id="angry-critic" class="angry-critic-box">
+            <div class="angry-avatar">🤬</div>
+            <div class="angry-speech" id="angry-text">Bu nə cavabdır?! Bir az diqqətli ol!</div>
         </div>
 
         <div class="footer">
@@ -393,7 +429,6 @@
 </div>
 
 <script>
-// Web Audio API Vasitəsilə Səs Efektləri Generatoru
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(type) {
@@ -408,8 +443,8 @@ function playSound(type) {
 
     if (type === 'correct') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
         gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
         osc.start();
@@ -440,6 +475,15 @@ function playSound(type) {
         osc.stop(audioCtx.currentTime + 0.6);
     }
 }
+
+const angryRemarks = [
+    "Bu nə cavabdır?! Sualı tam oxudun heç?! 😡",
+    "Ciddi ola bilməzsən! Bu sualın cavabı bu deyildi! 🤦‍♂️",
+    "Ay müəllim, bir az diqqətli ol! Belə də səhv olar?! 😤",
+    "Gözüyumulu seçirsən variantları?! Yenidən fikir ver! 😠",
+    "Gedib proqramı bir də oxumalısan, bu nə bərbad seçimdir! 💣",
+    "Xeyr! Səhvdir! Kitabı aç, bir də oxu! ❌"
+];
 
 const rawQuestions = [
     { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
@@ -557,10 +601,13 @@ function showQuestion() {
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
+    // Əsəbi adam pəncərəsini gizlət
+    document.getElementById("angry-critic").style.display = "none";
+
     // Sual animasiyasını sıfırla
     const qBox = document.getElementById("question-box");
     qBox.style.animation = 'none';
-    qBox.offsetHeight; // Reflow
+    qBox.offsetHeight; 
     qBox.style.animation = 'slideIn 0.3s ease-out';
 
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
@@ -621,6 +668,22 @@ function showQuestion() {
 
         optionsContainer.appendChild(btn);
     });
+
+    // Əgər artıq səhv cavab seçilibsə, əsəbi adamı saxla
+    if (selectedIdx !== null && selectedIdx !== correctIdx && !isReviewMode) {
+        showAngryCritic();
+    }
+}
+
+function showAngryCritic() {
+    const criticBox = document.getElementById("angry-critic");
+    const criticText = document.getElementById("angry-text");
+    
+    // Təsadüfi əsəbi söz seç
+    const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+    criticText.innerText = randomRemark;
+    
+    criticBox.style.display = "flex";
 }
 
 function selectOption(selectedIndex) {
@@ -632,12 +695,15 @@ function selectOption(selectedIndex) {
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
         playSound('click');
+        document.getElementById("angry-critic").style.display = "none";
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
             playSound('correct');
+            document.getElementById("angry-critic").style.display = "none";
         } else {
             playSound('wrong');
+            showAngryCritic();
         }
     }
     showQuestion();
