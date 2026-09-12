@@ -210,13 +210,14 @@
         }
 
         .angry-person-gif {
-            width: 220px;
+            width: 200px;
             height: auto;
             max-height: 280px;
             border-radius: 20px;
             border: 4px solid var(--duo-red);
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             background-color: #fff;
+            object-fit: cover;
         }
 
         /* Əsəbi qızın danışıq balonu */
@@ -386,7 +387,7 @@
 
 <!-- Ekranın sol tərəfindən sürüşüb çıxacaq ƏSƏBİ BALACA QIZ (GIF) -->
 <div id="angry-man-overlay" class="angry-man-overlay">
-    <img id="angry-gif" src="https://media.giphy.com/media/l1J3p8k35U3rQc8M0/giphy.gif" alt="Əsəbi Qız" class="angry-person-gif">
+    <img id="angry-gif" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1NHNmcWRiaXUxeGJtZnJtb2t3dDk3OWxmeHN3am4ycHAyYTVhdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l1J3p8k35U3rQc8M0/giphy.gif" alt="Əsəbi Qız" class="angry-person-gif">
     <div class="angry-speech-bubble" id="angry-text">
         Off! Yenə səhv etdin?! Bir az diqqətli ol da! 😡
     </div>
@@ -495,12 +496,8 @@ function playSound(type) {
     }
 }
 
-// Əsəbi Balaca Qız GIF-ləri
-const angryGifs = [
-    "https://media.giphy.com/media/l1J3p8k35U3rQc8M0/giphy.gif",
-    "https://media.giphy.com/media/l0G17mKNa6L8rVJpC/giphy.gif",
-    "https://media.giphy.com/media/3o6fZRf9iYAt3Sscx2/giphy.gif"
-];
+// Birbaşa Giphy CDN keçidi
+const angryGirlGif = "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1NHNmcWRiaXUxeGJtZnJtb2t3dDk3OWxmeHN3am4ycHAyYTVhdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l1J3p8k35U3rQc8M0/giphy.gif";
 
 // Əsəbi balaca qızın cümlələri
 const angryRemarks = [
@@ -536,7 +533,7 @@ const rawQuestions = [
     { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
     { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
     { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+    { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə gösterilməsi", "hərəkətin izahı və gösterilməsi", "hərəkətdərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
     { q: "26. Fiziki məşğələlərin öyrənilməsi mərhələləri ilə bağlı hansı fikir doğrudur?", options: ["İlkin tapşırıqlar, möhkəmləndirmə, təkmilləşdirmə (yaradıcılıq)", "Yalnız hərəkətin qeyri-dəqiq gösterilməsi", "Əsas hərəkətlərin tamamilə təcrid olunması", "Hərəkətlərin izahsız təkrarı"], answer: 0 },
     { q: "27. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir.", "Natiqlik mədəniyyətinə və yumşaq səs tonuna malik olmalıdır.", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir.", "Nəzakətli və yaxşı əhval-ruhiyyədə olmalıdır."], answer: 0 },
     { q: "28. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
@@ -631,14 +628,11 @@ function showAngryMan() {
     const angryText = document.getElementById("angry-text");
     const angryGif = document.getElementById("angry-gif");
     
-    // Təsadüfi GIF və tənqid seç
-    const randomGif = angryGifs[Math.floor(Math.random() * angryGifs.length)];
     const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
     
-    angryGif.src = randomGif;
+    angryGif.src = angryGirlGif;
     angryText.innerText = randomRemark;
     
-    // Soldan sağa sürüşüb ekrana çıxır
     overlay.classList.add("show");
 }
 
