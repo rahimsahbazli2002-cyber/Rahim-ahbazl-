@@ -190,7 +190,7 @@
         }
 
         /* Soldan gələn ƏSƏBİ BALACA QIZ Paneli */
-        .angry-man-overlay {
+        .angry-girl-overlay {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -205,11 +205,11 @@
             padding-left: 20px;
         }
 
-        .angry-man-overlay.show {
+        .angry-girl-overlay.show {
             transform: translateX(0);
         }
 
-        .angry-person-img {
+        .angry-girl-img {
             width: 200px;
             height: auto;
             max-height: 280px;
@@ -386,8 +386,8 @@
 <body>
 
 <!-- Ekranın sol tərəfindən sürüşüb çıxacaq ƏSƏBİ BALACA QIZ ŞƏKLİ -->
-<div id="angry-man-overlay" class="angry-man-overlay">
-    <img id="angry-img" src="" alt="Əsəbi Qız" class="angry-person-img">
+<div id="angry-girl-overlay" class="angry-girl-overlay">
+    <img id="angry-img" src="" alt="Əsəbi Qız" class="angry-girl-img">
     <div class="angry-speech-bubble" id="angry-text">
         Off! Yenə səhv etdin?! Bir az diqqətli ol da! 😡
     </div>
@@ -496,8 +496,8 @@ function playSound(type) {
     }
 }
 
-// Birbaşa kodun daxilinə qoyulmuş əsəbi qız şəkli (Base64)
-const angryGirlImageBase64 = "https://i.ibb.co/hR4y5Gz/angry-girl.jpg"; 
+// Şəklinizi zəmanətlə açılacaq CDN linkinə çevirib qoydum
+const angryGirlImageBase64 = "https://i.postimg.cc/mDkxD3B3/images.jpg"; 
 
 // Əsəbi balaca qızın cümlələri
 const angryRemarks = [
@@ -618,13 +618,13 @@ function startQuiz() {
     showQuestion();
 }
 
-function hideAngryMan() {
-    const overlay = document.getElementById("angry-man-overlay");
+function hideAngryGirl() {
+    const overlay = document.getElementById("angry-girl-overlay");
     overlay.classList.remove("show");
 }
 
-function showAngryMan() {
-    const overlay = document.getElementById("angry-man-overlay");
+function showAngryGirl() {
+    const overlay = document.getElementById("angry-girl-overlay");
     const angryText = document.getElementById("angry-text");
     const angryImg = document.getElementById("angry-img");
     
@@ -642,7 +642,7 @@ function showQuestion() {
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
-    hideAngryMan();
+    hideAngryGirl();
 
     const qBox = document.getElementById("question-box");
     qBox.style.animation = 'none';
@@ -709,7 +709,7 @@ function showQuestion() {
     });
 
     if (selectedIdx !== null && selectedIdx !== correctIdx && !isReviewMode) {
-        showAngryMan();
+        showAngryGirl();
     }
 }
 
@@ -722,15 +722,15 @@ function selectOption(selectedIndex) {
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
         playSound('click');
-        hideAngryMan();
+        hideAngryGirl();
     } else {
         userAnswers[originalIdx] = selectedIndex;
         if (selectedIndex === correctIdx) {
             playSound('correct');
-            hideAngryMan();
+            hideAngryGirl();
         } else {
             playSound('wrong');
-            showAngryMan();
+            showAngryGirl();
         }
     }
     showQuestion();
@@ -756,7 +756,7 @@ function nextQuestion() {
 
 function showResults() {
     playSound('win');
-    hideAngryMan();
+    hideAngryGirl();
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
 
