@@ -189,7 +189,7 @@
             animation: shake 0.4s ease;
         }
 
-        /* Soldan gələn Real Əsəbi Adam Paneli */
+        /* Soldan gələn CANLI ƏSƏBİ ADAM (GIF) Paneli */
         .angry-man-overlay {
             position: fixed;
             bottom: 0;
@@ -209,12 +209,14 @@
             transform: translateX(0);
         }
 
-        .angry-person-img {
-            width: 220px;
+        .angry-person-gif {
+            width: 240px;
             height: auto;
-            max-height: 350px;
-            object-fit: contain;
-            filter: drop-shadow(4px 4px 15px rgba(0,0,0,0.3));
+            max-height: 320px;
+            border-radius: 20px;
+            border: 4px solid var(--duo-red);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background-color: #000;
         }
 
         /* Əsəbi adamın danışıq balonu */
@@ -229,7 +231,7 @@
             box-shadow: 0 6px 0 #ea2b2b, 0 10px 20px rgba(0,0,0,0.2);
             max-width: 280px;
             position: relative;
-            margin-bottom: 100px;
+            margin-bottom: 90px;
             animation: shake 0.5s ease;
         }
 
@@ -382,9 +384,9 @@
 </head>
 <body>
 
-<!-- Ekranın sol tərəfindən sürüşüb çıxacaq REAL ƏSƏBİ ADAM -->
+<!-- Ekranın sol tərəfindən sürüşüb çıxacaq CANLI ƏSƏBİ ADAM (GIF) -->
 <div id="angry-man-overlay" class="angry-man-overlay">
-    <img src="https://images.unsplash.com/photo-1541577141970-eebc83ebe30e?q=80&w=600&auto=format&fit=crop" alt="Əsəbi Adam" class="angry-person-img">
+    <img id="angry-gif" src="https://media.giphy.com/media/l1J9u3TZfpmeDLkD6/giphy.gif" alt="Əsəbi Adam" class="angry-person-gif">
     <div class="angry-speech-bubble" id="angry-text">
         Bu nə cavabdır?! Bir az diqqətli ol! 😡
     </div>
@@ -493,12 +495,20 @@ function playSound(type) {
     }
 }
 
+// Müxtəlif canlı əsəbi GIF-lər
+const angryGifs = [
+    "https://media.giphy.com/media/l1J9u3TZfpmeDLkD6/giphy.gif",
+    "https://media.giphy.com/media/3o9bQX4D8SmsX0B35C/giphy.gif",
+    "https://media.giphy.com/media/11tTNkKOScnLSi/giphy.gif",
+    "https://media.giphy.com/media/11tTNkKOScnLSi/giphy.gif"
+];
+
 const angryRemarks = [
     "Bu nə cavabdır?! Sualı tam oxudun ki?! 😡",
     "Ciddi ola bilməzsən! Cavab bu deyildi! 🤦‍♂️",
     "Bir az diqqətli ol! Belə də səhv olar?! 😤",
     "Gözüyumulu seçirsən variantları?! 😠",
-    "Gedib proqramı bir də oxymalısan! 💣",
+    "Gedib proqramı bir də oxumalısan! 💣",
     "Xeyr! Tamamilə səhvdir! Bir də düşün! ❌"
 ];
 
@@ -620,12 +630,16 @@ function hideAngryMan() {
 function showAngryMan() {
     const overlay = document.getElementById("angry-man-overlay");
     const angryText = document.getElementById("angry-text");
+    const angryGif = document.getElementById("angry-gif");
     
-    // Təsadüfi sərt tənqid seç
+    // Təsadüfi GIF və tənqid seç
+    const randomGif = angryGifs[Math.floor(Math.random() * angryGifs.length)];
     const randomRemark = angryRemarks[Math.floor(Math.random() * angryRemarks.length)];
+    
+    angryGif.src = randomGif;
     angryText.innerText = randomRemark;
     
-    // Soldan sağa ekrana çıxır
+    // Soldan sağa sürüşüb ekrana çıxır
     overlay.classList.add("show");
 }
 
