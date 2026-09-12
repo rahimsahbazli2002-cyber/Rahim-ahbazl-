@@ -38,6 +38,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
@@ -49,6 +50,7 @@
             padding: 32px;
             position: relative;
             box-shadow: 0 8px 0 var(--duo-gray);
+            transition: transform 0.2s ease;
         }
 
         /* Yuxarı Panel */
@@ -64,11 +66,16 @@
             color: var(--duo-dark-gray);
             cursor: pointer;
             font-weight: 900;
+            transition: transform 0.2s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2) rotate(90deg);
         }
 
         .progress-bar-container {
             flex-grow: 1;
-            height: 16px;
+            height: 18px;
             background-color: var(--duo-gray);
             border-radius: 12px;
             overflow: hidden;
@@ -78,9 +85,21 @@
         .progress-bar {
             height: 100%;
             width: 0%;
-            background-color: var(--duo-green);
+            background: linear-gradient(90deg, var(--duo-green), #78de19);
             border-radius: 12px;
             transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
         }
 
         .stats-badge {
@@ -90,9 +109,14 @@
             font-weight: 800;
             font-size: 1.1rem;
             color: var(--duo-yellow);
+            animation: pulse 1.5s infinite alternate;
         }
 
-        /* Sual Sahəsi */
+        /* Sual Sahəsi Animasiyası */
+        .question-box {
+            animation: slideIn 0.3s ease-out;
+        }
+
         .question-title {
             font-size: 0.95rem;
             text-transform: uppercase;
@@ -130,7 +154,7 @@
             color: #4b4b4b;
             text-align: left;
             cursor: pointer;
-            transition: all 0.1s ease;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -138,6 +162,7 @@
 
         .option-btn:hover:not(:disabled) {
             background-color: #f4f4f4;
+            transform: translateY(-2px);
         }
 
         .option-btn:active:not(:disabled) {
@@ -147,18 +172,12 @@
         }
 
         /* Seçilmiş variant halları */
-        .option-btn.selected {
-            border-color: var(--duo-blue);
-            border-bottom-color: var(--duo-blue-shadow);
-            background-color: #ddf4ff;
-            color: var(--duo-blue-shadow);
-        }
-
         .option-btn.correct {
             background-color: #d7ffb8 !important;
             border-color: var(--duo-green) !important;
             border-bottom-color: var(--duo-green-shadow) !important;
             color: var(--duo-green-shadow) !important;
+            animation: bounce 0.4s ease;
         }
 
         .option-btn.wrong {
@@ -166,6 +185,7 @@
             border-color: var(--duo-red) !important;
             border-bottom-color: var(--duo-red-shadow) !important;
             color: var(--duo-red-shadow) !important;
+            animation: shake 0.4s ease;
         }
 
         /* Alt Düymələr */
@@ -229,11 +249,14 @@
         .result-screen {
             text-align: center;
             padding: 20px 0;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .result-icon {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 10px;
+            display: inline-block;
+            animation: float 2s infinite ease-in-out;
         }
 
         .result-title {
@@ -260,6 +283,11 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
         }
 
         .stat-value {
@@ -273,6 +301,38 @@
             justify-content: center;
             flex-wrap: wrap;
         }
+
+        /* Animasiya Keyframe-ləri */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
     </style>
 </head>
 <body>
@@ -281,17 +341,18 @@
     <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
-            <div class="close-btn">✕</div>
+            <div class="close-btn" onclick="startQuiz()">✕</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
             <div class="stats-badge">⚡ <span id="answered-count">0/60</span></div>
         </div>
 
-        <div class="question-title" id="question-number">SUAL 1 / 60</div>
-        <div id="question-text" class="question-text">Sual yüklənir...</div>
-        
-        <div id="options-container" class="options-container"></div>
+        <div class="question-box" id="question-box">
+            <div class="question-title" id="question-number">SUAL 1 / 60</div>
+            <div id="question-text" class="question-text">Sual yüklənir...</div>
+            <div id="options-container" class="options-container"></div>
+        </div>
 
         <div class="footer">
             <button id="prev-btn" class="btn btn-gray" onclick="prevQuestion()" disabled>GERİ</button>
@@ -332,6 +393,54 @@
 </div>
 
 <script>
+// Web Audio API Vasitəsilə Səs Efektləri Generatoru
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+    } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+    }
+}
+
 const rawQuestions = [
     { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
     { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
@@ -395,6 +504,8 @@ const rawQuestions = [
     { q: "60. Tərbiyəçi məşğələ zamanı uşaqların fərdi xüsusiyyətlərini necə nəzərə almalıdır?", options: ["Hər bir uşağın inkişaf tempinə və bacarığına uyğun fərdi yanaşaraq", "Hamıya eyni dərəcədə təzyiq edərək", "Zəif uşaqları fəaliyyətdən təcrid edərək", "Yalnız fəal uşaqlarla işləyərək"], answer: 0 }
 ];
 
+const optionPrefixes = ["A) ", "B) ", "C) ", "D) "];
+
 let currentQuestions = [];
 let activeQuestionsList = [];
 let currentQuestionIndex = 0;
@@ -411,6 +522,7 @@ function shuffleArray(array) {
 }
 
 function startQuiz() {
+    playSound('click');
     isReviewMode = false;
     let shuffledQuestions = shuffleArray(rawQuestions);
     let selectedQuestions = shuffledQuestions.slice(0, 60);
@@ -445,6 +557,12 @@ function showQuestion() {
     let originalIdx = item.originalIndex;
     let total = activeQuestionsList.length;
 
+    // Sual animasiyasını sıfırla
+    const qBox = document.getElementById("question-box");
+    qBox.style.animation = 'none';
+    qBox.offsetHeight; // Reflow
+    qBox.style.animation = 'slideIn 0.3s ease-out';
+
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
     
     if (isReviewMode) {
@@ -470,32 +588,33 @@ function showQuestion() {
     q.options.forEach((optText, idx) => {
         let btn = document.createElement("button");
         btn.className = "option-btn";
+        let prefixedText = optionPrefixes[idx] + optText;
         
         if (isReviewMode) {
             btn.disabled = true;
             if (idx === correctIdx) {
                 btn.classList.add("correct");
-                btn.innerHTML = `<span>${optText}</span> <span>✓</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
             } else if (idx === selectedIdx) {
                 btn.classList.add("wrong");
-                btn.innerHTML = `<span>${optText}</span> <span>✕</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
             } else {
-                btn.innerHTML = `<span>${optText}</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span>`;
             }
         } 
         else {
             if (selectedIdx !== null) {
                 if (idx === correctIdx) {
                     btn.classList.add("correct");
-                    btn.innerHTML = `<span>${optText}</span> <span>✓</span>`;
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>✓</span>`;
                 } else if (idx === selectedIdx) {
                     btn.classList.add("wrong");
-                    btn.innerHTML = `<span>${optText}</span> <span>✕</span>`;
+                    btn.innerHTML = `<span>${prefixedText}</span> <span>✕</span>`;
                 } else {
-                    btn.innerHTML = `<span>${optText}</span>`;
+                    btn.innerHTML = `<span>${prefixedText}</span>`;
                 }
             } else {
-                btn.innerHTML = `<span>${optText}</span>`;
+                btn.innerHTML = `<span>${prefixedText}</span>`;
             }
             btn.onclick = () => selectOption(idx);
         }
@@ -508,16 +627,24 @@ function selectOption(selectedIndex) {
     if (isReviewMode) return;
 
     let originalIdx = activeQuestionsList[currentQuestionIndex].originalIndex;
+    let correctIdx = activeQuestionsList[currentQuestionIndex].question.answer;
 
     if (userAnswers[originalIdx] === selectedIndex) {
         userAnswers[originalIdx] = null;
+        playSound('click');
     } else {
         userAnswers[originalIdx] = selectedIndex;
+        if (selectedIndex === correctIdx) {
+            playSound('correct');
+        } else {
+            playSound('wrong');
+        }
     }
     showQuestion();
 }
 
 function prevQuestion() {
+    playSound('click');
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         showQuestion();
@@ -525,6 +652,7 @@ function prevQuestion() {
 }
 
 function nextQuestion() {
+    playSound('click');
     if (currentQuestionIndex < activeQuestionsList.length - 1) {
         currentQuestionIndex++;
         showQuestion();
@@ -534,6 +662,7 @@ function nextQuestion() {
 }
 
 function showResults() {
+    playSound('win');
     document.getElementById("quiz-screen").style.display = "none";
     document.getElementById("result-screen").style.display = "block";
 
@@ -556,6 +685,7 @@ function showResults() {
 }
 
 function reviewAllQuiz() {
+    playSound('click');
     isReviewMode = true;
     activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
     currentQuestionIndex = 0;
@@ -565,6 +695,7 @@ function reviewAllQuiz() {
 }
 
 function reviewWrongQuiz() {
+    playSound('click');
     let wrongList = [];
 
     currentQuestions.forEach((q, idx) => {
