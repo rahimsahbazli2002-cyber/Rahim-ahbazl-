@@ -1,386 +1,386 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (61+)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --duo-green: #58cc02;
-            --duo-green-shadow: #46a302;
-            --duo-gray: #e5e5e5;
-            --duo-gray-shadow: #cecece;
-            --duo-text: #3c3c3c;
-            --duo-blue: #1cb0f6;
-            --duo-blue-shadow: #1899d6;
-            --duo-red: #ff4b4b;
-            --duo-red-shadow: #ea2b2b;
-            --duo-purple: #ce82ff;
-            --duo-purple-shadow: #a559d6;
-            --correct-bg: #d7ffb8;
-            --correct-border: #58cc02;
-            --correct-text: #2b7000;
-            --wrong-bg: #ffdfe0;
-            --wrong-border: #ff4b4b;
-            --wrong-text: #ea2b2b;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (61+)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-shadow: #46a302;
+            --duo-gray: #e5e5e5;
+            --duo-gray-shadow: #cecece;
+            --duo-text: #3c3c3c;
+            --duo-blue: #1cb0f6;
+            --duo-blue-shadow: #1899d6;
+            --duo-red: #ff4b4b;
+            --duo-red-shadow: #ea2b2b;
+            --duo-purple: #ce82ff;
+            --duo-purple-shadow: #a559d6;
+            --correct-bg: #d7ffb8;
+            --correct-border: #58cc02;
+            --correct-text: #2b7000;
+            --wrong-bg: #ffdfe0;
+            --wrong-border: #ff4b4b;
+            --wrong-text: #ea2b2b;
+        }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Nunito', sans-serif;
-            user-select: none;
-        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+        }
 
-        body {
-            background-color: #ffffff;
-            color: var(--duo-text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+        body {
+            background-color: #ffffff;
+            color: var(--duo-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-        .container {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-        /* Top Header & Progress Bar */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
+        /* Top Header & Progress Bar */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #afafaf;
-            cursor: pointer;
-            font-weight: 800;
-        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #afafaf;
+            cursor: pointer;
+            font-weight: 800;
+        }
 
-        .progress-bar-container {
-            flex-grow: 1;
-            height: 16px;
-            background-color: var(--duo-gray);
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-        }
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 16px;
+            background-color: var(--duo-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--duo-green);
-            border-radius: 12px;
-            transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1);
-            position: relative;
-        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--duo-green);
+            border-radius: 12px;
+            transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+        }
 
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 5px;
-            right: 5px;
-            height: 4px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
 
-        .stats-badge {
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: #afafaf;
-            white-space: nowrap;
-        }
+        .stats-badge {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #afafaf;
+            white-space: nowrap;
+        }
 
-        /* Question Section */
-        .question-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--duo-text);
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
+        /* Question Section */
+        .question-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--duo-text);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
 
-        /* Options */
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
+        /* Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
 
-        .option-btn {
-            background-color: #ffffff;
-            border: 2px solid var(--duo-gray);
-            border-bottom: 4px solid var(--duo-gray-shadow);
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--duo-text);
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            line-height: 1.4;
-        }
+        .option-btn {
+            background-color: #ffffff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray-shadow);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--duo-text);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            line-height: 1.4;
+        }
 
-        .option-btn:hover:not(:disabled) {
-            background-color: #f7f7f7;
-            border-color: #cecece;
-        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #f7f7f7;
+            border-color: #cecece;
+        }
 
-        .option-btn:active:not(:disabled) {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
-            margin-bottom: 2px;
-        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            margin-bottom: 2px;
+        }
 
-        .option-prefix {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            border: 2px solid var(--duo-gray);
-            border-radius: 8px;
-            margin-right: 12px;
-            font-weight: 800;
-            color: #afafaf;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
+        .option-prefix {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 8px;
+            margin-right: 12px;
+            font-weight: 800;
+            color: #afafaf;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
 
-        .option-btn.selected {
-            background-color: #ddf4ff;
-            border-color: var(--duo-blue);
-            border-bottom-color: var(--duo-blue-shadow);
-            color: #1899d6;
-        }
+        .option-btn.selected {
+            background-color: #ddf4ff;
+            border-color: var(--duo-blue);
+            border-bottom-color: var(--duo-blue-shadow);
+            color: #1899d6;
+        }
 
-        .option-btn.selected .option-prefix {
-            border-color: var(--duo-blue);
-            color: var(--duo-blue);
-            background-color: #ffffff;
-        }
+        .option-btn.selected .option-prefix {
+            border-color: var(--duo-blue);
+            color: var(--duo-blue);
+            background-color: #ffffff;
+        }
 
-        .option-btn.correct {
-            background-color: var(--correct-bg) !important;
-            border-color: var(--correct-border) !important;
-            border-bottom-color: var(--duo-green-shadow) !important;
-            color: var(--correct-text) !important;
-        }
+        .option-btn.correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct-border) !important;
+            border-bottom-color: var(--duo-green-shadow) !important;
+            color: var(--correct-text) !important;
+        }
 
-        .option-btn.correct .option-prefix {
-            border-color: var(--duo-green);
-            background-color: var(--duo-green);
-            color: white;
-        }
+        .option-btn.correct .option-prefix {
+            border-color: var(--duo-green);
+            background-color: var(--duo-green);
+            color: white;
+        }
 
-        .option-btn.wrong {
-            background-color: var(--wrong-bg) !important;
-            border-color: var(--wrong-border) !important;
-            border-bottom-color: var(--duo-red-shadow) !important;
-            color: var(--wrong-text) !important;
-        }
+        .option-btn.wrong {
+            background-color: var(--wrong-bg) !important;
+            border-color: var(--wrong-border) !important;
+            border-bottom-color: var(--duo-red-shadow) !important;
+            color: var(--wrong-text) !important;
+        }
 
-        .option-btn.wrong .option-prefix {
-            border-color: var(--duo-red);
-            background-color: var(--duo-red);
-            color: white;
-        }
+        .option-btn.wrong .option-prefix {
+            border-color: var(--duo-red);
+            background-color: var(--duo-red);
+            color: white;
+        }
 
-        /* Footer & Actions */
-        .footer {
-            border-top: 2px solid var(--duo-gray);
-            padding-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
+        /* Footer & Actions */
+        .footer {
+            border-top: 2px solid var(--duo-gray);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
 
-        .duo-btn {
-            border: none;
-            border-radius: 16px;
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .duo-btn {
+            border: none;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .duo-btn-green {
-            background-color: var(--duo-green);
-            color: #ffffff;
-            box-shadow: 0 4px 0 var(--duo-green-shadow);
-        }
+        .duo-btn-green {
+            background-color: var(--duo-green);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+        }
 
-        .duo-btn-green:hover:not(:disabled) { filter: brightness(1.05); }
-        .duo-btn-green:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-green-shadow); }
+        .duo-btn-green:hover:not(:disabled) { filter: brightness(1.05); }
+        .duo-btn-green:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-green-shadow); }
 
-        .duo-btn-gray {
-            background-color: #ffffff;
-            color: #afafaf;
-            border: 2px solid var(--duo-gray);
-            box-shadow: 0 4px 0 var(--duo-gray-shadow);
-        }
+        .duo-btn-gray {
+            background-color: #ffffff;
+            color: #afafaf;
+            border: 2px solid var(--duo-gray);
+            box-shadow: 0 4px 0 var(--duo-gray-shadow);
+        }
 
-        .duo-btn-gray:hover:not(:disabled) { background-color: #f7f7f7; color: var(--duo-text); }
-        .duo-btn-gray:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-gray-shadow); }
+        .duo-btn-gray:hover:not(:disabled) { background-color: #f7f7f7; color: var(--duo-text); }
+        .duo-btn-gray:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-gray-shadow); }
 
-        .duo-btn-purple {
-            background-color: var(--duo-purple);
-            color: #ffffff;
-            box-shadow: 0 4px 0 var(--duo-purple-shadow);
-        }
+        .duo-btn-purple {
+            background-color: var(--duo-purple);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-purple-shadow);
+        }
 
-        .duo-btn-purple:hover:not(:disabled) { filter: brightness(1.05); }
-        .duo-btn-purple:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-purple-shadow); }
+        .duo-btn-purple:hover:not(:disabled) { filter: brightness(1.05); }
+        .duo-btn-purple:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-purple-shadow); }
 
-        .duo-btn-red {
-            background-color: var(--duo-red);
-            color: #ffffff;
-            box-shadow: 0 4px 0 var(--duo-red-shadow);
-        }
+        .duo-btn-red {
+            background-color: var(--duo-red);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-red-shadow);
+        }
 
-        .duo-btn-red:hover:not(:disabled) { filter: brightness(1.05); }
-        .duo-btn-red:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-red-shadow); }
+        .duo-btn-red:hover:not(:disabled) { filter: brightness(1.05); }
+        .duo-btn-red:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--duo-red-shadow); }
 
-        .duo-btn:disabled {
-            background-color: var(--duo-gray);
-            color: #afafaf;
-            box-shadow: none;
-            cursor: not-allowed;
-            border: none;
-        }
+        .duo-btn:disabled {
+            background-color: var(--duo-gray);
+            color: #afafaf;
+            box-shadow: none;
+            cursor: not-allowed;
+            border: none;
+        }
 
-        /* Result Screen */
-        .result-screen {
-            text-align: center;
-            padding: 20px 0;
-        }
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
 
-        .result-icon { font-size: 5rem; margin-bottom: 15px; }
-        .result-title { font-size: 2.2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
-        .score-box { font-size: 3.5rem; font-weight: 900; color: var(--duo-green); margin-bottom: 30px; }
+        .result-icon { font-size: 5rem; margin-bottom: 15px; }
+        .result-title { font-size: 2.2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
+        .score-box { font-size: 3.5rem; font-weight: 900; color: var(--duo-green); margin-bottom: 30px; }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
-        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
 
-        .stat-card {
-            background-color: #ffffff;
-            border: 2px solid var(--duo-gray);
-            border-bottom: 4px solid var(--duo-gray-shadow);
-            border-radius: 16px;
-            padding: 15px;
-            font-weight: 800;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .stat-card {
+            background-color: #ffffff;
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray-shadow);
+            border-radius: 16px;
+            padding: 15px;
+            font-weight: 800;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .result-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .result-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-        @media (max-width: 600px) {
-            .footer { flex-direction: column; }
-            .duo-btn { width: 100%; }
-        }
-    </style>
+        @media (max-width: 600px) {
+            .footer { flex-direction: column; }
+            .duo-btn { width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container" id="quiz-container">
-    <!-- Test Ekranı -->
-    <div id="quiz-screen">
-        <div class="header">
-            <button class="close-btn">✕</button>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <div class="stats-badge" id="question-number">61 / 120</div>
-        </div>
+    <!-- Test Ekranı -->
+    <div id="quiz-screen">
+        <div class="header">
+            <button class="close-btn">✕</button>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="stats-badge" id="question-number">61 / 120</div>
+        </div>
 
-        <div id="question-text" class="question-title">Sual mətni yüklənir...</div>
-        <div id="options-container" class="options-container"></div>
+        <div id="question-text" class="question-title">Sual mətni yüklənir...</div>
+        <div id="options-container" class="options-container"></div>
 
-        <div class="footer">
-            <button id="prev-btn" class="duo-btn duo-btn-gray" onclick="prevQuestion()" disabled>ƏVVƏLKİ</button>
-            <button id="next-btn" class="duo-btn duo-btn-green" onclick="nextQuestion()">NÖVBƏTİ</button>
-        </div>
-    </div>
+        <div class="footer">
+            <button id="prev-btn" class="duo-btn duo-btn-gray" onclick="prevQuestion()" disabled>ƏVVƏLKİ</button>
+            <button id="next-btn" class="duo-btn duo-btn-green" onclick="nextQuestion()">NÖVBƏTİ</button>
+        </div>
+    </div>
 
-    <!-- Nəticə Ekranı -->
-    <div id="result-screen" class="result-screen" style="display: none;">
-        <div class="result-icon">🎉</div>
-        <h2 class="result-title">MƏRHƏLƏ TAMAMLANDI!</h2>
-        <div class="score-box" id="final-score">0.00</div>
+    <!-- Nəticə Ekranı -->
+    <div id="result-screen" class="result-screen" style="display: none;">
+        <div class="result-icon">🎉</div>
+        <h2 class="result-title">MƏRHƏLƏ TAMAMLANDI!</h2>
+        <div class="score-box" id="final-score">0.00</div>
 
-        <div class="stats-grid">
-            <div class="stat-card">Düzgün: <span id="stat-correct" style="color: var(--duo-green);">0</span></div>
-            <div class="stat-card">Səhv: <span id="stat-incorrect" style="color: var(--duo-red);">0</span></div>
-            <div class="stat-card">Cavabsız: <span id="stat-unanswered" style="color: #afafaf;">0</span></div>
-            <div class="stat-card">Dəqiqlik: <span id="stat-percent" style="color: var(--duo-blue);">0%</span></div>
-        </div>
+        <div class="stats-grid">
+            <div class="stat-card">Düzgün: <span id="stat-correct" style="color: var(--duo-green);">0</span></div>
+            <div class="stat-card">Səhv: <span id="stat-incorrect" style="color: var(--duo-red);">0</span></div>
+            <div class="stat-card">Cavabsız: <span id="stat-unanswered" style="color: #afafaf;">0</span></div>
+            <div class="stat-card">Dəqiqlik: <span id="stat-percent" style="color: var(--duo-blue);">0%</span></div>
+        </div>
 
-        <div class="result-buttons">
-            <button class="duo-btn duo-btn-purple" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
-            <button class="duo-btn duo-btn-red" onclick="reviewWrongQuiz()">❌ Səhvlərə Bax</button>
-            <button class="duo-btn duo-btn-green" onclick="startQuiz()">🔄 YENİDƏN BAŞLA</button>
-        </div>
-    </div>
+        <div class="result-buttons">
+            <button class="duo-btn duo-btn-purple" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
+            <button class="duo-btn duo-btn-red" onclick="reviewWrongQuiz()">❌ Səhvlərə Bax</button>
+            <button class="duo-btn duo-btn-green" onclick="startQuiz()">🔄 YENİDƏN BAŞLA</button>
+        </div>
+    </div>
 </div>
 
 <script>
 const rawQuestions = [
-    { q: "61. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Uşaqlarda lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrənməyə məcbur etmək"], answer: 0 },
-    { q: "62. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsini dinləmək", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
-    { q: "63. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
-    { q: "64. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
-    { q: "65. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
-    { q: "66. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
-    { q: "67. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
-    { q: "68. Uşaqların ətraf aləmlə tanışlığı zamanı hansı müşahidə növündən istifadə olunur?", options: ["Məqsədyönlü və müntəzəm müşahidə", "Yalnız təsadüfi baxış", "Yalnız şəkillər üzrə müşahidə", "Müşahidə aparılmır"], answer: 0 },
-    { q: "69. Uşaqlarda sadə riyazi anlayışların formalaşdırılması üzrə məşğələlərdə ilk addım nədir?", options: ["Əşyaların miqdarını və ölçüsünü müqayisə etmək", "Vurma cədvəlini əzbərləmək", "Tənliklər həll etmək", "Kəsrlərlə işləmək"], answer: 0 },
-    { q: "70. Əşyaların böyüklük, uzunluq və hündürlüyünə görə müqayisəsi hansı yaş qrupundan başlanır?", options: ["2-ci kiçik qrupdan", "Yalnız məktəbəhazırlıq qrupundan", "Yalnız ibtidai sinifdə", "Körpələr qrupundan"], answer: 0 },
-    { q: "71. Uşaqlarda zaman anlayışlarını (dünən, bu gün, sabah) formalaşdırmaq hansı qrupda intensivləşir?", options: ["Orta və böyük qruplarda", "Yalnız 1-ci kiçik qrupda", "Körpələr evində", "Yalnız bağçadan sonra"], answer: 0 },
-    { q: "72. Geometrik fiqurların (dairə, kvadrat, üçbucaq) tanıdılması nə zaman başlanır?", options: ["2-ci kiçik qrupda", "Məktəbəhazırlıq bitəndən sonra", "Yalnız 6 yaşında", "Orta məktəbin 5-ci sinfində"], answer: 0 },
-    { q: "73. Məktəbəqədər təhsildə mənəvi-ətraf tərbiyənin əsas vasitəsi nədir?", options: ["Şəxsi nümunə və oyun fəaliyyəti", "Sərt cəza metodları", "Yalnız mühazirə oxumaq", "Qaydaları əzbərlətmək"], answer: 0 },
-    { q: "74. Uşaqlarda əmək tərbiyəsi hansı formada həyata keçirilir?", options: ["Növbətçilik, tapşırıqlar və birgə əmək", "Ağır fiziki işlər görməklə", "Yalnız məcburi təmizliklə", "Yalnız pul müqabilində"], answer: 0 },
-    { q: "75. Uşaq bağçasında nizam-intizam və rejim qaydalarının əsas məqsədi nədir?", options: ["Uşağın fiziki və psixi sağlamlığını qorumaq", "Uşaqların hərəkətini məhdudlaşdırmaq", "Müəllimin işini azaltmaq", "Valideynləri rahatlatmaq"], answer: 0 },
-    { q: "76. Tərbiyəçi müəllimin dərslərarası fasilədə (dinlənmə dəqiqələrində) etməli olduğu iş nədir?", options: ["Otağı havalandırmaq və uşaqların sərbəst istirahətini təmin etmək", "Uşaqları oturdub sakit saxlamaq", "Yalnız sənədləşmə ilə məşğul olmaq", "Otağı bağlamaq"], answer: 0 },
-    { q: "77. Uşağın sosiallaşmasında ən birinci mühit hansıdır?", options: ["Ailə", "Uşaq bağçası", "Məktəb", "Həyət dostları"], answer: 0 },
-    { q: "78. Məktəbəqədər müəssisədə inklyuziv təhsil nədir?", options: ["Xüsusi qayğıya ehtiyacı olan uşaqların sağlam uşaqlarla birgə təhsili", "Yalnız istedadlı uşaqların təhsili", "Özəl bağça təhsili", "Distant təhsil müəssisəsi"], answer: 0 },
-    { q: "79. Uşaqların psixoloji hazırlığı dedikdə nə nəzərdə tutulur?", options: ["Emosional, iradi və idrak proseslərinin məktəb təliminə hazır olması", "Yalnız oxumağı bilməsi", "Yalnız idmanla məşğul olması", "Partada düzgün oturması"], answer: 0 },
-    { q: "80. Tərbiyəçinin valideynlərlə əməkdaşlıq formalarına hansı daxil DEYİL?", options: ["Uşağın fərdi gizli məlumatlarını başqalarının yanında müzakirə etmək", "Valideyn iclasları keçirmək", "Fərdi söhbətlər aparmaq", "Açıq qapı günləri təşkil etmək"], answer: 0 }
+    { q: "61. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Uşaqlarda lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrənməyə məcbur etmək"], answer: 0 },
+    { q: "62. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsini dinləmək", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
+    { q: "63. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
+    { q: "64. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
+    { q: "65. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
+    { q: "66. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
+    { q: "67. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
+    { q: "68. Uşaqların ətraf aləmlə tanışlığı zamanı hansı müşahidə növündən istifadə olunur?", options: ["Məqsədyönlü və müntəzəm müşahidə", "Yalnız təsadüfi baxış", "Yalnız şəkillər üzrə müşahidə", "Müşahidə aparılmır"], answer: 0 },
+    { q: "69. Uşaqlarda sadə riyazi anlayışların formalaşdırılması üzrə məşğələlərdə ilk addım nədir?", options: ["Əşyaların miqdarını və ölçüsünü müqayisə etmək", "Vurma cədvəlini əzbərləmək", "Tənliklər həll etmək", "Kəsrlərlə işləmək"], answer: 0 },
+    { q: "70. Əşyaların böyüklük, uzunluq və hündürlüyünə görə müqayisəsi hansı yaş qrupundan başlanır?", options: ["2-ci kiçik qrupdan", "Yalnız məktəbəhazırlıq qrupundan", "Yalnız ibtidai sinifdə", "Körpələr qrupundan"], answer: 0 },
+    { q: "71. Uşaqlarda zaman anlayışlarını (dünən, bu gün, sabah) formalaşdırmaq hansı qrupda intensivləşir?", options: ["Orta və böyük qruplarda", "Yalnız 1-ci kiçik qrupda", "Körpələr evində", "Yalnız bağçadan sonra"], answer: 0 },
+    { q: "72. Geometrik fiqurların (dairə, kvadrat, üçbucaq) tanıdılması nə zaman başlanır?", options: ["2-ci kiçik qrupda", "Məktəbəhazırlıq bitəndən sonra", "Yalnız 6 yaşında", "Orta məktəbin 5-ci sinfində"], answer: 0 },
+    { q: "73. Məktəbəqədər təhsildə mənəvi-ətraf tərbiyənin əsas vasitəsi nədir?", options: ["Şəxsi nümunə və oyun fəaliyyəti", "Sərt cəza metodları", "Yalnız mühazirə oxumaq", "Qaydaları əzbərlətmək"], answer: 0 },
+    { q: "74. Uşaqlarda əmək tərbiyəsi hansı formada həyata keçirilir?", options: ["Növbətçilik, tapşırıqlar və birgə əmək", "Ağır fiziki işlər görməklə", "Yalnız məcburi təmizliklə", "Yalnız pul müqabilində"], answer: 0 },
+    { q: "75. Uşaq bağçasında nizam-intizam və rejim qaydalarının əsas məqsədi nədir?", options: ["Uşağın fiziki və psixi sağlamlığını qorumaq", "Uşaqların hərəkətini məhdudlaşdırmaq", "Müəllimin işini azaltmaq", "Valideynləri rahatlatmaq"], answer: 0 },
+    { q: "76. Tərbiyəçi müəllimin dərslərarası fasilədə (dinlənmə dəqiqələrində) etməli olduğu iş nədir?", options: ["Otağı havalandırmaq və uşaqların sərbəst istirahətini təmin etmək", "Uşaqları oturdub sakit saxlamaq", "Yalnız sənədləşmə ilə məşğul olmaq", "Otağı bağlamaq"], answer: 0 },
+    { q: "77. Uşağın sosiallaşmasında ən birinci mühit hansıdır?", options: ["Ailə", "Uşaq bağçası", "Məktəb", "Həyət dostları"], answer: 0 },
+    { q: "78. Məktəbəqədər müəssisədə inklyuziv təhsil nədir?", options: ["Xüsusi qayğıya ehtiyacı olan uşaqların sağlam uşaqlarla birgə təhsili", "Yalnız istedadlı uşaqların təhsili", "Özəl bağça təhsili", "Distant təhsil müəssisəsi"], answer: 0 },
+    { q: "79. Uşaqların psixoloji hazırlığı dedikdə nə nəzərdə tutulur?", options: ["Emosional, iradi və idrak proseslərinin məktəb təliminə hazır olması", "Yalnız oxumağı bilməsi", "Yalnız idmanla məşğul olması", "Partada düzgün oturması"], answer: 0 },
+    { q: "80. Tərbiyəçinin valideynlərlə əməkdaşlıq formalarına hansı daxil DEYİL?", options: ["Uşağın fərdi gizli məlumatlarını başqalarının yanında müzakirə etmək", "Valideyn iclasları keçirmək", "Fərdi söhbətlər aparmaq", "Açıq qapı günləri təşkil etmək"], answer: 0 }
 ];
 
 const optionPrefixes = ["A", "B", "C", "D"];
@@ -391,172 +391,172 @@ let userAnswers = [];
 let isReviewMode = false;
 
 function startQuiz() {
-    isReviewMode = false;
-    currentQuestions = rawQuestions.map(qObj => ({
-        q: qObj.q,
-        options: [...qObj.options],
-        answer: qObj.answer
-    }));
+    isReviewMode = false;
+    currentQuestions = rawQuestions.map(qObj => ({
+        q: qObj.q,
+        options: [...qObj.options],
+        answer: qObj.answer
+    }));
 
-    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
-    currentQuestionIndex = 0;
-    userAnswers = new Array(currentQuestions.length).fill(null);
-    
-    document.getElementById("result-screen").style.display = "none";
-    document.getElementById("quiz-screen").style.display = "block";
-    
-    showQuestion();
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
+    currentQuestionIndex = 0;
+    userAnswers = new Array(currentQuestions.length).fill(null);
+    
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    
+    showQuestion();
 }
 
 function showQuestion() {
-    let item = activeQuestionsList[currentQuestionIndex];
-    let q = item.question;
-    let originalIdx = item.originalIndex;
-    let total = activeQuestionsList.length;
+    let item = activeQuestionsList[currentQuestionIndex];
+    let q = item.question;
+    let originalIdx = item.originalIndex;
+    let total = activeQuestionsList.length;
 
-    document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
-    
-    if (isReviewMode) {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
-    } else {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TАMАMLА" : "NÖVBƏTİ";
-    }
+    document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
+    
+    if (isReviewMode) {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
+    } else {
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TАMАMLА" : "NÖVBƏTİ";
+    }
 
-    document.getElementById("question-number").innerText = `${currentQuestionIndex + 61} / ${total + 60}`;
-    document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+    document.getElementById("question-number").innerText = `${currentQuestionIndex + 61} / ${total + 60}`;
+    document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
 
-    document.getElementById("question-text").innerText = q.q;
+    document.getElementById("question-text").innerText = q.q;
 
-    let optionsContainer = document.getElementById("options-container");
-    optionsContainer.innerHTML = "";
+    let optionsContainer = document.getElementById("options-container");
+    optionsContainer.innerHTML = "";
 
-    let selectedIdx = userAnswers[originalIdx];
-    let correctIdx = q.answer;
+    let selectedIdx = userAnswers[originalIdx];
+    let correctIdx = q.answer;
 
-    q.options.forEach((optText, idx) => {
-        let btn = document.createElement("button");
-        btn.className = "option-btn";
-        let prefix = optionPrefixes[idx] || "";
-        
-        if (isReviewMode) {
-            btn.disabled = true;
-            if (idx === correctIdx) {
-                btn.classList.add("correct");
-                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
-            } else if (idx === selectedIdx) {
-                btn.classList.add("wrong");
-                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
-            } else {
-                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
-            }
-        } 
-        else {
-            if (selectedIdx === idx) {
-                btn.classList.add("selected");
-            }
+    q.options.forEach((optText, idx) => {
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        let prefix = optionPrefixes[idx] || "";
+        
+        if (isReviewMode) {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
+            } else if (idx === selectedIdx) {
+                btn.classList.add("wrong");
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
+            } else {
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
+            }
+        } 
+        else {
+            if (selectedIdx === idx) {
+                btn.classList.add("selected");
+            }
 
-            if (selectedIdx !== null) {
-                if (idx === correctIdx) {
-                    btn.classList.add("correct");
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
-                } else if (idx === selectedIdx) {
-                    btn.classList.add("wrong");
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
-                } else {
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
-                }
-            } else {
-                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
-            }
-            btn.onclick = () => selectOption(idx);
-        }
+            if (selectedIdx !== null) {
+                if (idx === correctIdx) {
+                    btn.classList.add("correct");
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
+                } else if (idx === selectedIdx) {
+                    btn.classList.add("wrong");
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
+                } else {
+                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
+                }
+            } else {
+                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
+            }
+            btn.onclick = () => selectOption(idx);
+        }
 
-        optionsContainer.appendChild(btn);
-    });
+        optionsContainer.appendChild(btn);
+    });
 }
 
 function selectOption(selectedIndex) {
-    if (isReviewMode) return;
+    if (isReviewMode) return;
 
-    let originalIdx = activeQuestionsList[currentQuestionIndex].originalIndex;
+    let originalIdx = activeQuestionsList[currentQuestionIndex].originalIndex;
 
-    if (userAnswers[originalIdx] === selectedIndex) {
-        userAnswers[originalIdx] = null;
-    } else {
-        userAnswers[originalIdx] = selectedIndex;
-    }
-    showQuestion();
+    if (userAnswers[originalIdx] === selectedIndex) {
+        userAnswers[originalIdx] = null;
+    } else {
+        userAnswers[originalIdx] = selectedIndex;
+    }
+    showQuestion();
 }
 
 function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-    }
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion();
+    }
 }
 
 function nextQuestion() {
-    if (currentQuestionIndex < activeQuestionsList.length - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-    } else {
-        showResults();
-    }
+    if (currentQuestionIndex < activeQuestionsList.length - 1) {
+        currentQuestionIndex++;
+        showQuestion();
+    } else {
+        showResults();
+    }
 }
 
 function showResults() {
-    document.getElementById("quiz-screen").style.display = "none";
-    document.getElementById("result-screen").style.display = "block";
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
 
-    let correct = 0, incorrect = 0, unanswered = 0;
+    let correct = 0, incorrect = 0, unanswered = 0;
 
-    userAnswers.forEach((ans, idx) => {
-        if (ans === null) unanswered++;
-        else if (ans === currentQuestions[idx].answer) correct++;
-        else incorrect++;
-    });
+    userAnswers.forEach((ans, idx) => {
+        if (ans === null) unanswered++;
+        else if (ans === currentQuestions[idx].answer) correct++;
+        else incorrect++;
+    });
 
-    let total = currentQuestions.length;
-    let finalScore = Math.max(0, (correct * 1) - (incorrect * 0.25));
-    let percentage = (correct / total) * 100;
+    let total = currentQuestions.length;
+    let finalScore = Math.max(0, (correct * 1) - (incorrect * 0.25));
+    let percentage = (correct / total) * 100;
 
-    document.getElementById("final-score").innerText = `${finalScore.toFixed(2)} / ${total}`;
-    document.getElementById("stat-correct").innerText = correct;
-    document.getElementById("stat-incorrect").innerText = incorrect;
-    document.getElementById("stat-unanswered").innerText = unanswered;
-    document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
+    document.getElementById("final-score").innerText = `${finalScore.toFixed(2)} / ${total}`;
+    document.getElementById("stat-correct").innerText = correct;
+    document.getElementById("stat-incorrect").innerText = incorrect;
+    document.getElementById("stat-unanswered").innerText = unanswered;
+    document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
 }
 
 function reviewAllQuiz() {
-    isReviewMode = true;
-    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
-    currentQuestionIndex = 0;
-    document.getElementById("result-screen").style.display = "none";
-    document.getElementById("quiz-screen").style.display = "block";
-    showQuestion();
+    isReviewMode = true;
+    activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
 }
 
 function reviewWrongQuiz() {
-    let wrongList = [];
+    let wrongList = [];
 
-    currentQuestions.forEach((q, idx) => {
-        let ans = userAnswers[idx];
-        if (ans !== null && ans !== q.answer) {
-            wrongList.push({ question: q, originalIndex: idx });
-        }
-    });
+    currentQuestions.forEach((q, idx) => {
+        let ans = userAnswers[idx];
+        if (ans !== null && ans !== q.answer) {
+            wrongList.push({ question: q, originalIndex: idx });
+        }
+    });
 
-    if (wrongList.length === 0) {
-        alert("Təbrik edirik! Sizin heç bir səhv cavabınız yoxdur. 🎉");
-        return;
-    }
+    if (wrongList.length === 0) {
+        alert("Təbrik edirik! Sizin heç bir səhv cavabınız yoxdur. 🎉");
+        return;
+    }
 
-    isReviewMode = true;
-    activeQuestionsList = wrongList;
-    currentQuestionIndex = 0;
-    document.getElementById("result-screen").style.display = "none";
-    document.getElementById("quiz-screen").style.display = "block";
-    showQuestion();
+    isReviewMode = true;
+    activeQuestionsList = wrongList;
+    currentQuestionIndex = 0;
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    showQuestion();
 }
 
 window.onload = startQuiz;
