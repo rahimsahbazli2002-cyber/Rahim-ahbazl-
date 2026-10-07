@@ -52,12 +52,11 @@
             position: relative;
         }
 
-        /* Top Header & Progress Bar */
         .header {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .close-btn {
@@ -105,26 +104,22 @@
             white-space: nowrap;
         }
 
-        .topic-badge {
-            text-align: center;
+        .topic-title {
             font-size: 1.1rem;
             font-weight: 800;
             color: var(--duo-blue);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        /* Question Section */
         .question-title {
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--duo-text);
             margin-bottom: 25px;
             line-height: 1.4;
         }
 
-        /* Options */
         .options-container {
             display: flex;
             flex-direction: column;
@@ -215,7 +210,6 @@
             color: white;
         }
 
-        /* Footer & Actions */
         .footer {
             border-top: 2px solid var(--duo-gray);
             padding-top: 20px;
@@ -284,14 +278,13 @@
             border: none;
         }
 
-        /* Result Screen */
         .result-screen {
             text-align: center;
             padding: 20px 0;
         }
 
         .result-icon { font-size: 5rem; margin-bottom: 15px; }
-        .result-title { font-size: 2.2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
+        .result-title { font-size: 2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
         .score-box { font-size: 3.5rem; font-weight: 900; color: var(--duo-green); margin-bottom: 30px; }
 
         .stats-grid {
@@ -329,17 +322,16 @@
 <body>
 
 <div class="container" id="quiz-container">
-    <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
-            <button class="close-btn">✕</button>
+            <button class="close-btn" onclick="location.reload()">✕</button>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
             <div class="stats-badge" id="question-number">1 / 60</div>
         </div>
 
-        <div id="topic-title" class="topic-badge">MÖVZU 1</div>
+        <div id="topic-title" class="topic-title">MÖVZU 1</div>
         <div id="question-text" class="question-title">Sual mətni yüklənir...</div>
         <div id="options-container" class="options-container"></div>
 
@@ -349,10 +341,9 @@
         </div>
     </div>
 
-    <!-- Nəticə Ekranı -->
     <div id="result-screen" class="result-screen" style="display: none;">
         <div class="result-icon">🎉</div>
-        <h2 class="result-title">MƏRHƏLƏ TAMAMLANDI!</h2>
+        <h2 class="result-title" id="result-topic-name">MƏRHƏLƏ TAMAMLANDI!</h2>
         <div class="score-box" id="final-score">0.00</div>
 
         <div class="stats-grid">
@@ -363,145 +354,274 @@
         </div>
 
         <div class="result-buttons">
+            <button class="duo-btn duo-btn-green" id="next-topic-btn" onclick="loadNextTopic()" style="display: none;">➡️ NÖVBƏTİ MÖVZUYА KEÇ</button>
             <button class="duo-btn duo-btn-purple" onclick="reviewAllQuiz()">🔍 Bütün Cavablara Bax</button>
             <button class="duo-btn duo-btn-red" onclick="reviewWrongQuiz()">❌ Səhvlərə Bax</button>
-            <button class="duo-btn duo-btn-green" id="next-topic-btn" onclick="startNextTopic()">➡️ NÖVBƏTİ MÖVZUYA KEÇ (MÖVZU 2)</button>
-            <button class="duo-btn duo-btn-gray" onclick="restartCurrentTopic()">🔄 BU MÖVZUNU YENİDƏN İŞLƏ</button>
+            <button class="duo-btn duo-btn-gray" onclick="restartCurrentTopic()">🔄 BU MÖVZUNU YENİDƏN BAŞLA</button>
         </div>
     </div>
 </div>
 
 <script>
-// Mövzu üzrə 60-lıq test blokları
-const quizTopics = [
+const topicsData = [
     {
-        title: "1. Təsviri Fəaliyyət və Fiziki Tərbiyə Metodikası",
+        title: "1. Təsviri fəaliyyət və Fiziki tərbiyənin tədrisi metodikası",
         questions: [
-            { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya (quraşdırma/plastilin)", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
+            { q: "1. Tərbiyəçi-müəllimin fəaliyyəti əyaniliyə əsaslanır. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Tərbiyəçi-müəllimin əsas vəzifələrindən biri uşağa karandaşı və fırçanı düzgün tutmağı öyrətməkdir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepkaya", "konstruksiyaetməyə", "rəsmçəkməyə", "applikasiyaya"], answer: 2 },
             { q: "2. Təsviri fəaliyyətin hansı növündə uşaqlarda tərbiyəçini dinləmək, uşaqların düşündüyü rəsmi çəkmək və nəticəni qiymətləndirmək bacarığını formalaşdırmaq vacibdir?", options: ["rəsmçəkmə", "lepka", "konstruksiyaetmə", "applikasiya"], answer: 0 },
             { q: "3. Bu texnika üçün kimyəvi qatqısı olmayan təhlükəsiz boya vacibdir. Bu, barmaqlar və ovuc içi ilə rəsm çəkməyə aiddir. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 1 },
             { q: "4. Onun əsas xüsusiyyəti təmiz rənglərin istifadə edilməsidir, rənglərin qarışdırılmasına icazə verilmir. Onlar nöqtələrlə çəkirlər. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 2 },
-            { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Sonra isə rəsm üçün fırçanın köməyilə işi bitirə bilərik. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
-            { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boya ləkəsini tətbiq etdikdən sonra boyanı kokteyl borucuğu ilə yaydı. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə) texnikası"], answer: 3 },
-            { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu, hansı rəsm texnikasına aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
-            { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində, evlərin bəzədilməsində tətbiq olunur. Bu, müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-            { q: "9. Bu zaman uşaqlar mənimsəyirlər... iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi, işə nəzarət və nəticənin qiymətləndirilməsi kimi bilik və bacarıqları əldə edirlər. Bu, təsviri fəaliyyətin hansı növünə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
-            { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu, rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda rəsmçəkmə", "orta qrupda rəsmçəkmə"], answer: 0 },
-            { q: "11. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük.", "uşaqlarda yalnız iri motorika inkişaf edir.", "uşaq orqanizminin sağlamlığını qorumağa kömək edir.", "psixoloji gərginliyi aradan qaldırır."], answer: 1 },
-            { q: "12. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
-            { q: "13. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
-            { q: "14. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək müəyyən fiziki hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
-            { q: "15. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
-            { q: "16. Lepka məşğələsində hansı xammal materialından istifadə olunmur?", options: ["Plastilin", "Gil", "Xəmir", "Sement"], answer: 3 },
-            { q: "17. Məktəbəqədər müəssisədə səhər gimnastikasının əsas məqsədi nədir?", options: ["Uşaq orqanizmini oyatmaq və gümrahlaşdırmaq", "Ağır idman rekordları vurmaq", "Səhər yeməyini əvəz etmək", "Uşaqları yorub yatırtmaq"], answer: 0 },
-            { q: "18. Kiçik motorikanın inkişafı üçün hansı təsviri fəaliyyət növü daha effektivdir?", options: ["Lepka və Applikasiya", "Yalnız qaçış hərəkətləri", "Müzik dinləmək", "Yalnız şeir əzbərləmək"], answer: 0 },
-            { q: "19. Applikasiya işində istifadə olunan əsas alət hansıdır?", options: ["Qayçı və yapışqan", "Çəkic və mismar", "Xətkeş və pərgar", "Akvarel və fırça"], answer: 0 },
-            { q: "20. Konstruksiyaetmə fəaliyyətinə nə daxildir?", options: ["Tikinti materiallarından müxtəlif fiqurlar və binalar quraşdırmaq", "Rəsm dəftərində boyamaq", "Nağıl danışmaq", "Mahnı oxumaq"], answer: 0 },
-            { q: "21. Hərəkətli oyunların əsas funksiyası nədir?", options: ["Uşaqların fiziki keyfiyyətlərini və çevikliyini inkişaf etdirmək", "Yalnız nizam-intizamı pozmaq", "Sakitliyi təmin etmək", "Yazı yazmağı öyrətmək"], answer: 0 },
-            { q: "22. Qrupda fiziki tərbiyə dəqiqələri (fizkulutminutka) nə vaxt keçirilir?", options: ["Məşğələ zamanı yorğunluğu aradan qaldırmaq üçün mid-fasilədə", "Yalnız gəzinti vaxtı", "Yalnız yuxudan sonra", "Səhər yeməyindən əvvəl"], answer: 0 },
-            { q: "23. Kağızdan müxtəlif formalar kəsib yapışdırmaq hansı fəaliyyətdir?", options: ["Applikasiya", "Lepka", "Rəsm", "Gimnastika"], answer: 0 },
-            { q: "24. Açıq havada keçirilən fiziki hərəkətlərin üstünlüyü nədir?", options: ["Orqanizmin möhkəmlənməsi və temiz hava qəbulu", "Otağın çirklənməməsi", "Uşaqların tez yorulması", "Heç bir üstünlüyü yoxdur"], answer: 0 },
-            { q: "25. 2-ci kiçik qrupda rəsm çəkərkən hansı fırça növünə üstünlük verilir?", options: ["Yoğun və yumşaq fırçalara", "Çox incə qələmlərə", "Quru quş tükünə", "Metal millərə"], answer: 0 },
-            { q: "26. Fırçanı boyaya batırarkən hansı qaydaya əməl edilməlidir?", options: ["Fırçanın yalnız tük hissəsini batırmaq", "Fırçanın sapını tam batırmaq", "Fırçanı boyada sıxmaq", "Fırçanı su ilə yumadan rəngə qatmaq"], answer: 0 },
-            { q: "27. Barmaq boyakarlığı zamanı istifadə olunan boyanın əsas xassəsi nə olmalıdır?", options: ["Zərərsiz və toksik olmayan", "Yağlı və gec quruyan", "Suda həll olunmayan", "Kəskin qoxulu"], answer: 0 },
-            { q: "28. Ştamplama texnikasında hansı materiallardan faydalanmaq olar?", options: ["Kartof, yarpaq, süngər möhürlər", "Dəmir hissələr", "Şüşə qırıqları", "Bitişik daşlar"], answer: 0 },
-            { q: "29. Lepka işində istifadə olunan plastilinin yumşaldılması necə həyata keçirilir?", options: ["Əl içi istiliyi və ovuşdurma ilə", "Suya atıb qaynatmaqla", "Bıçaqla doğramaqla", "Dondurucuya qoymaqla"], answer: 0 },
-            { q: "30. Applikasiyada 'cırma' texnikası nədir?", options: ["Kağızı qayçısız, əllə cıraraq forma almaq", "Kağızı yandırmaq", "Kağızı islandıb yaymaq", "Kağızı rəngləmək"], answer: 0 },
-            { q: "31. Məktəbəqədər uşaqların qamətinin düzgün formalaşması üçün nə vacibdir?", options: ["Düzgün oturuş və balanslaşdırılmış fiziki hərəkətlər", "Yalnız uzanmaq", "Ağır yük qaldırmaq", "Cəzalandırmaq"], answer: 0 },
-            { q: "32. Düzdabanlığın profilaktikası üçün hansı fiziki tapşırıq yararlıdır?", options: ["Yalınayaq kələ-kötür xalça və ya xüsusi xalçada gəzmək", "Yalnız stulda oturmaq", "Bərk ayaqqabıda qaçmaq", "Cüt ayaq tullanmaq"], answer: 0 },
-            { q: "33. Uşaqların qaçış zamanı müvazinəti saxlaması üçün hansı hərəkətlər etdirilir?", options: ["Xətt boyunca gəzmək və maneələri dəf etmək", "Gözü bağlı oturmaq", "Kitab oxumaq", "Şeir demək"], answer: 0 },
-            { q: "34. Rəsm məşğələsində uşağın iş yeri necə işıqlandırılmalıdır?", options: ["İşıq soldan və ya öndən düşməlidir", "İşıq arxadan düşməlidir", "Tam qaranlıq olmalıdır", "Ağır projektor vurulmalıdır"], answer: 0 },
-            { q: "35. Uşaqların konstruksiya işində təbii materiallara nə aid edilə bilər?", options: ["Qoz qabığı, şam qozası, qurumuş yarpaqlar", "Plastik qablar", "Metal dördbucaqlar", "Kərpic qırıqları"], answer: 0 },
-            { q: "36. Gimnastika zamanı nəfəs alma qaydası necə olmalıdır?", options: ["Burunla nəfəs alıb ağızla vermək", "Nəfəsi saxlamaq", "Sürətlə təngimək", "Yalnız ağızla nəfəs almaq"], answer: 0 },
-            { q: "37. Uşaqlarda hərəkət koordinasiyasını inkişaf etdirən əsas vasitə:", options: ["Məqsədli idman oyunları və tullanmalar", "Şəkil çəkmək", "Nağıla qulaq asmaq", "Pazl toplamaq"], answer: 0 },
-            { q: "38. Məktəbəhazırlıq qrupunda applikasiya zamanı qayçı ilə iş qaydası necə öyrədilir?", options: ["Qayçının uclarını aşağı tutmaq və təhlükəsizlik qaydalarına əməl etmək", "Qayçını yuxarı tutub qaçmaq", "Qayçı ilə oynamaq", "Təhlükəsizlik qaydası yoxdur"], answer: 0 },
-            { q: "39. Lepka məşğələsindən sonra uşaqlar nə etməlidirlər?", options: ["Ellərini sabunla yumalı və iş yerini təmizləməlidirlər", "Dərhal yemək yeməlidirlər", "Otaqdan qaçmalıdırlar", "Plastilini yerə atmalıdırlar"], answer: 0 },
-            { q: "40. Təsviri fəaliyyət məşğələlərinin sonunda ne edilir?", options: ["Uşaqların əl işləri sərgilənir və stimullaşdırıcı qiymətləndirilir", "İşlər zibil qutusuna atılır", "Müəllim işləri gizlədir", "Cəza verilir"], answer: 0 },
-            { q: "41. Orta qrupda rəsm çəkərkən rəng seçimi necə yönləndirilir?", options: ["Əşyaların real rənglərinə uyğun seçməyə həvəsləndirilir", "Yalnız qara rəngdən istifadə edilir", "Rəng seçiminə müdaxilə olunmur", "Rənglərdən istifadə olunmur"], answer: 0 },
-            { q: "42. Uşaqların estetik tərbiyəsində təsviri fəaliyyətin rolu nədir?", options: ["Gözəlliyi duymaq və yaratmaq bacarığını inkişaf etdirir", "Yalnız vaxt aparır", "Yazı yazmağı sürətləndirir", "Fiziki gücü artırır"], answer: 0 },
-            { q: "43. Ştamplama üçün ən uyğun rəng hansıdır?", options: ["Qatı quaş boya", "Durulaşdırılmış akvarel", "Yağlı boya", "Qələm mürəkkəbi"], answer: 0 },
-            { q: "44. Lepka fəaliyyətində girildəmə və yumalama hərəkətləri nəyi inkişaf etdirir?", options: ["Əl əzələlərini və kiçik motorikanı", "Yalnız görmə qabiliyyətini", "Eşitmə qabiliyyətini", "Ayaq əzələlərini"], answer: 0 },
-            { q: "45. Şəkildə nümayiş etdirilən 'Monotipiya' nədir?", options: ["Hamar səthə çəkilmiş rəsmin kağıza basılaraq çıxarılması", "Kağızı cırmaq", "Qələmlə nöqtə qoymaq", "Heykəl yonmaq"], answer: 0 },
-            { q: "46. Fiziki məşğələdə sıra təlimi (sıraya düzülmə) hansı yaşdan başlanır?", options: ["2-ci kiçik və orta qruplardan", "Yalnız 1 yaşda", "Yalnız məktəbdə", "Körpələr evində"], answer: 0 },
-            { q: "47. Uşağın fırçanı barmaqları arasında düzgün tutması üçün hansı tutuş forması öyrədilir?", options: ["Üç barmaqla (baş, şəhadət və orta barmaq)", "Yumruqla sıkaraq", "İki əllə tutaraq", "Yalnız çeçələ barmaqla"], answer: 0 },
-            { q: "48. Süjetli rəsmçəkmə hansı qrupdan etibarən daha geniş tətbiq olunur?", options: ["Orta və böyük qruplardan", "1-ci kiçik qrupdan", "Körpələr qrupundan", "Yalnız ibtidai sinifdə"], answer: 0 },
-            { q: "49. İri motorikanın inkişafına aid olan hərəkət hansıdır?", options: ["Tullanmaq, qaçmaq, top atmaq", "Düymə düymələmək", "Muncuq düzmək", "Qələmlə nöqtə qoymaq"], answer: 0 },
-            { q: "50. Təsviri fəaliyyət məşğələsinin müddəti kiçik qrupda neçə dəqiqədir?", options: ["15 minüt (dəqiqə)", "45 dəqiqə", "60 dəqiqə", "5 dəqiqə"], answer: 0 },
-            { q: "51. Məktəbəhazırlıq qrupunda fiziki tərbiyə məşğələsinin müddəti nə qədərdir?", options: ["25-30 dəqiqə", "10 dəqiqə", "50 dəqiqə", "1 saat"], answer: 0 },
-            { q: "52. Uşaqların idman geyimində olması nə üçün vacibdir?", options: ["Hərəkət sərbəstliyini və təhlükəsizliyi təmin etmək üçün", "Gözəl görünmək üçün", "Müəllim istədiyi üçün", "Formalı olmaq üçün"], answer: 0 },
-            { q: "53. Quraşdırma (konstruksiya) zamanı uşağın hansı təfəkkürü inkişaf edir?", options: ["Məkan və məntiqi təfəkkürü", "Yalnız hafizəsi", "Yalnız nitqi", "Səs intonasiyası"], answer: 0 },
-            { q: "54. Plastilindən istifadə zamanı гигиена qaydası hansıdır?", options: ["Döşənəkdən (xüsusi lövhədən) istifadə etmək", "Plastilini ağza qoymaq", "Masaya sürtmək", "Paltara yapışdırmaq"], answer: 0 },
-            { q: "55. Uşaq rəsmlərinin təhlili zamanı nəyə önəm verilməlidir?", options: ["Uşağın yaradıcı yanaşmasına və emosiyasına", "Yalnız xətlərin kəskinliyinə", "Müəllimin köməyinin dərəcəsinə", "Şəklin böyüklüyünə"], answer: 0 },
-            { q: "56. Qrup otağında təsviri fəaliyyət küncünün saxlanma şəraiti necə olmalıdır?", options: ["Əlçatan, təhlükəsiz və zəngin materiallı", "Qıfıllı şkafda", "Uşaqların əli çatmayan yerdə", "Yalnız müəllim masasında"], answer: 0 },
-            { q: "57. Uşaqlarda çeviklik keyfiyyətini inkişaf etdirən idman vasitəsi:", options: ["Maneəli qaçış və estafetlər", "Uzanıb yatmaq", "Ağır çəki qaldırmaq", "Lent kəsmək"], answer: 0 },
-            { q: "58. Məktəbəqədər müəssisədə su prosedurları və bərkitmə işləri hansı sahəyə aiddir?", options: ["Fiziki tərbiyə və sağlamlıq", "Nitq inkişafı", "Riyaziyyat", "Musiqi"], answer: 0 },
-            { q: "59. Müəllimin rəsm məşğələsində nümunə göstərməsi nə vaxt azalır?", options: ["Böyük və məktəbəhazırlıq qruplarında uşaq sərbəstliyi artdıqca", "Heç vaxt azalmır", "1-ci kiçik qrupda", "Heç göstərilmir"], answer: 0 },
-            { q: "60. Təsviri fəaliyyətin hansı növü uşağın həcmli fiqurları qavramasına daha çox kömək edir?", options: ["Lepka (heykəltaraşlıq/plastilin)", "Şəkil çəkmək", "Nöqtələri birleşdirmək", "Kağız qatlamaq"], answer: 0 }
+            { q: "5. Əgər fırçanın köməyilə müxtəlif formalı gülü rəngləsək və onu təmiz kağızın üzərinə çevirsək, gülün izi kağıza keçəcək. Bu, rəsm texnikasının hansı növünə aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "monotipiya texnikası"], answer: 0 },
+            { q: "6. Leyla kağızın bir tərəfinə bir neçə damcı boya tökdü, sonra kağızı qatladı, ehtiyatla hamarladı və açaraq rəsmi fırça ilə tamamladı. Boyanı kokteyl borucuğu ilə yaydı. Bu hansı texnikadır?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "klyaksoqrafiya (ləkəçəkmə)"], answer: 3 },
+            { q: "7. Rəsm şam və sabun tikəsi ilə yerinə yetirilir, akvarellə rənglədikdə boyanın altından rəsm üzə çıxır. Bu hansı texnikaya aiddir?", options: ["ştamplama texnikası", "barmaq boyakarlığı", "puantilizm texnikası", "fotokopiya"], answer: 3 },
+            { q: "8. Müxtəlif xalqların məişət əşyalarında, geyimlərində tətbiq olunur. Müxtəlif formaların onların bədii kompozisiyasının müvafiq fonunda yerləşdirilməsidir. Hansı növə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+            { q: "9. Uşaqlar iş üsullarını və yerinə yetiriləcək işin qabaqcadan planlaşdırılması, lazımi materialın seçilməsi bacarığını əldə edirlər. Hansı fəaliyyətə aiddir?", options: ["lepka", "konstruksiyaetmə", "rəsmçəkmə", "applikasiya"], answer: 3 },
+            { q: "10. Tərbiyəçi-müəllimin əsas fəaliyyəti əyanilikdir. Uşaq tərbiyəçinin nə çəkdiyinə baxır və təkrar edir. Bu rəsmçəkmənin hansı yaş qrupuna aiddir?", options: ["1-ci kiçik qrupda rəsmçəkmə", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda", "orta qrupda"], answer: 0 },
+            { q: "11. Tərbiyəçi uşaqlarda tərbiyəçi-müəllimi dinləmək, gördüyünü və ya düşündüyü rəsmi çəkmək bacarığını formalaşdırır. Hansı mərhələdir?", options: ["1-ci kiçik qrupda", "2-ci kiçik qrupda rəsmçəkmə", "məktəbəhazırlıq qrupunda", "orta qrupda"], answer: 1 },
+            { q: "12. Tərbiyəçi uşaqlara əşyanı detallara ayırmağı, onların məkanda yerləşməsinə diqqət yetirməyi öyrətməlidir. Hansı mərhələyə aiddir?", options: ["1-ci kiçik qrupda", "2-ci kiçik qrupda", "məktəbəhazırlıq qrupunda", "böyük qrupda rəsmçəkmə"], answer: 3 },
+            { q: "13. Məktəbəqədər yaşda uşaqların işinin keyfiyyətini nə xarakterizə edir?", options: ["obrazların ifadəliliyi", "texniki savadlılığın yüksək səviyyəsi", "düşüncənin dərinliyi", "analitik yanaşma"], answer: 0 },
+            { q: "14. Uşaqlarda estetik zövqü, bədii yaradıcılıq qabiliyyətini, rəngi, formanı, əşyaların ölçüsünü səsləndirmək bacarığını formalaşdırmaq hansı qrupa aiddir?", options: ["1-ci kiçik qrupda", "2-ci kiçik qrupda", "məktəbəhazırlıq qrupunda", "orta qrupda rəsmçəkmə"], answer: 3 },
+            { q: "15. Bu yaş dövrünün xüsusiyyətlərini nəzərə alaraq qayçı verilmir, bütün fiqurlar hazırdır, əlvan kağızı isə əlləri ilə cırırlar. Hansı mərhələdir?", options: ["2-ci kiçik qrupda applikasiya", "orta qrupda", "böyük qrupda", "məktəbəhazırlıq qrupunda"], answer: 0 },
+            { q: "16. Gündəlik həyat əşyalarının izlənilməsini əhatə edir. Məşğələ zamanı uşaqlar əşyaları sualsız müzakirə etməyi öyrənirlər. Hansı mərhələdir?", options: ["2-ci kiçik qrupda", "orta qrupda", "böyük qrupda applikasiya", "məktəbəhazırlıq qrupunda"], answer: 2 },
+            { q: "17. Bu yaş dövründə uşaqların əl əzələləri möhkəmlənir, hərəkətləri daha dəqiq olur. Müəllim əşyaya baxarkən uşaqları aktivləşdirir. Hansı mərhələdir?", options: ["2-ci kiçik qrupda", "orta qrupda applikasiya", "böyük qrupda", "məktəbəhazırlıq qrupunda"], answer: 1 },
+            { q: "18. Fransız dilindən tərcümədə 'nöqtə' deməkdir. Təmiz rənglərin istifadə olunması əsas xüsusiyyətidir. Hansı texnikadır?", options: ["kopiyalama texnikası", "klyaksoqrafiya texnikası", "puantilizm texnikası", "sürtmə texnikası"], answer: 2 },
+            { q: "19. Bu, uşaqlar üçün ənənəvi olmayan rəsm texnikasının faydalı xüsusiyyətlərinə aiddir:", options: ["özünəqiymətləndirmə formalaşdırır", "ünsiyyət bacarıqlarını inkişaf etdirir", "özünəinamı formalaşdırır", "idrak bacarıqlarını inkişaf etdirir"], answer: 2 },
+            { q: "20. Qanunauyğunluqların, gündəlik həyat əşyalarının izlənilməsi baş verir. Uşaqlar əşyaları müzakirə etməyi öyrənirlər. Hansı mərhələdir?", options: ["2-ci kiçik qrupa", "orta qrupa", "böyük qrupa", "məktəbəhazırlıq qrupuna"], answer: 2 },
+            { q: "21. Fiziki tərbiyə məşğələlərinə dair təqdim olunan mülahizələrdən biri yanlışdır:", options: ["uşaqlarda yüksək fiziki dözümlülük", "uşaqlarda yalnız iri motorika inkişaf edir", "uşaq orqanizminin sağlamlığını qoruyur", "psixoloji gərginliyi aradan qaldırır"], answer: 1 },
+            { q: "22. Məşğələlərin frontal forması hansı iş formasıdır?", options: ["Kollektiv", "Fərdi", "Cütlərlə", "Qrupla"], answer: 0 },
+            { q: "23. Bu iş formasında uşaqlar müəyyən fiziki hərəkətləri ardıcıl olaraq yerinə yetirirlər:", options: ["Qruplarla", "Cütlərlə", "Konveyer", "Frontal"], answer: 2 },
+            { q: "24. Hansı iş formasında müəllim lider təyin edir, uşaqlar isə yerlərini növbə ilə dəyişərək hərəkətləri yerinə yetirirlər?", options: ["Konveyer", "Qrupla", "Kollektiv", "Fərdi"], answer: 1 },
+            { q: "25. Fiziki tərbiyə məşğələlərində tətbiq olunan üsullardan biri yanlışdır:", options: ["hərəkətlərin yalnız bir dəfə göstərilməsi", "hərəkətin izahı və göstərilməsi", "hərəkətlərin möhkəmləndirilməsi", "konkret tapşırıqlarla hərəkətlərin öyrədilməsi"], answer: 0 },
+            { q: "26. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı tərbiyəçiyə qoyulan tələblərə hansı daxil edilə BİLMƏZ?", options: ["O, yalnız uşaqların əhval-ruhiyyəsinə nəzarət etməlidir", "Natiqlik mədəniyyətinə malik olmalıdır", "Hərəkətlərin düzgün tamamlanmasına nəzarət etməlidir", "Nəzakətli olmalıdır"], answer: 0 },
+            { q: "27. Fiziki tərbiyə məşğələsinin hissələrini göstərin:", options: ["Əsas, giriş, əlavə", "Yekun, köməkçi, giriş", "Giriş, əsas, yekun", "Köməkçi, əlavə, giriş"], answer: 2 },
+            { q: "28. Fiziki tərbiyə üzrə məşğələlərin təşkili zamanı hazırlıq hərəkətlərindən biri yanlışdır:", options: ["İdman zalının qabaqcadan hazırlanması", "Tərbiyəçinin məşğələ planını hazırlaması", "Təlim prosesində metodların seçilməsi", "Tərbiyəçinin məşğələyə 'özünü hazırlaması'"], answer: 2 },
+            { q: "29. Məşğələnin hansı hissəsində tərbiyəçi-müəllim ümuminkişafetdirici və əsas hərəkətlərdən istifadə edir?", options: ["Əsas", "Giriş", "Yekun", "Hazırlıq"], answer: 0 },
+            { q: "30. Tərbiyəçi uşaqlara yeni hərəkəti rəsmlərin köməyi ilə göstərdikdə hansı təlim metodundan istifadə edir?", options: ["Praktik", "Oyun", "Əyani", "Yarış"], answer: 2 },
+            { q: "31. Velosiped sürərkən, üzgüçülüklə məşğul olarkən uşaqlarda hansı hərəki bacarıqlar inkişaf edir?", options: ["İri motorika", "Xırda motorika", "Sensomotor bacarıqlar", "Sensor etalon"], answer: 0 },
+            { q: "32. Fiziki tərbiyə məşğələlərində hərəkətlərin göstərilməsi metodunun hansı metodla uyğunlaşdırılması ən böyük effekti verir?", options: ["Şifahi izahla", "Şəkillərin istifadəsi ilə", "Kitabların istifadəsi ilə", "Yoldaşların gösterilməsi ilə"], answer: 0 },
+            { q: "33. Məşğələnin hansı hissəsində uşaqların məşğələyə marağı yaradılır və orqanizm hazırlaşdırılır?", options: ["Yekun", "Giriş", "Əsas", "Köməkçi"], answer: 1 },
+            { q: "34. İzah, sual və cavablar, söhbətlər, təlimat, nağıllar təlimin hansı metoduna aiddir?", options: ["Əyani", "Dövri məşqlər", "Yarış", "Şifahi"], answer: 3 },
+            { q: "35. Hansı fiziki oyunların keçirilməsi üçün böyük həcmdə hava və geniş sahə tələb olunur?", options: ["Mütəhərrik oyunlar", "Qaydalar üzrə oyunlar", "Didaktik oyunlar", "Süjetli-rollu oyunlar"], answer: 0 },
+            { q: "36. Hansı təlim metodu görsəl (görmə), eşitmə və toxunma qavrayışını əhatə edir?", options: ["Əyani", "Dövri məşqlər", "Şifahi", "Yarış"], answer: 0 },
+            { q: "37. Uşaqlarda top, üzgüçülük və rolikdə sürmə oyunları zamanı hansı hərəki bacarıqlar inkişaf edir?", options: ["Xırda motorika", "İri motorika", "Sensomotor bacarıqlar", "Sensor motorika"], answer: 1 },
+            { q: "38. Təsviri fəaliyyət məşğələsində kağızı cırmaqla iş aparmaq hansı qrup üçün xarakterikdir?", options: ["1-ci kiçik qrup", "2-ci kiçik qrup", "Orta qrup", "Böyük qrup"], answer: 1 },
+            { q: "39. Fırçadan düzgün istifadə etmək, boyanı bərabər yaymaq vərdişləri nə zaman formalasdırılır?", options: ["2-ci kiçik qrupdan", "Məktəbəhazırlıqdan", "Böyük qrupdan", "Ancaq məktəbdə"], answer: 0 },
+            { q: "40. Təsviri fəaliyyətdə quraşdırma (konstruksiya) nəyə xidmət edir?", options: ["Məkan təfəkkürünün inkişafına", "Yalnız hərfləri öyrənməyə", "Yalnız yazmağa", "Nizam-intizamı pozmağa"], answer: 0 },
+            { q: "41. Mütəhərrik oyunlar uşaqlarda hansı keyfiyyəti tərbiyə etmir?", options: ["Cəldlik", "Qorxaqlıq", "Çeviklik", "Dözümlülük"], answer: 1 },
+            { q: "42. Fiziki tərbiyə məşğələsində əsas hərəkətlərə hansı daxildir?", options: ["Qaçış, tullanma, dırmaşma", "Şeir oxumaq", "Rəsm çəkmək", "Sakit oturmaq"], answer: 0 },
+            { q: "43. Plastilinlə iş zamanı uşaqlarda əsasən nə inkişaf edir?", options: ["Xırda motorika", "Eşitmə qabiliyyəti", "Boy artımı", "Yazı texnikası"], answer: 0 },
+            { q: "44. Hansı rəsm texnikasında qatlama vasitəsilə simmetrik ləkələr alınır?", options: ["Monotipiya", "Puantilizm", "Ştamplama", "Fotokopiya"], answer: 0 },
+            { q: "45. Ştamplama texnikasında istifadə olunan əsas vasitə nədir?", options: ["Möhür/forma izləri", "Şam", "Kokteyl borusu", "Süngər gülü"], answer: 0 },
+            { q: "46. Fiziki məşğələlərin yekun hissəsinin əsas məqsədi nədir?", options: ["Orqanizmi sakitləşdirmək", "Yüksək yük vermək", "Yeni hərəkət öyrətmək", "Qaçış yarışı təşkil etmək"], answer: 0 },
+            { q: "47. Applikasiya dərslərində kəsmə bacarığı hansı yaşdan öyrədilir?", options: ["Orta qrupdan", "2-ci kiçik qrupdan", "Körpələr qrupundan", "1-ci kiçik qrupdan"], answer: 0 },
+            { q: "48. Süjetli rəsmçəkmə əsasən hansı yaş qrupunda geniş yer alır?", options: ["Böyük və məktəbəhazırlıq qrupunda", "1-ci kiçik qrupda", "Körpələr evində", "2-ci kiçik qrupda"], answer: 0 },
+            { q: "49. İdman zalında təhlükəsizlik qaydalarına əməl etmək kimin vəzifəsidir?", options: ["Tərbiyəçi-müəllimin", "Yalnız uşaqların", "Valideynlərin", "Xadimənin"], answer: 0 },
+            { q: "50. Fırçanı qabın kənarına yüngülcə sıxaraq artıq boyanı təmizləmək hansı yaşda öyrədilir?", options: ["2-ci kiçik qrupda", "Məktəbəhazırlıqda", "Böyük qrupda", "Orta qrupda"], answer: 0 },
+            { q: "51. Fiziki məşğələlərdə fərdi yanaşma nə zaman tətbiq olunur?", options: ["Bütün uşaqların fiziki imkanları fərqli olduqda", "Heç vaxt", "Yalnız yarışlarda", "Yalnız xəstə uşaqlara"], answer: 0 },
+            { q: "52. Lepka (plastilin) məşğələsində istifadə olunan alət necə adlanır?", options: ["Stek (bıçaqça)", "Qayçı", "Xətkeş", "Pərgar"], answer: 0 },
+            { q: "53. Qamətin düzgün formalaşması üçün hansı fiziki hərəkətlər vacibdir?", options: ["Müvazinət və duruş hərəkətləri", "Yalnız oturmaq", "Yalnız top atmaq", "Sürətli qaçış"], answer: 0 },
+            { q: "54. Rəsm dərslərində işıq və kölgə anlayışı hansı qrupda tanıtmağa başlanılır?", options: ["Məktəbəhazırlıq qrupunda", "1-ci kiçik qrupda", "2-ci kiçik qrupda", "Orta qrupda"], answer: 0 },
+            { q: "55. Gimnastika divarına dırmaşma hərəkətləri uşaqda nəyi inkişaf etdirir?", options: ["Əzələ gücünü və koordinasiyanı", "Yalnız nitqi", "Göz görməsini", "Eşitməni"], answer: 0 },
+            { q: "56. Təsviri fəaliyyətdə nəticənin sərgilənməsi nəyə xidmət edir?", options: ["Uşaqda özünəinam və estetik zövq yaratmağa", "Uşaqları utandırmağa", "Səhvləri cəzalandırmağa", "Vaxt aparmağa"], answer: 0 },
+            { q: "57. Səhər gimnastikasının əsas məqsədi nədir?", options: ["Orqanizmi oyatmaq və iş qabiliyyətini artırmaq", "Uşaqları yormaq", "Bütün günü yatırtmaq", "Səhər yeməyini əvəz etmək"], answer: 0 },
+            { q: "58. Barmaq oyunları fiziki inkişafda nəyə kömək edir?", options: ["Xırda motorikanın və nitqin inkişafına", "Böyük əzələlərin inkişafına", "Yalnız ayaq əzələlərinə", "Hündürlüyə tullanmağa"], answer: 0 },
+            { q: "59. Təsviri fəaliyyət məşğələlərində uşağa azadlıq verilməsi nəyi stimullaşdırır?", options: ["Yaradıcı təxəyyülü", "Nizam-intizamsızlığı", "Tənbəlliyi", "Diqqətsizliyi"], answer: 0 },
+            { q: "60. Məktəbəqədər müəssisədə fiziki tərbiyə gün rejiminin nəyini təşkil edir?", options: ["Mühüm tərkib hissəsini", "Yalnız istəyə bağlı hissəsini", "Faydasız hissəsini", "Yalnız qışda vacib olan hissəsini"], answer: 0 }
         ]
     },
     {
-        title: "2. Nitq İnkişafı və Bədii Ədəbiyyat Metodikası",
+        title: "2. İbtidai riyazi təsəvvürlərin formalaşdırılması metodikası",
         questions: [
-            { q: "61. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Uşaqlarda lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrənməyə məcbur etmək"], answer: 0 },
-            { q: "62. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsini dinləmək", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
-            { q: "63. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
-            { q: "64. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
-            { q: "65. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
-            { q: "66. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
-            { q: "67. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
-            { q: "68. Nitq inkişafı üzrə vəzifələrə nə aid deyil?", options: ["nitqin qrammatik quruluşunun formalaşdırılması", "nitqin leksik quruluşunun formalaşdırılması", "nağıletmənin (monoloji nitqin) formalaşdırılması", "səs mədəniyyəti tərbiyəsi"], answer: 1 },
-            { q: "69. Nitqin qrammatik quruluşunun düzgün formalaşması üçün nə edilir?", options: ["Sözlərin hallanması və cümlədə düzgün uzlaşmasını öyrətmək", "Sözləri tərsinə oxutmaq", "Yalnız tək sözlər təkrarlatmaq", "Cümlə qurdurmamaq"], answer: 0 },
-            { q: "70. Passiv lüğət nədir?", options: ["Uşağın başa düşdüyü, lakin gündəlik nitqində az istifadə etdiyi sözlər", "Daim istifadə etdiyi sözlər", "Uşağın bilmədiyi xarici sözlər", "Səhv tələffüz olunan sözlər"], answer: 0 },
-            { q: "71. Fəal lüğət nədir?", options: ["Uşağın anladığı və öz nitqində sərbəst işlətdiyi sözlər", "Unudulmuş sözlər", "Yalnız kitablarda olan sözlər", "Bilmədiyi sözlər"], answer: 0 },
-            { q: "72. Uşaqlara nağıl danışarkən müəllimin intonasiyası necə olmalıdır?", options: ["Emosional, obrazlı və rola uyğun", "Monoton və sürətli", "Pıçıltı ilə", "Qışqıraraq"], answer: 0 },
-            { q: "73. Tapmacaların uşaq nitqində və təfəkküründə rolu nədir?", options: ["Məntiqi təfəkkürü və lüğət ehtiyatını inkişaf etdirir", "Yalnız vaxt aparır", "Yazını təkmilləşdirir", "Fiziki gücü artırır"], answer: 0 },
-            { q: "74. Yanıltmacların əsas faydası nədir?", options: ["Düzgün tələffüzü (artikulyasiyanı) və nitq aparatını inkişaf etdirmək", "Yazı sürətini artırmaq", "Yaddaşı zəiflətmək", "Hesablama aparmaq"], answer: 0 },
-            { q: "75. Şəkilli kitabların məktəbəqədər yaşlı uşaqlar üçün önəmi nədir?", options: ["Əyaniliyi təmin edir və süjeti anlamağa kömək edir", "Kitabı ağırlaşdırır", "Təfəkkürü məhdudlaşdırır", "Heç bir önəmi yoxdur"], answer: 0 },
-            { q: "76. Monoloji nitq bacarığına nə daxildir?", options: ["Mətnin müstəqil şəkildə ardıcıl danışılması (nağıl etmə)", "İki nəfərin sual-cavabı", "Susmaq", "Mahnı oxumaq"], answer: 0 },
-            { q: "77. Dialoji nitq nədir?", options: ["İki və ya daha çox şəxs arasında qarşılıqlı ünsiyyət", "Təkbaşına danışmaq", "Kitab oxumaq", "Şeir əzbərləmək"], answer: 0 },
-            { q: "78. Məktəbəqədər uşaqlarda səs təhlili zamanı ilk nə öyrədilir?", options: ["Sözdə ilk və son səsi müəyyən etmək", "Cümlə təhlili sxemi", "Hərfləri qələmlə yazmaq", "Xarici alfavit"], answer: 0 },
-            { q: "79. Uşaqların nitqində qrammatik səhvləri necə düzəltmək lazımdır?", options: ["Səhvi dərhal uşağın üzünə vurmadan, düzgün variantı söhbət zamanı səsləndirməklə", "Uşağı cəzalandırmaqla", "Uşağı lağa qoymaqla", "Diqqət etməməklə"], answer: 0 },
-            { q: "80. Bədii əsərin uşaqlara oxunmasından sonra hansı iş aparılır?", options: ["Əsərin məzmunu üzrə həmsöhbət olunur və sual-cavab edilir", "Uşaqlar dərhal yatızdırılır", "Riyaziyyat misalları həll edilir", "Sənədlər doldurulur"], answer: 0 },
-            { q: "81. Nağılın səhnələşdirilməsi (teatrallaşdırılması) nəyə xidmət edir?", options: ["Emosional nitqin və aktyorluq bacarıqlarının formalaşmasına", "Yalnız vaxt itkisinə", "Nizam-intizamın pozulmasına", "Səssizliyə"], answer: 0 },
-            { q: "82. Uşaq nitqində 'antonimlər' nə zaman öyrədilməyə başlanır?", options: ["Əks mənalı sözlər müqayisəli oyunlarla öyrədilir", "Yalnız ali məktəbdə", "Heç vaxt", "Yalnız yazılı"], answer: 0 },
-            { q: "83. 'Sinonimlər' uşaqlara necə izah olunur?", options: ["Yaxın mənalı sözlərlə lüğət zənginləşdirilir", "Yalnız xarici dildə", "Sərt qaydalarla", "Öyrədilmir"], answer: 0 },
-            { q: "84. Sözlərin səs tərkibi dedikdə nə nəzərdə tutulur?", options: ["Sözün hansı səslərdən ibarət olması (sait, samit)", "Sözün neçə hərflə yazılması", "Sözün çəkisi", "Sözün rəngi"], answer: 0 },
-            { q: "85. Kiçik yaşlı uşaqların nitqində mimika və gestlərin rolu:", options: ["Fikri tam ifadə etməyə kömək edir", "Nitqi korlayır", "Qadağandır", "Mənasızdır"], answer: 0 },
-            { q: "86. Səs mədəniyyəti üzrə məşğələlərdə hansı nəfəs gimnastikası tətbiq edilir?", options: ["Düzgün nitq nəfəsini formalaşdıran çalışmalar", "Ağır idman nəfəsi", "Nəfəsi tutub durmaq", "Yalnız qaçış"], answer: 0 },
-            { q: "87. Uşaqların ətraf aləm haqqında təsəvvürlərinin nitqlə əlaqəsi:", options: ["Bilik artdıqca lüğət ehtiyatı da zənginləşir", "Əlaqə yoxdur", "Nitq zəifləyir", "Təfəkkür dayandırılır"], answer: 0 },
-            { q: "88. Məktəbəqədər təhsildə savad təliminin əsası hansı metoddur?", options: ["Səs analitik-sintez metodu", "Əzbərçilik metodu", "Bütün sözü şəkil kimi yadda saxlama", "Yalnız qrammatika qaydaları"], answer: 0 },
-            { q: "89. Uşaqlarda bədii tərbiyənin formalaşmasında hansı əsərlərdən istifadə olunur?", options: ["Uşaq folkloru, nağıllar, şeirlər, hekayələr", "Elmi fantastik romanlar", "Qəzet məqalələri", "Biznes kitabları"], answer: 0 },
-            { q: "90. Atalar sözləri uşaqlara hansı mənəvi keyfiyyəti aşılayır?", options: ["Hikmət, əxlaq və məntiqi nəticə çıxarmaq", "Eqoizm", "Tənbəllik", "Sərtlik"], answer: 0 },
-            { q: "91. 1-ci kiçik qrupda nitqin inkişafı üçün müəllimin nitqi necə olmalıdır?", options: ["Aydın, yavaş, səlis və emosional", "Çox sürətli və mürəkkəb", "Pıçıltı ilə", "Sərt və qışqırıqla"], answer: 0 },
-            { q: "92. Şəkildə gördüyünü təsvir etmək uşaqda hansı nitq növünü inkişaf etdirir?", options: ["Müfəssəl monoloji nitqi", "Yalnız daxili nitqi", "Səssizliyi", "Yazılı nitqi"], answer: 0 },
-            { q: "93. Süjetli şkillər üzrə hekayə qurma hansı qruplarda aparılır?", options: ["Orta, böyük və məktəbəhazırlıq qruplarında", "Yalnız körpələr evində", "Yalnız böyüklər üçün", "Heç birində"], answer: 0 },
-            { q: "94. Uşağa kitab oxuyarkən diqqəti saxlamaq üçün nə edilməlidir?", options: ["İllüstrasiyaları göstərmək və maraqlı intonasiya tətbiq etmək", "Uşağı məcbur etmək", "Otağın işığını söndürmək", "Mətni tez oxuyub bitirmək"], answer: 0 },
-            { q: "95. Nitq qüsuru (məsələn, pəltəklik və ya səs tələffüzü pozuqluğu) olan uşaqla necə işlənməlidir?", options: ["Logoped və psixoloqla əməkdaşlıq edərək fərdi yanaşmaq", "Uşağı qrupdan çıxarmaq", "Görməzdən gəlmək", "Uşağı cəzalandırmaq"], answer: 0 },
-            { q: "96. Uşaqların öz təəssüratları haqqında danışması (məsələn, istirahət günü haqqında) nəyi inkişaf etdirir?", options: ["Şəxsi təcrübəyə əsaslanan rabitəli nitqi", "Yalnız yaddaşı korlayır", "Yalan danışmağı", "Qorxunu"], answer: 0 },
-            { q: "97. 'Söz oyunu' (məsələn, 'A' hərfi ilə başlayan söz de) nəyə xidmət edir?", options: ["Səs diqqətini və lüğət ehtiyatını inkişaf etdirməyə", "Yalnız vaxt öldürməyə", "Uşağı yormağa", "Riyazi hesaba"], answer: 0 },
-            { q: "98. Ədəbi dil normalarına riayət etmək tərbiyəçinin hansı məsuliyyətidir?", options: ["Nümunəvi nitq mədəniyyəti nümayiş etdirmək", "Vacib deyil", "Yalnız filoloqların işidir", "İstədiyi kimi danışmaq"], answer: 0 },
-            { q: "99. Nitq inkişafında rollu oyunların əsas rolu:", options: ["Ünsiyyət tələbatını ödəyir və nitq aktivliyini artırır", "Sakitliyi təmin edir", "Fiziki gücü azaldır", "Hərfləri yazdırır"], answer: 0 },
-            { q: "100. Nəğmələr və laylalar kiçik yaşlı uşaqlara necə təsir edir?", options: ["Emosional rahatlıq verir və nitq ritmini hiss etdirir", "Yuxusuzluq yaradır", "Qorxu yaradır", "Heç bir təsiri yoxdur"], answer: 0 },
-            { q: "101. Uşaq nağılı öz sözləri ilə dəyişdirərək bitirirsə, bu hansı qabiliyyətdir?", options: ["Yaradıcı təfəkkür və nitq fantaziyası", "Yalançılıq", "Səhv etmək", "Diqqətsizlik"], answer: 0 },
-            { q: "102. Cümlədə söz sırasının düzgün qurulması hansı sahəyə aiddir?", options: ["Nitqin qrammatik quruluşuna", "Səs tələffüzünə", "Lüğət ehtiyatına", "Fiziki tərbiyəyə"], answer: 0 },
-            { q: "103. Uşaqların ritm və qafiyə hissiyyatı hansı fəaliyyətlə inkişaf edir?", options: ["Şeir və nəğmə öyrənməklə", "Riyaziyyatla", "Rəsmlə", "Quraşdırmaqla"], answer: 0 },
-            { q: "104. Lüğətin təmizliyi nədir?", options: ["Nitqdə loru, parazit və vulqar sözlərin olmaması", "Yalnız kitab sözləri ilə danışmaq", "Milli sözləri işlətməmək", "Səssiz durmaq"], answer: 0 },
-            { q: "105. Uşaq bağçasında nitq bucağı (küncü) necə təşkil olunur?", options: ["Nəşrlər, teatr kuklaları, şəkilli kartlar və diafilmlərlə zəngin", "Yalnız boş rəflərlə", "Müəllim jurnalları ilə", "Yazı lövhəsi ilə"], answer: 0 },
-            { q: "106. Hekayə uydurma məşğələsi hansı yaş qrupunda daha uğurla aparılır?", options: ["Böyük və məktəbəhazırlıq qruplarında", "Körpələr qrupunda", "1-ci kiçik qrupda", "Yalnız ali məktəbdə"], answer: 0 },
-            { q: "107. Uşaqlarda 'Niyə?', 'Haçan?' suallarının artması hansı dövrə təsadüf edir?", options: ["İdrak fəallığının və nitqin sürətli inkişafı dövrünə (3-5 yaş)", "Məktəbi bitirəndən sonra", "1 yaşa qədər", "Heç vaxt"], answer: 0 },
-            { q: "108. Kukla teatrından nitq inkişafında istifadənin faydası:", options: ["Uşağı utancaqılıqdan azad edir və nitqini fəallaşdırır", "Uşağı qorxudur", "Eşitməni zəiflədir", "Heç bir xeyri yoxdur"], answer: 0 },
-            { q: "109. Nitqin tempinin çox sürətli olması hansı mənfi hala gətirir?", options: ["Sözlərin anlaşılmaz olmasına və səs tələffüzünün pozulmasına", "Daha ağıllı görünməyə", "Lüğətin artmasına", "Uşağın yaxşı yatmasına"], answer: 0 },
-            { q: "110. Uşaqlara əşyanın əlamətlərini təsvir etməyi öyrətmək hansı bacarığı formalaşdırır?", options: ["Səfətbərli sifətlər işlətməklə təsviri nitq bacarığını", "Riyazi hesablamanı", "İdman hərəkətini", "Yazı vərdişini"], answer: 0 },
-            { q: "111. Uşaq dili (uşaq jarqonu) ilə tərbiyəçinin danışması doğrundurmu?", options: ["Xeyr, tərbiyəçi düzgün ədəbi dildə konuşmalıdır", "Bəli, eyni dildə danışmalıdır", "Fərq etməz", "Yalnız işarələrlə danışmalıdır"], answer: 0 },
-            { q: "112. Uşaqların dinləmə mədəniyyəti necə formalaşdırılır?", options: ["Danışanı axıra qədər dinləmək və sözünü kəsməmək vərdişləri ilə", "Qışqırmaqla", "Otaqdan çıxmaqla", "Məcburən bağlamaqla"], answer: 0 },
-            { q: "113. Məktəbəhazırlıq qrupunda sözün hecalara bölünməsi necə öyrədilir?", options: ["Əl çalmaları (əlləri vurmaq) və ya ritmlə sözü hissələrə bölməklə", "Yazılı qaydalarla", "Mürəkkəb kitab oxusu ilə", "Öyrədilmir"], answer: 0 },
-            { q: "114. Sait və samit səslərin fərqi uşaqlara necə anlatılır?", options: ["Saitlərin maneəsiz və avazla, samitlərin isə maneə ilə tələffüz olunması ilə", "Rəngləri ilə", "Çəkiləri ilə", "Fərq anlatılmır"], answer: 0 },
-            { q: "115. Bədii əsərdən parça əzbərləmək uşaqda nəyi gücləndirir?", options: ["Hafizəni (yaddaşı) və ekspressiv nitqi", "Fiziki dözümlülüyü", "Görmə iti gözlüyünü", "Səssizliyi"], answer: 0 },
-            { q: "116. 'Mən mətni davam etdirirəm' oyunu nəyə xidmət edir?", options: ["Məntiqi nitq ardıcıllığını və diqqəti formalaşdırmağa", "Yalnız yorğunluq yaratmağa", "Uşaqları küsdürməyə", "Yazı yazmağa"], answer: 0 },
-            { q: "117. Uşaqlara öz adı, soyadı və ailəsi haqqında məlumat verməyi öyrətmək nə zaman vacibdir?", options: ["Kiçik yaşlardan başlayaraq sosial-nitq inkişafında", "Yalnız 18 yaşında", "Məktəbi bitirəndə", "Heç vaxt"], answer: 0 },
-            { q: "118. Eşitmə diqqətini inkişaf etdirən oyun hansıdır?", options: ["'Kimsə səsləndi?' və ya 'Səs haradan gəlir?' oyunu", "Rəsm çəkmək", "Plastilin ovuşdurmaq", "Süfə açmaq"], answer: 0 },
-            { q: "119. Nitq inkişafı üzrə fərdi iş kiminlə aparılır?", options: ["Nitq inkişafı ləngiyən və ya xüsusi dəstəyə ehtiyacı olan uşaqlarla", "Yalnız əlaçı uşaqlarla", "Bütün qrupla eyni vaxtda", "Heç kimlə"], answer: 0 },
-            { q: "120. Nitq inkişafı məşğələlərinin ümumi nəticəsi nə olmalıdır?", options: ["Uşağın sərbəst, anlaşıqlı və məntiqi ünsiyyət qura bilməsi", "Uşağın sakit oturması", "Bütün kitabları əzbərləməsi", "Müəllimin dincəlməsi"], answer: 0 }
+            { q: "1. Təfəkkür növlərindən biri ibtidai riyazi təsəvvürlərin formalaşması prosesinə uyğun gəlmir:", options: ["əyani-əməli", "əyani-obrazlı", "müqayisə", "sözlü-məntiqi"], answer: 2 },
+            { q: "2. Məktəbəqədər yaşlı uşaqların riyazi təhsilinin əsası kimi hissiyyat (sensor) tərbiyəsi — bu...", options: ["uşaqda qavrama və təsəvvür etmənin inkişafıdır", "hissiyyat idrakının formalaşmasına yönəlmiş məqsədyönlü pedaqoji prosesdir", "perseptiv hərəkətlərin məcmusudur", "xüsusi təşkil olunmuş prosesdir"], answer: 1 },
+            { q: "3. M. Montessori didaktik materialı nəyin inkişafına yönəlib?", options: ["idrak fəallığının", "sensor qabiliyyətlərin", "rabitəli nitqin", "konstruktiv qabiliyyətlərin"], answer: 2 },
+            { q: "4. İbtidai riyazi təsəvvürlərin formalaşdırılmasının ənənəvi vasitələri aşağıdakılardır:", options: ["oyunlar və məşğələlər üçün avadanlıqlar, əyani didaktik materiallar, ədəbiyyat", "kompyuter proqramları", "Montessori materialı", "nümayiş, təlimat"], answer: 0 },
+            { q: "5. Variantlardan biri məktəbəqədər yaşlı uşaqların riyazi inkişaf vəzifələrinə aid deyil:", options: ["ibtidai riyazi təsəvvürlər sisteminin formalaşdırılması", "riyazi təfəkkürün formalaşdırılması", "konstruktiv fəaliyyətin inkişafı", "rabitəli nitqin təkmilləşdirilməsi"], answer: 2 },
+            { q: "6. Uşaqların riyaziyyata olan idrak marağının inkişafı pedaqoqlardan nəyi tələb edir?", options: ["əşyavi-inkişafetdirici, oyun və məişət mühitinin yaradılmasını", "hesablama fəaliyyətinə yiyələnməyi", "ünsiyyət mədəniyyətini", "psixoloji rahatlığı"], answer: 0 },
+            { q: "7. İbtidai riyazi təsəvvürlərin formalaşdırılması proqramının artıq olan bölməsini çıxarın:", options: ["«Kəmiyyət və say»", "«Modellaşdırma»", "«Böyüklük» və «Forma»", "«Məkanda səmtləşmə»"], answer: 1 },
+            { q: "8. Kiçik məktəbəqədər yaşlı uşağın təlim proqramına görə hazırlıqdan əvvəlki fəaliyyət özünə daxildir:", options: ["əşyalarla modelləşdirmə", "müqayisə əməliyyatlarına yiyələnmək üçün zəruri olan əşya əlamətlərinin ayrılması", "sadə məsələlər tərtibi", "məntiqi əməliyyatlar"], answer: 3 },
+            { q: "9. Böyük məktəbəqədər yaşlı uşağın ədədlər aləminə daxil edilməsinin əsası nədir?", options: ["kəmiyyətlərlə əməliyyatlar", "əşyaların formaya görə qruplaşdırılması", "xəyali vəziyyət", "sıra sayı və kəmiyyət sayına yiyələnmə"], answer: 1 },
+            { q: "10. Riyazi təsəvvürlərin inkişafı məşğələlərində didaktik oyunlar və tapşırıqlar nəyə şərait yaradır?", options: ["bilik, bacarıq və vərdişlərin möhkəmləndirilməsinə, psixi proseslərin inkişafına", "riyazi təhsil almağa", "idrak fəallığına", "kollektiv vərdişlərə"], answer: 0 },
+            { q: "11. Uşağın sayma fəaliyyətinin inkişafının ilk mərhələsi:", options: ["say saylarının ardıcıl söylənilməsi", "onluqlarla sayma", "çoxluqlarla manipulyasiya etmək", "əşyaların bütöv qrupları ilə sayma"], answer: 0 },
+            { q: "12. Məktəbəqədər yaşlı uşağın riyazi inkişafının əsas məqsədi:", options: ["20 daxilində saymağı öyrətmək", "ölçməyi, məsələ həll etməyi öyrətmək", "məktəbə hazırlıq", "ətraf aləmdə xassələri, münasibətləri görmək və kəşf etmək qabiliyyətini inkişaf etdirmək"], answer: 0 },
+            { q: "13. Y.A. Komenski didaktikanın hansı prinsipini 'qızıl qayda' adlandırırdı?", options: ["Şüurluluq və fəallıq", "Əyanilik", "Sistematiklik", "Daimi təkrar"], answer: 1 },
+            { q: "14. Riyazi təhsilin əsas vəzifələri hesab edilə bilər:", options: ["idrak, inkişafetdirici, praktiki", "inkişafetdirici, nəzəri, tərbiyəvi", "idrak, praktiki, tərbiyəvi", "inkişafetdirici, tərbiyəvi, idrak"], answer: 2 },
+            { q: "15. Matryoşkaları boy sırasına görə düzərkən uşaq hansı məntiqi üsulu reallaşdırır?", options: ["Sintez", "Analiz", "Ümumiləşdirmə", "Seriasiya (ardıcıllıqla düzmə)"], answer: 2 },
+            { q: "16. Şəkildəki fiqurlar üzrə qruplaşdırma apararkən hansı üsuldan istifadə olunur?", options: ["Sintez", "Ümumiləşdirmə", "Təsnifat (Klassifikasiya)", "Konkretləşdirmə"], answer: 1 },
+            { q: "17. Paylama materialı ilə işləmək vərdişləri hansı yaşdan başlayır?", options: ["Orta qrupdan", "Böyük qrupdan", "İkinci kiçik qrupdan", "Məktəbəhazırlıq qrupundan"], answer: 0 },
+            { q: "18. Təlim fəaliyyəti vərdişləri nə vaxt formalaşır?", options: ["Orta qrupdan başlayaraq", "Böyük qrupdan", "İkinci kiçik qrupdan başlayaraq", "Məktəbəhazırlıq qrupundan"], answer: 0 },
+            { q: "19. Seçimlərdən biri təlim fəaliyyəti vərdişlərinə aid deyil:", options: ["Məşğələdə intizamı gözləmək", "Düzgün qaməti saxlayaraq oturmaq", "Sakitcə ayağa qalxmaq", "Əlini yalnız cavabı biləndə qaldırmaq"], answer: 0 },
+            { q: "20. Əşyaları vahid çoxluqda toplamaq istəyi nə vaxt ortaya çıxır?", options: ["İkinci kiçik qrupa", "Birinci kiçik qrupa", "Orta qrupa", "Böyük qrupa"], answer: 1 },
+            { q: "21. 'Çox' və 'Bir' anlayışları uşaqlara ilk dəfə hansı qrupda öyrədilir?", options: ["1-ci kiçik qrupda", "Orta qrupda", "Böyük qrupda", "Məktəbəhazırlıqda"], answer: 0 },
+            { q: "22. Əşyaların uzunluğuna görə müqayisəsi (uzun-qısa) hansı yaşdan başlanır?", options: ["2-ci kiçik qrupdan", "Məktəbəhazırlıqdan", "Böyük qrupdan", "Yalnız ibtidai sinifdə"], answer: 0 },
+            { q: "23. Dairə, kvadrat, üçbucaq kimi sadə fiqurlar hansı yaşda tanıdılır?", options: ["2-ci kiçik qrupda", "Böyük qrupda", "1-ci sinifdə", "Körpələr evində"], answer: 0 },
+            { q: "24. Zaman anlayışlarından 'dünən, bu gün, sabah' hansı qruplarda intensivleşir?", options: ["Orta və böyük qruplarda", "1-ci kiçik qrupda", "Körpələr qrupunda", "Yalnız bağçadan sonra"], answer: 0 },
+            { q: "25. Səmtləşmə (sağ, sol, yuxarı, aşağı) məşğələlərinin əsas məqsədi nədir?", options: ["Məkanda səmtləşməni öyrətmək", "Yalnız yazı yazmaq", "Rəsm çəkmək", "Saymaq"], answer: 0 },
+            { q: "26. Ədədin tərkibini (məsələn, 5 ədədi 2 və 3-dən ibarətdir) öyrənmək hansı qrupa aiddir?", options: ["Böyük və məktəbəhazırlıq qrupuna", "1-ci kiçik qrupa", "2-ci kiçik qrupa", "Körpələr qrupuna"], answer: 0 },
+            { q: "27. Geometrik cisimlər (kürə, kub, silindr) fiqurlardan nə ilə fərqlənir?", options: ["Həcmli olmaları ilə", "Rəngləri ilə", "Yalnız kağızda çəkilməsi ilə", "Fərqlənmir"], answer: 0 },
+            { q: "28. Şərti ölçü vahidlərindən (çubuq, lent) istifadə edərək ölçmə hansı qrupda öyrədilir?", options: ["Böyük və məktəbəhazırlıq qrupunda", "1-ci kiçik qrupda", "2-ci kiçik qrupda", "Orta qrupda"], answer: 0 },
+            { q: "29. Sıra sayı (birinci, ikinci...) nəyi bildirir?", options: ["Əşyanın sıradakı yerini", "Əşyanın ümumi miqdarını", "Əşyanın rəngini", "Əşyanın çəkisini"], answer: 0 },
+            { q: "30. Kəmiyyət sayı (bir, iki, üç...) nəyi bildirir?", options: ["Əşyaların ümumi miqdarını", "Əşyanın sırasını", "Əşyanın formasını", "Əşyanın boyunu"], answer: 0 },
+            { q: "31. Əşyaları iki bərabər hissəyə bölmək (yarıya bölmə) hansı qrupda öyrədilir?", options: ["Böyük qrupda", "1-ci kiçik qrupda", "2-ci kiçik qrupda", "Körpələr evində"], answer: 0 },
+            { q: "32. Riyazi məsələnin tərkib hissələri hansılardır?", options: ["Şərt, sual, həll, cavab", "Mətn, nağıl, şeir", "Rəsm, xətt, nöqtə", "Sual və cavab"], answer: 0 },
+            { q: "33. Uşaq bağçasında toplama və çıxma əməliyyatları hansı ədəd daxilində öyrədilir?", options: ["10 daxilində", "100 daxilində", "1000 daxilində", "Öyrədilmir"], answer: 0 },
+            { q: "34. Əşyalar qrupunu müqayisə edərkən 'bərabərdir', 'çoxdur', 'azdır' sözləri nə zaman işlədilir?", options: ["Əşyaları üst-üstə və ya yan-yana qoyduqda", "Gözləri yumduqda", "Yalnız şeir oxuduqda", "Rəsm çəkdikdə"], answer: 0 },
+            { q: "35. Uşaqlarda məntiqi təfəkkürün inkişafı üçün hansı materiallardan istifadə olunur?", options: ["Dyeneş blokları, Küizener çubuqları", "Yalnız karandaş", "Yalnız dəftər", "Yalnız nağıl kitabı"], answer: 0 },
+            { q: "36. Haftanın günlərinin ardıcıllığını öyrənmək hansı bölməyə aiddir?", options: ["Zamanda səmtləşmə", "Məkanda səmtləşmə", "Böyüklük", "Forma"], answer: 0 },
+            { q: "37. İl fasilləri və onların ardıcıllığı hansı age daxilində intensiv mənimsənilir?", options: ["Böyük və məktəbəhazırlıq qrupunda", "1-ci kiçik qrupda", "Körpələr qrupunda", "2-ci kiçik qrupda"], answer: 0 },
+            { q: "38. Fiqurları xassələrinə (rəng, forma, ölçü) görə təsnif etmək nəyi inkişaf etdirir?", options: ["Məntiqi təfəkkürü", "Fiziki dözümlülüyü", "Səs tələffüzünü", "Yazı texnikasını"], answer: 0 },
+            { q: "39. 0 (sıfır) rəqəmi uşaqlara necə izah olunur?", options: ["Heç bir əşyanın olmaması kimi", "Ən böyük ədəd kimi", "Çoxlu əşya kimi", "Ulduz kimi"], answer: 0 },
+            { q: "40. Bir-bir artan və ya azalan ədəd sırası hansı qrupda öyrədilir?", options: ["Məktəbəhazırlıq qrupunda", "1-ci kiçik qrupda", "2-ci kiçik qrupda", "Körpələr evində"], answer: 0 },
+            { q: "41. Əşyanın enini ölçmək üçün nə istifadə olunur?", options: ["Şərti ölçü lenti", "Çəki daşı", "Saat", "Termometr"], answer: 0 },
+            { q: "42. 'Hündür - alçaq' anlayışları neçə əşyanın müqayisəsində daha aydın görünür?", options: ["Ən azı iki əşyanın", "Bir əşyanın", "Sonsuz əşyanın", "Hiç birinin"], answer: 0 },
+            { q: "43. Riyaziyyat dərslərində istifadə olunan 'Pazl' oyunu nəyi inkişaf etdirir?", options: ["Hissələrdən bütöv almaq bacarığını", "Yalnız qaçış sürətini", "Səs tonunu", "Düzgün nəfəs almanı"], answer: 0 },
+            { q: "44. Hansı fiqurun bucağı və tərəfi yoxdur?", options: ["Dairə (və oval)", "Kvadrat", "Üçbucaq", "Düzbucaqlı"], answer: 0 },
+            { q: "45. Kvadratın neçə tərəfi və bucağı var?", options: ["4 tərəfi, 4 bucağı (bütün tərəfləri bərabər)", "3 tərəfi", "5 tərəfi", "Tərəfi yoxdur"], answer: 0 },
+            { q: "46. Üçbucağın neçə tərəfi var?", options: ["3", "4", "2", "0"], answer: 0 },
+            { q: "47. Əşyanın çəkisini müqayisə etmək üçün hansı anlayışlar işlədilir?", options: ["Ağır - yüngül", "Uzun - qısa", "Geniş - dar", "Hündür - alçaq"], answer: 0 },
+            { q: "48. 'Sağ əl', 'Sol əl' tanınması uşaqlarda nə zaman tam formalaşır?", options: ["Orta və böyük qrupda", "Körpələr evində", "1-ci kiçik qrupda", "Yalnız 10 yaşında"], answer: 0 },
+            { q: "49. Riyazi oyunlarda diqqəti toplamaq üçün nə lazımdır?", options: ["Maraqlı əyani material və oyun süjeti", "Yalnız sərt nəzarət", "Cəza", "Sakit durmaq"], answer: 0 },
+            { q: "50. 'Əvvəl - sonra' anlayışları nəyə aiddir?", options: ["Zamanda səmtləşməyə", "Məkanda səmtləşməyə", "Cismə", "Çəkiyə"], answer: 0 },
+            { q: "51. 'İçində - çölündə' anlayışları nəyə aiddir?", options: ["Məkanda səmtləşməyə", "Zamanda səmtləşməyə", "Saymaya", "Ölçməyə"], answer: 0 },
+            { q: "52. Uşaqların sərbəst hesablama aparması üçün əsas dayaq nədir?", options: ["Əyani əşyalar və barmaqlar/çubuqlar", "Mürəkkəb düsturlar", "Kalkulyator", "Kitab redaktəsi"], answer: 0 },
+            { q: "53. Qrupda neçə uşağın olduğunu bilmək üçün hansı saymadan istifadə olunur?", options: ["Kəmiyyət sayından", "Sıra sayından", "Geriyə saymadan", "Təxmini saymadan"], answer: 0 },
+            { q: "54. 'Böyük - kiçik' anlayışı uşaqda ilk dəfə nə zaman formalaşır?", options: ["Ən erkən yaşlardan (1-2 kiçik qrup)", "Yalnız 6 yaşında", "Məktəbdə", "Yalnız 5-ci sinifdə"], answer: 0 },
+            { q: "55. Düzbucaqlı ilə kvadratın əsas fərqi nədir?", options: ["Düzbucaqlının yalnız qarşı tərəfləri bərabərdir", "Bucaqları yoxdur", "Dairəvidir", "Fərqi yoxdur"], answer: 0 },
+            { q: "56. 'Səhər, günorta, axşam, gecə' necə adlanır?", options: ["Sutkanın hissələri", "Həftənin günləri", "İlin fəsilləri", "Ayın günləri"], answer: 0 },
+            { q: "57. Bir həftədə neçə gün var?", options: ["7", "5", "10", "12"], answer: 0 },
+            { q: "58. Bir ildə neçə fəsil var?", options: ["4", "12", "7", "2"], answer: 0 },
+            { q: "59. Əşyaları təkrarlanma qaydasına görə düzmək (məsələn: qırmızı, göy, qırmızı, göy) necə adlanır?", options: ["Qanunauyğunluq (Pattern)", "Təsnifat", "Ölçmə", "Hesablama"], answer: 0 },
+            { q: "60. Məktəbəqədər yaşda riyaziyyat dərsi necə təşkil olunmalıdır?", options: ["Oyun formasında və əyani", "Yalnız müəllim mühazirəsi ilə", "Yazılı imtahanla", "Kitab əzbərləməklə"], answer: 0 }
+        ]
+    },
+    {
+        title: "3. Nitqin inkişafı üzrə işin təşkili metodikası",
+        questions: [
+            { q: "1. Nitqin inkişafı üzrə vəzifələrə nə aid deyil?", options: ["nitqin qrammatik quruluşunun formalaşdırılması", "nitqin leksik quruluşunun formalaşdırılması", "nağıletmənin formalaşdırılması", "səs mədəniyyəti tərbiyəsi"], answer: 1 },
+            { q: "2. Nitqin inkişafı üzrə vəzifələrə nə aid deyil?", options: ["uşaqların savad təliminə hazırlanması", "bədii ədəbiyyatla tanışlıq", "uşaqların ibtidai məktəbdə fənləri öyrənməsi", "lüğət ehtiyatının zənginləşdirilməsi"], answer: 2 },
+            { q: "3. Uşaq bağçasında uşaqların lüğət ehtiyatının sürətlə zənginləşdirilməsi üçün...", options: ["şərait yoxdur", "çoxlu çətinliklər var", "əlverişli şərait yaradılır", "əlverişli şərait yaradılmır"], answer: 2 },
+            { q: "4. Uşaqlar təcrübədə cümlələrlə, sözlərlə, hecalarla və səslərlə tanış olurlar. Burada nitqin hansı vəzifəsindən söhbət gedir?", options: ["uşaqların savad təliminə hazırlanması", "yenidən danışmanın formalaşdırılması", "nitq səs mədəniyyəti", "bədii ədəbiyyat"], answer: 0 },
+            { q: "5. ...... özünə eyni zamanda eşitmək və anlamaq, söhbəti davam etdirmək, suallara cavab vermək komponentlərini daxil edir.", options: ["dialoji nitq", "monoloji nitq", "bədii ədəbiyyatla tanışlıq", "nitq səs mədəniyyəti"], answer: 0 },
+            { q: "6. Uşaq bağçalarında kitabla iş elə təşkil olunmalıdır ki, .....", options: ["uşaqlar kitabları oxuya bilsinlər", "uşaqlarda kitaba, onun oxunmasına dərin maraq tərbiyə olunsun", "uşaqlar mütləq oxusunlar", "kitablar istifadə edilməsin"], answer: 1 },
+            { q: "7. 'Tənəffüsü, nitqin sürətini və diksiyanı tənzimləyir.' Bu nəyə aiddir?", options: ["Oyun", "Musiqili-rollu oyun", "Əmək", "Təsviri incəsənət"], answer: 1 },
+            { q: "8. Nitqin inkişafı üzrə işə verilən tələblərə aid OLMAYAN variantı seçin.", options: ["nitq işi vaxtında başlamalıdır", "nitqin inkişafı üçün uşağın çoxlu şeir əzbərləməsi lazımdır", "məşğələyə vaxtında hazırlanmaq lazımdır", "nitq işi fəaliyyətin bütün sahələri ilə bağlı olmalıdır"], answer: 1 },
+            { q: "9. Nitqin inkişafı üzrə işə verilən tələblərə aid OLMAYAN variantı seçin.", options: ["məşğələlər kompleks şəkildə aparılmalıdır", "məşğələlər tərbiyəvi xarakter daşımalıdır", "məşğələlər öyrədici xarakter daşımalı, uşağa çoxlu tədris materialı təqdim etməlidir", "nitq işi həyatın bütün sahələri ilə bağlı olmalıdır"], answer: 2 },
+            { q: "10. Dili hiss etmə (həssaslıq) dedikdə nə nəzərdə tutulur?", options: ["uşaq səslərin və söz birləşmələrinin nitqdə necə istifadə olunduğunu yadda saxlamaq üçün nəzərdə tutulub", "nitq qüsurlarına həssaslıq", "mənası olmayan ifadələr", "alınma sözlərə həssaslıq"], answer: 0 },
+            { q: "11. Nitqin inkişafı prosesində istifadə olunan metodları seçin (2-Əyani, 4-Praktik, 5-Şifahi):", options: ["1, 2, 3", "2, 4, 5", "2, 3, 4", "1, 3, 5"], answer: 1 },
+            { q: "12. Əyani metodlara daxildir:", options: ["müşahidə, ekskursiya, illüstrasiyalar, nümayiş", "müşahidə, söhbət, ekskursiya", "şəkillər, illüstrasiyalar, nümayiş", "müşahidə, ekskursiya, yazılı təsvirlər"], answer: 0 },
+            { q: "13. ...... bu metod uşaqların qazandıqları bilikləri nitq təcrübəsində tətbiq etmələri üçün şərait yaradır.", options: ["əyani metodlar", "şifahi metodlar", "təcrübi metodlar", "Düzgün cavab yoxdur"], answer: 2 },
+            { q: "14. Uyğunluğu müəyyən edin: 1-Əyani (c), 2-Şifahi (b), 3-Təcrübi (a)", options: ["1-c, 2-b, 3-a", "1-a, 2-b, 3-c", "1-c, 2-a, 3-b", "1-b, 2-a, 3-c"], answer: 0 },
+            { q: "15. Nitqin inkişafı metodikası hansı fənlə sıx bağlıdır?", options: ["Ədəbiyyatşünaslıq", "Psixologiya", "Riyaziyyatın tədrisi", "Ana dilinin tədrisi metodikası"], answer: 3 },
+            { q: "16. ...... nitqi öyrənir, nitq fəaliyyətinin növlərini müəyyənləşdirir, uşağın nitq ünsiyyətinin yaranması yollarını dəqiqləşdirir.", options: ["Pedaqogika", "Psixologiya", "Fiziologiya", "Nitqin inkişafı"], answer: 1 },
+            { q: "17. Səhv fikri müəyyən edin:", options: ["nitqin inkişafı üzrə iş uşağın həyatının bütün sahələri ilə bağlı ola bilməz", "məşğələyə vaxtında hazırlanmaq lazımdır", "məşğələ tərbiyəvi xarakter daşımalıdır", "hər yaş dövrünün xüsusiyyətləri nəzərə alınmalıdır"], answer: 0 },
+            { q: "18. Məşğələ uşaqlarda məmnunluq hiss yaratmaq üçün necə təşkil olunmalıdır?", options: ["sakit, rahat", "oturaq vəziyyətdə", "maraqlı", "qarışıq"], answer: 2 },
+            { q: "19. I sinfə daxil olan uşaqların oxu və yazı texnikasına yiyələnməsi ləng gedir. Səbəb nədir?", options: ["valideynlər az əlaqədə olur", "rus dili tədris olunmur", "onların mütləq əksəriyyəti savad təliminə hazır deyillər", "uyğun cavab yoxdur"], answer: 2 },
+            { q: "20. Əgər uşaqlar şəkil üzrə danışmağı və ya mətni yenidən danışmağı bacarırlarsa, bu nitqin hansı formasıdır?", options: ["dialoji nitq", "monoloji nitq", "sadə nitq", "mürəkkəb nitq"], answer: 1 },
+            { q: "21. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrətmək"], answer: 0 },
+            { q: "22. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsi", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
+            { q: "23. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
+            { q: "24. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
+            { q: "25. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
+            { q: "26. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
+            { q: "27. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
+            { q: "28. Artikulasiya gimnastikası nə üçün keçirilir?", options: ["Danışıq üzvlərinin (dil, dodaq) çevikliyini artırmaq üçün", "Əl əzələlərini gücləndirmək üçün", "Gözləri dincəltmək üçün", "Qaçış sürətini artırmaq üçün"], answer: 0 },
+            { q: "29. Sözün heca tərkibini müəyyən etmək hansı mərhələyə aiddir?", options: ["Savad təliminə hazırlıq mərhələsinə", "Körpələr qrupuna", "1-ci kiçik qrupa", "Yalnız 5-ci sinfə"], answer: 0 },
+            { q: "30. Passiv lüğət nədir?", options: ["Uşağın anladığı, lakin gündəlik nitqində az işlətdiyi sözlər", "Uşağın hər gün işlətdiyi sözlər", "Xarici sözlər", "Səhv tələffüz edilən sözlər"], answer: 0 },
+            { q: "31. Aktive lüğət nədir?", options: ["Uşağın başa düşdüyü və müntəzəm işlətdiyi sözlər", "Yalnız kitablarda yazılan sözlər", "Unudulmuş sözlər", "Yalnız şeir sözləri"], answer: 0 },
+            { q: "32. Uşaq nitqində fonematik eşitmə nədir?", options: ["Dilin səslərini ayırd etmək və təhlil etmək bacarığı", "Musiqini uca dinləmək", "Asta danışmaq", "Şeiri ucadan oxumaq"], answer: 0 },
+            { q: "33. Nitq inkişafı məşğələlərində süjetli şəkillər üzrə nağıletmə hansı qrupdan başlayır?", options: ["Orta və böyük qruplardan", "1-ci kiçik qrupdan", "Körpələr evindən", "Yalnız ibtidai sinifdə"], answer: 0 },
+            { q: "34. Nitq neçə yaşdan etibarən uşağın əsas ünsiyyət vasitəsinə çevrilir?", options: ["2-3 yaşdan", "7 yaşdan", "10 yaşdan", "15 yaşdan"], answer: 0 },
+            { q: "35. Uşaqda nitq qüsuru (məsələn, r və ya l səsini deyə bilməmək) olduqda kimə müraciət edilir?", options: ["Loqopedə", "Psixiatra", "Cərraha", "İdman müəlliminə"], answer: 0 },
+            { q: "36. Nəfəs gimnastikası nitq inkişafında nəyə xidmət edir?", options: ["Düzgün və rəvan nitq nəfəsinin formalaşmasına", "Əl hərəkətlərinə", "Bədən tərbiyəsinə", "Yazı yazmağa"], answer: 0 },
+            { q: "37. Uşağa tapmaca tapdırmaq nitqin hansı tərəfini inkişaf etdirir?", options: ["Məntiqi təfəkkürü və lüğət ehtiyatını", "Yalnız səsi", "Yalnız qaməti", "Yazı sürətini"], answer: 0 },
+            { q: "38. 'Söz oyunu' (məsələn, 'A' hərfi ilə başlayan söz de) neyə xidmət edir?", options: ["Fonematik qavrayışın və lüğətin inkişafına", "Yalnız fiziki gücə", "Yalnız diqqəti dağıtmağa", "Sakit oturmağa"], answer: 0 },
+            { q: "39. Monoloji nitq növlərinə hansı daxildir?", options: ["Təsviri nağıletmə, nəql etmə, mühakimə", "Sual-cavab", "Dialoq", "İki nəfərin söhbəti"], answer: 0 },
+            { q: "40. Dialoji nitqin əsas elementi nədir?", options: ["Sual və cavab, qarşılıqlı replikalar", "Müəllimin təkbaşına mühazirəsi", "Sessiz kitab oxumaq", "Şeir əzbərləmək"], answer: 0 },
+            { q: "41. Məktəbəqədər yaşlı uşağın nitqində sintaktik quruluş nəyi bildirir?", options: ["Cümlələrin düzgün qurulmasını", "Sözlərin hecalanmasını", "Səslərin tələffüzünü", "Yazı xəttini"], answer: 0 },
+            { q: "42. Uşaqlara əks mənalı sözləri (antonimləri) öyrətmək lüğət işinin hansı hissəsidir?", options: ["Mənanın dəqiqləşdirilməsi və keyfiyyət lüğəti", "Səs mədəniyyəti", "Nəfəs gimnastikası", "Savad təlimi"], answer: 0 },
+            { q: "43. Yakın mənalı sözlər necə adlanır?", options: ["Sinonimlər", "Antonimlər", "Omonimlər", "Metafordir"], answer: 0 },
+            { q: "44. Zidd mənalı sözlər necə adlanır?", options: ["Antonimlər", "Sinonimlər", "Omonimlər", "Fratrazlar"], answer: 0 },
+            { q: "45. Bədii əsəri uşaqlara ifadəli oxuyarkən nəyə diqqət edilməlidir?", options: ["İntonasiyaya, pauzalara və səs tembrinə", "Yalnız çox sürətli oxumağa", "Yalnız çox asta oxumağa", "Gözləri yummağa"], answer: 0 },
+            { q: "46. Nitq inkişafında 'Barmaq teatrı' nə üçün istifadə olunur?", options: ["Emosional nitqi və xırda motorikanı inkişaf etdirmək üçün", "Yalnız şəkil çəkmək üçün", "Uşaqları qorxutmaq üçün", "Riyaziyyat öyrətmək üçün"], answer: 0 },
+            { q: "47. Nitqin morfoloji tərəfi nəyi öyrədir?", options: ["Sözlərin şəkilçilərlə düzgün dəyişməsini (hal, cəm)", "Səslərin fiziki tezliyini", "Yazı qaydalarını", "Hərflərin çəkilişini"], answer: 0 },
+            { q: "48. Uşaq bağçasında nağılın səhnələşdirilməsi (dramatizasiya) nəyə kömək edir?", options: ["Obrazlı nitqin və aktyorluq bacarığının inkişafına", "Yalnız səssiz durmağa", "Riyazi hesablamaya", "İdman hərəkətlərinə"], answer: 0 },
+            { q: "49. Səs təhlili zamanı 'Sait' səslər uşaqlara necə izah olunur?", options: ["Ağızda maneəyə rast gəlmədən avazla tələffüz olunan səslər", "Maneə ilə tələffüz olunan", "Yazılmayan səslər", "Eşidilməyən səslər"], answer: 0 },
+            { q: "50. Səs təhlili zamanı 'Samit' səslər uşaqlara necə izah olunur?", options: ["Tələffüz zamanı ağız boşluğunda maneəyə rast gələn səslər", "Avazlı səslər", "Maneəsiz səslər", "Yalnız oxunan səslər"], answer: 0 },
+            { q: "51. Nitq inkişafında müəllimin nitqi necə olmalıdır?", options: ["Aydın, səlis, mədəni və nümünəvi", "Mürəkkəb elmi terminlərlə zəngin", "Çox sürətli və qışqıraraq", "Asta və anlaşılmaz"], answer: 0 },
+            { q: "52. Uşaqların uydurma nağıl tərtib etməsi hansı nitq bacarığına aiddir?", options: ["Yaradıcı nağıletməyə (monoloji)", "Dialoji nitqə", "Passiv lüğətə", "Səs mədəniyyətinə"], answer: 0 },
+            { q: "53. Əşyanın təsviri (məsələn, 'Bu alma qırmızıdır, şirindir') hansı nağıletmə türüdür?", options: ["Təsviri nağıletmə", "Süjetli nağıletmə", "Mühakimə", "Dramatizasiya"], answer: 0 },
+            { q: "54. Uşaqlarda nitq inkişafı nə zaman başlanır?", options: ["Anadan olduğu ilk günlərdən (qığıldama və uğuldama)", "Yalnız 3 yaşında", "Yalnız bağçaya gedəndə", "Yalnız 1-ci sinifdə"], answer: 0 },
+            { q: "55. Yanıltmaclar nitq inkişafında neyə xidmət edir?", options: ["Diksiyanı və diksiyanın sürətli, düzgün tələffüzünü yaxşılaşdırmağa", "Məsələ həll etməyə", "Yalnız yaddaşı korlamağa", "Rəsm çəkməyə"], answer: 0 },
+            { q: "56. Atalar sözləri uşaq nitqində neyi formalaşdırır?", options: ["Məntiqi düşüncəni və obrazlı dil vasitələrini", "Sürətli qaçışı", "Səssizliyi", "Rəqəmləri"], answer: 0 },
+            { q: "57. Uşağın nitqində 'Nə üçün?', 'Niyə?' suallarının çoğalması hansı yaşın əlamətidir?", options: ["3-5 yaş (idrak fəallığı dövrü)", "1 yaş", "12 yaş", "18 yaş"], answer: 0 },
+            { q: "58. Məktəbəhazırlıq qrupunda uşaq cümlədə sözlərin sırasını necə qurmalıdır?", options: ["Qrammatik qaydalara uyğun və ardıcıl", "Qarışıq və natamam", "Yalnız tək sözlərlə", "Danışmamalıdır"], answer: 0 },
+            { q: "59. Nitq inkişafı məşğələsində əyani vəsait kimi şəkillərdən istifadə neyə kömək edir?", options: ["Məzmunu daha yaxşı dərk etməyə və nitqi stimullaşdırmağa", "Yalnız vaxt aparmağa", "Uşaqları yormağa", "Otağı bəzəməyə"], answer: 0 },
+            { q: "60. Uşaq bağçasında nitq inkişafı üzrə işin yekun nəticəsi nə olmalıdır?", options: ["Uşağın sərbəst, rabitəli və mədəni nitqə yiyələnməsi", "Yalnız 100 şeir bilməsi", "Mürəkkəb kitabları oxuması", "Sakit oturması"], answer: 0 }
+        ]
+    },
+    {
+        title: "4. Ətraf aləmlə tanışlıq və Bədii təfəkkürün inkişafı metodikası",
+        questions: [
+            { q: "1. Ətraf aləmlə tanışlıq metodikasında uşaqların ictimai həyat hadisələrinə cəlb edilməsi haqqında təsəvvürlərdən biri səhvdir:", options: ["yalnız müəyyən metod və üsullardan istifadə edərək bu bacarıqları formalaşdırmaq", "nitq məşğələlərində tanış ola bilərlər", "gəzinti və ekskursiyalarda tanış ola bilərlər", "müşahidə metoduna geniş yer verilir"], answer: 0 },
+            { q: "2. Hansı metodların istifadəsi ictimai həyatla tanışlıq üzrə işə kömək edə BİLMƏZ?", options: ["fərdi tapşırıqlar", "müzakirə metodları", "müəllimin şəxsi təcrübəsi", "müxtəlif oyunlar"], answer: 2 },
+            { q: "3. Ətraf aləmlə tanışlıq metodu uşaqlara görənləri müstəqil təhlil etməyə, fərqi görməyə imkan verir:", options: ["Modelləşdirmə", "Müqayisə", "Süjetli-rollu oyunlar", "Hərəkətli oyunlar"], answer: 1 },
+            { q: "4. Uşaqlar öz Vətənləri, digər ölkələr, yol hərəkəti qaydaları haqqında məlumatı hansı fəaliyyət sahəsində alırlar?", options: ["təfəkkürün inkişafı zamanı", "vətənpərvərlik üzrə", "şəxsi gigiyena üzrə", "ictimai-siyasi mühitlə tanışlıq fəaliyyəti zamanı"], answer: 3 },
+            { q: "5. Ətraf aləmlə tanışlıq metodikasında ictimai-siyasi həyatla tanışlıq zamanı hansı prinsipə əməl olunmalıdır?", options: ["yaxından uzağa prinsipi", "mürəkkəbdən sadəyə", "Tələb prinsipi", "Əməkdaşlıq prinsipi"], answer: 0 },
+            { q: "6. Uşaqlarda estetik zövqün, bədii təfəkkürün və şən əhval-ruhiyyənin formalaşmasında mühüm rol oynayır:", options: ["ictimai həyat hadisələri", "bayramların və təntənələrin keçirilməsi", "təbiət hadisələri", "yol hərəkəti qaydaları"], answer: 1 },
+            { q: "7. Bayramlar haqqında təqdim olunan mülahizələrdən biri SƏHVDIR:", options: ["yaş xüsusiyyətləri nəzərə alınmalıdır", "uşaqlarda riyazi bacarıqları formalaşdırır", "bədii zövq formalaşdırır", "nitqi və iradəni inkişaf etdirir"], answer: 1 },
+            { q: "8. Bayramlar zamanı vətənpərvərlik, sevinc, yoldaşlıq hissinin formalaşması hansı didaktik prinsipi göstərir?", options: ["Tələb", "Varislik", "Şəxsiyyətə yönümlülük", "İnteqrativlik"], answer: 2 },
+            { q: "9. Aşağıdakılardan hansı uşaq bağçalarında keçirilən bayram türü ola BİLMƏZ?", options: ["ictimai-siyasi bayramlar", "mövsümi bayramlar", "tarixi bayramlar", "məişət bayramları"], answer: 2 },
+            { q: "10. Bu bayram növünə 20 Yanvar, Xocalı daxildir:", options: ["məişət tədbirlərinə", "siyasi tədbirlərə", "ictimai tədbirlərə", "mövsümi tədbirlərə"], answer: 1 },
+            { q: "11. Kukla teatrı aiddir:", options: ["ictimai bayramlara", "mövsümi bayramlara", "əyləncələrə", "məişət bayramlarına"], answer: 2 },
+            { q: "12. Təbiətdə müşahidə haqqında mülahizələrdən biri səhvdir:", options: ["uzunmüddətli və qısamüddətli ola bilər", "suallar verərək diqqət cəlb edilə bilər", "müəyyən təlim məqsədləri qoyulur", "uşaqlar obyektləri eyni mühitdə müşahidə edirlər"], answer: 3 },
+            { q: "13. Hansı yaş qrupunda şəkil əsasında şifahi metoddan istifadə olunur?", options: ["birinci kiçik qrup", "böyük qrup", "ikinci kiçik qrup", "orta qrup"], answer: 1 },
+            { q: "14. Hansı metodika sahəsində ətraf aləmlə tanışlıq uşaqların əqli və sensor qabiliyyətlərini inkişaf etdirir?", options: ["ictimai həyat hadisələri", "bayramlar və əyləncələr", "təbiətdə əməklə tanışlıq", "gündəlik həyat hadisələri"], answer: 2 },
+            { q: "15. Hansılardan biri təbiətdə əməyə aid DEYİL?", options: ["yol hərəkəti qaydalarını öyrənmək", "maddi fikir və düşüncələrin formalaşdırılması", "heyvanlara, bitkilərə qulluq", "əməksevərlik, məsuliyyət"], answer: 0 },
+            { q: "16. Hansı yaş qrupunun uşaqlarını təbiət guşəsində növbətçiliyə cəlb edirlər?", options: ["kiçik qrup", "məktəbəhazırlıq qrupu", "böyük qrup", "orta qrup"], answer: 1 },
+            { q: "17. Hansı təlim metodu təlimi uşaq bağçasında bütün yaş dövrü üçün effektiv keçməyə imkan verir?", options: ["Oyun", "Əmək", "Ünsiyyət", "Musiqi"], answer: 0 },
+            { q: "18. Uşaqlar otaqları təmizləyirlər, qayda yaradırlar. Bu hansı əmək türüdür?", options: ["ictimai həyat", "təbiətdə əmək", "bayramlar", "təsərrüfat-məişət əməyi"], answer: 3 },
+            { q: "19. Məşğələlər haqqında məlumatlardan biri səhvdir:", options: ["ekskursiyalarda təlim məqsədi qoyulur", "uşaqlar ekskursiyadan qayıtdıqda ekskursiyanı təhlil etmirlər", "pedaqoq öncədən hazırlaşır", "ekskursiya öyrədici olmalıdır"], answer: 1 },
+            { q: "20. Ekskursiyalarda ən geniş istifadə olunan metod hansıdır?", options: ["Təhlil", "Ümumiləşdirmə", "Sintez", "Müşahidə"], answer: 3 },
+            { q: "21. Ekskursiyaların üstünlüyü nədir?", options: ["açıq havada olması", "kollektiv gəzinti", "əşyaları müşahidə edərək daha dərindən öyrənmək imkanı", "toxunmadan öyrənmək"], answer: 2 },
+            { q: "22. Anar yerdən qarı götürmək və toxunmaq istədi, lakin müəllim icazə vermədi. Müəllim hansı inkişafa mane oldu?", options: ["təfəkkürün", "nitqin", "sensor inkişaf", "estetik"], answer: 2 },
+            { q: "23. Hansı yaş qrupunda uşaqlar təbiət hadisələrini müqayisə edib öz münasibətini bildiri bilərlər?", options: ["kiçik qrup", "orta qrup", "böyük qrup", "məktəbəhazırlıq qrupu"], answer: 3 },
+            { q: "24. Ekskursiyanın keçirilməsi mərhələlərinin düzgün ardıcıllığı (1-Məlumatlandırma, 2-Hazırlıq, 3-Keçirilmə, 4-Yekun):", options: ["1, 2, 3, 4", "2, 1, 3, 4", "3, 2, 1, 4", "2, 1, 4, 3"], answer: 0 },
+            { q: "25. Ekskursiyanın yaxşı nəticə verməməsinin əsas səbəbi nədir?", options: ["soyuq hava", "öncədən səhv planlaşdırılması", "uşaq sayının çoxluğu", "yerin səhv seçilməsi"], answer: 1 },
+            { q: "26. Uşaq bağçalarında bədii təfəkkürün inkişafı üzrə əsas işləri adlandırın?", options: ["fiziki hərəkətlər", "bədii əsərlərlə tanışlıq", "tədqiqatçılıq", "musiqi fəaliyyəti"], answer: 1 },
+            { q: "27. Bədii təfəkkürün inkişafı üzrə məşğələlərdə hansı metodu istifadə etmək olar?", options: ["dramatizasiya və ya teatrlaşdırma metodu", "qaydalarla oyunlar", "didaktik oyunlar", "Tapmacalar"], answer: 0 },
+            { q: "28. Oxumaq üçün əsər seçərkən nəzərə almalı olduğu faktorlardan biri SƏHVDIR?", options: ["əsərin mövzusu", "əsərin məzmunu", "əsərin həcmi", "əsərin müəllifinin geyimi"], answer: 3 },
+            { q: "29. Hansı metoddan istifadə edərkən tərbiyəçi əsərin hissəsini ixtisar edə və ya əlavə edə bilər?", options: ["qoyuluş metodu", "şeir əzbərləmə metodu", "yenidən danışma metodu", "Söhbət metodu"], answer: 0 },
+            { q: "30. Bədii əsərlərlə tanışlıqda şifahi və əyani metodları kompleks şəkildə özündə necə birləşdirir?", options: ["kitabda illüstrasiyalara baxmaq", "təkrar oxu", "əsər üzrə söhbət", "seçmə oxu"], answer: 0 },
+            { q: "31. Uşaqların ədəbi əsərlərlə tanış edilməsi metodlarından biri SƏHV verilmişdir:", options: ["yenidən danışma", "təkrar oxu", "əzbər öyrənmə", "riyazi hesablama"], answer: 3 },
+            { q: "32. Göstərilənlərdən hansı oxuya dair quruluş təsəvvürləri haqqında səhvdir?", options: ["bədii təfəkkür üzrə məşğələlər həftədə 2 dəfə aparılır", "tarixi günlər nəzərə alınır", "bir məşğələdə bir neçə əsərin oxunması", "söhbətin girişdə istifadəsi"], answer: 2 },
+            { q: "33. Mətnin məzmununun anlanması və söz ehtiyatının zənginləşməsi hansı bölməyə aiddir?", options: ["bədii mətni dinləməkdə uşaqlara kömək", "məşğələyə hazırlanma", "bədii əsərlərin oxunması", "şeirlərin yadda saxlanılması"], answer: 0 },
+            { q: "34. Oxu zamanı hansı mülahizə SƏHV verilmişdir?", options: ["uşaqlar müəllimin üzünü görməlidir", "uşaqlar səs tonunu izləməlidir", "tərbiyəçi gözünü heç bir halda kitabdan ayırmamalıdır", "fasilə etməlidir"], answer: 2 },
+            { q: "35. Bədii təfəkkür üzrə hansı işlər uşaqlarda nitq qabiliyyətlərini inkişaf etdirir?", options: ["şeir əzbərləmə", "bədii əsərin oxunması", "şəkillərə baxmaq", "əsər üzrə söhbət"], answer: 3 },
+            { q: "36. Nağılların oxunması haqqında təsəvvürlərdən biri SƏHV verilmişdir?", options: ["nağıllar yaşına uyğun seçilməlidir", "hekayə böyük olsa da, onu olduğu kimi oxumaq lazımdır", "müəllim təkrar oxuya bilər", "maraqlar nəzərə alınmalıdır"], answer: 1 },
+            { q: "37. Neçə yaşdan şeir əzbərləmə başlayır?", options: ["3 yaşdan", "2 yaşdan", "4 yaşdan", "1 yaşdan"], answer: 1 },
+            { q: "38. Yaddaşı möhkəmləndirməyə hansı metod kömək edir?", options: ["əzbər öyrənmə", "yenidən danışma", "ifadəl oxu", "hekayələrin yenidən danışılması"], answer: 0 },
+            { q: "39. Hansı metodikanın tərkib hissəsi bədii təfəkkürün inkişafıdır?", options: ["ətraf aləmlə tanışlıq", "nitqin inkişafı metodikası", "savad təlimi", "məntiqi-riyazi təfəkkür"], answer: 1 },
+            { q: "40. Hansı bacarıqları bədii təfəkkürün inkişafı formalaşdırmır?", options: ["oxumaq arzusu", "dinləmək bacarığı", "kitabdan diqqətsiz istifadə etmək bacarığı", "estetik düşünmək"], answer: 2 },
+            { q: "41. Bədii əsər və hekayələrin oxunması inkişafın hansı sahəsinə aiddir?", options: ["təfəkkürün inkişafı", "estetik və yaradıcı inkişaf sahəsi", "sosial-emosional", "fiziki inkişaf"], answer: 1 },
+            { q: "42. Kitablara münasibətdə uşaqlar haqqında hansı fikir SƏHV verilmişdir?", options: ["kitabdan səliqəli istifadə etmək", "məsafəni saxlamaq", "barmağı dilə toxundurmamaq", "kitabda müəyyən qeydlər etmək"], answer: 3 },
+            { q: "43. Məktəbəhazırlıq qrupunda uşaqlar üçün hansı əsərləri oxumaq məqsədəuyğundur?", options: ["elmi-kütləvi hekayələr və mürəkkəb süjetli nağıllar", "yalnız 2 cümləli mətnlər", "məqalələr", "körpə nağılları"], answer: 0 },
+            { q: "44. Bədii təfəkkürə təlimin effektivliyi nədən asılıdır?", options: ["müəllimin məşğələyə necə hazırlanmasından", "müəllimin geyimindən", "hava şəraitindən", "otağın rəngindən"], answer: 0 },
+            { q: "45. Canlı təbiət obyektlərinə hansılar daxildir?", options: ["Bitkilər, heyvanlar, insan", "Daş, torpaq, su", "Hava, günəş", "Binalar, maşınlar"], answer: 0 },
+            { q: "46. Cansız təbiət obyektlərinə hansılar daxildir?", options: ["Su, torpaq, hava, daş", "Ağaclar, güllər", "Quşlar, balıqlar", "Uşaqlar, müəllimlər"], answer: 0 },
+            { q: "47. Təbiət guşəsində Otaq bitkilərinə qulluq uşaqlarda nəyi tərbiyə edir?", options: ["Məsuliyyət, qayğıkeşlik və əməksevərlik", "Yalnız şeir oxumaq", "Qorxu", "Tənbəllik"], answer: 0 },
+            { q: "48. Yol hərəkəti qaydaları (svetoforun rəngləri) hansı yaşdan öyrədilir?", options: ["Erkən yaşlardan (2-3 yaşdan başlayaraq)", "Yalnız 10 yaşında", "Məktəbi bitirəndə", "Heç vaxt"], answer: 0 },
+            { q: "49. Svetoforun 'Qırmızı' işığı nəyi bildirir?", options: ["Dayanmaq / Dayan!", "Hazırlaş!", "Keç!", "Qaç!"], answer: 0 },
+            { q: "50. Svetoforun 'Yaşıl' işığı nəyi bildirir?", options: ["Hərəkət etmək / Keçmək olar", "Dayan!", "Gözlə!", "Yat!"], answer: 0 },
+            { q: "51. Vətənpərvərlik tərbiyəsinin əsası nə zaman qoyulur?", options: ["Məktəbəqədər yaş dövründə", "Yalnız hərbi xidmətdə", "Yalnız universitetdə", "30 yaşında"], answer: 0 },
+            { q: "52. Dövlət rəmzlərimiz (Bayraq, Gerb, Himn) uşaqlara hansı qruplarda öyrədilir?", options: ["Bütün qruplarda (yaşına uyğun səviyyədə)", "Yalnız məktəbdə", "Yalnız böyüklərə", "Öyrədilmir"], answer: 0 },
+            { q: "53. Azərbaycan Respublikasının Dövlət Bayrağı neçə rəngdən ibarətdir?", options: ["3 rəng (Göy, Qırmızı, Yaşıl)", "2 rəng", "4 rəng", "5 rəng"], answer: 0 },
+            { q: "54. Uşaqlarda ekoloji tərbiyə nədir?", options: ["Təbiəti sevmək, qorumaq və ona zərər vurmamaq anlayışı", "Yalnız agac kəsmək", "Yalnız heyvanları qorxutmaq", "Zibil atmaq"], answer: 0 },
+            { q: "55. Bədii ədəbiyyat vasitəsilə uşaqlarda hansı hisslər tərbiyə olunur?", options: ["Xeyirxahlıq, dostluq, ədalət və mənəviyyat", "Paxıllıq", "Yalançılıq", "Qəddarlıq"], answer: 0 },
+            { q: "56. Nağıllarda 'Xeyir' və 'Şər' obrazların mübarizəsi uşağa neyi öyrədir?", options: ["Xeyirin həmişə qələbə çaldığını və yaxşı olmağı", "Şər olmağı", "Yalan danışmağı", "Döyüşməyi"], answer: 0 },
+            { q: "57. Uşaqlara şəxsi gigiyena qaydalarını (əlləri yumaq, dişləri fırçalamaq) öyrətmək neyə xidmət edir?", options: ["Sağlamlığın qorunmasına və vərdişlərin formalaşmasına", "Yalnız vaxt itkisinə", "Yorulmağa", "Nizamı pozmağa"], answer: 0 },
+            { q: "58. İlin mövsümləri (Yaz, Yay, Payız, Qış) haqqında biliklər necə möhkəmləndirilir?", options: ["Müşahidələr, gəzintilər və rəsmlər vasitəsilə", "Yalnız kitab əzbərləməklə", "Yalnız evdə oturmaqla", "Yazı yazmaqla"], answer: 0 },
+            { q: "59. Bədii təfəkkürün inkişafında müəllimin nağılı danışma texnikası necə olmalıdır?", options: ["Canlı, emosional, obrazlı və rola uyğun", "Monoton və bezdirici", "Çox berk qışqıraraq", "Fısıltı ilə"], answer: 0 },
+            { q: "60. Məktəbəqədər yaşda ətraf aləmlə tanışlıq məşğələlərinin əsas məqsədi nədir?", options: ["Uşaqda ətraf aləm haqqında bütöv dünyagörüşü və müsbət münasibət yaratmaq", "Yalnız mürəkkəb terminlər əzbərlətmək", "Uşaqları bağçada saxlamaq", "Yalnız şəkil çəkdirmək"], answer: 0 }
         ]
     }
 ];
@@ -514,12 +634,10 @@ let currentQuestionIndex = 0;
 let userAnswers = [];
 let isReviewMode = false;
 
-function initTopic(topicIdx) {
+function loadTopic(topicIdx) {
     currentTopicIndex = topicIdx;
     isReviewMode = false;
-    let topicData = quizTopics[currentTopicIndex];
-    
-    document.getElementById("topic-title").innerText = topicData.title;
+    let topicData = topicsData[currentTopicIndex];
 
     currentQuestions = topicData.questions.map(qObj => ({
         q: qObj.q,
@@ -530,10 +648,11 @@ function initTopic(topicIdx) {
     activeQuestionsList = currentQuestions.map((q, idx) => ({ question: q, originalIndex: idx }));
     currentQuestionIndex = 0;
     userAnswers = new Array(currentQuestions.length).fill(null);
-    
+
+    document.getElementById("topic-title").innerText = topicData.title;
     document.getElementById("result-screen").style.display = "none";
     document.getElementById("quiz-screen").style.display = "block";
-    
+
     showQuestion();
 }
 
@@ -544,7 +663,7 @@ function showQuestion() {
     let total = activeQuestionsList.length;
 
     document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
-    
+
     if (isReviewMode) {
         document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
     } else {
@@ -566,7 +685,7 @@ function showQuestion() {
         let btn = document.createElement("button");
         btn.className = "option-btn";
         let prefix = optionPrefixes[idx] || "";
-        
+
         if (isReviewMode) {
             btn.disabled = true;
             if (idx === correctIdx) {
@@ -649,19 +768,29 @@ function showResults() {
     let finalScore = Math.max(0, (correct * 1) - (incorrect * 0.25));
     let percentage = (correct / total) * 100;
 
+    document.getElementById("result-topic-name").innerText = `${topicsData[currentTopicIndex].title} - TAMAMLANDI!`;
     document.getElementById("final-score").innerText = `${finalScore.toFixed(2)} / ${total}`;
     document.getElementById("stat-correct").innerText = correct;
     document.getElementById("stat-incorrect").innerText = incorrect;
     document.getElementById("stat-unanswered").innerText = unanswered;
     document.getElementById("stat-percent").innerText = `${percentage.toFixed(1)}%`;
 
-    let nextTopicBtn = document.getElementById("next-topic-btn");
-    if (currentTopicIndex + 1 < quizTopics.length) {
-        nextTopicBtn.style.display = "inline-flex";
-        nextTopicBtn.innerText = `➡️ NÖVBƏTİ MÖVZUYA KEÇ (MÖVZU ${currentTopicIndex + 2})`;
+    let nextBtn = document.getElementById("next-topic-btn");
+    if (currentTopicIndex < topicsData.length - 1) {
+        nextBtn.style.display = "block";
     } else {
-        nextTopicBtn.style.display = "none";
+        nextBtn.style.display = "none";
     }
+}
+
+function loadNextTopic() {
+    if (currentTopicIndex < topicsData.length - 1) {
+        loadTopic(currentTopicIndex + 1);
+    }
+}
+
+function restartCurrentTopic() {
+    loadTopic(currentTopicIndex);
 }
 
 function reviewAllQuiz() {
@@ -696,19 +825,7 @@ function reviewWrongQuiz() {
     showQuestion();
 }
 
-function startNextTopic() {
-    if (currentTopicIndex + 1 < quizTopics.length) {
-        initTopic(currentTopicIndex + 1);
-    }
-}
-
-function restartCurrentTopic() {
-    initTopic(currentTopicIndex);
-}
-
-window.onload = function() {
-    initTopic(0);
-};
+window.onload = () => loadTopic(0);
 </script>
 
 </body>
