@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (61+)</title>
+    <title>Məktəbəqədər Müəllimlər Üçün İmtahan Testi (60 Sual)</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -46,18 +46,17 @@
 
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 680px;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* Top Header & Progress Bar */
         .header {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .close-btn {
@@ -105,21 +104,32 @@
             white-space: nowrap;
         }
 
-        /* Question Section */
+        .category-badge {
+            display: inline-block;
+            background-color: #ddf4ff;
+            color: var(--duo-blue-shadow);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .question-title {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
             color: var(--duo-text);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             line-height: 1.4;
         }
 
-        /* Options */
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .option-btn {
@@ -127,8 +137,8 @@
             border: 2px solid var(--duo-gray);
             border-bottom: 4px solid var(--duo-gray-shadow);
             border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 1.05rem;
+            padding: 14px 18px;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--duo-text);
             text-align: left;
@@ -148,21 +158,20 @@
         .option-btn:active:not(:disabled) {
             transform: translateY(2px);
             border-bottom-width: 2px;
-            margin-bottom: 2px;
         }
 
         .option-prefix {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border: 2px solid var(--duo-gray);
             border-radius: 8px;
             margin-right: 12px;
             font-weight: 800;
             color: #afafaf;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
         }
 
@@ -205,7 +214,6 @@
             color: white;
         }
 
-        /* Footer & Actions */
         .footer {
             border-top: 2px solid var(--duo-gray);
             padding-top: 20px;
@@ -274,21 +282,20 @@
             border: none;
         }
 
-        /* Result Screen */
         .result-screen {
             text-align: center;
             padding: 20px 0;
         }
 
-        .result-icon { font-size: 5rem; margin-bottom: 15px; }
-        .result-title { font-size: 2.2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
-        .score-box { font-size: 3.5rem; font-weight: 900; color: var(--duo-green); margin-bottom: 30px; }
+        .result-icon { font-size: 4.5rem; margin-bottom: 10px; }
+        .result-title { font-size: 2rem; font-weight: 900; color: #ffc800; margin-bottom: 10px; }
+        .score-box { font-size: 3rem; font-weight: 900; color: var(--duo-green); margin-bottom: 25px; }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
@@ -296,7 +303,7 @@
             border: 2px solid var(--duo-gray);
             border-bottom: 4px solid var(--duo-gray-shadow);
             border-radius: 16px;
-            padding: 15px;
+            padding: 14px;
             font-weight: 800;
             text-align: left;
             display: flex;
@@ -319,14 +326,17 @@
 <body>
 
 <div class="container" id="quiz-container">
-    <!-- Test Ekranı -->
     <div id="quiz-screen">
         <div class="header">
-            <button class="close-btn">✕</button>
+            <button class="close-btn" onclick="if(confirm('Testi tərk etmək istədiyinizdən əminsiniz?')) startQuiz();">✕</button>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
-            <div class="stats-badge" id="question-number">61 / 120</div>
+            <div class="stats-badge" id="question-number">1 / 60</div>
+        </div>
+
+        <div>
+            <span class="category-badge" id="category-name">Mövzu yüklenir...</span>
         </div>
 
         <div id="question-text" class="question-title">Sual mətni yüklənir...</div>
@@ -338,11 +348,10 @@
         </div>
     </div>
 
-    <!-- Nəticə Ekranı -->
     <div id="result-screen" class="result-screen" style="display: none;">
         <div class="result-icon">🎉</div>
-        <h2 class="result-title">MƏRHƏLƏ TAMAMLANDI!</h2>
-        <div class="score-box" id="final-score">0.00</div>
+        <h2 class="result-title">İMTAHAN TAMAMLANDI!</h2>
+        <div class="score-box" id="final-score">0.00 / 60</div>
 
         <div class="stats-grid">
             <div class="stat-card">Düzgün: <span id="stat-correct" style="color: var(--duo-green);">0</span></div>
@@ -361,26 +370,71 @@
 
 <script>
 const rawQuestions = [
-    { q: "61. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Uşaqlarda lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrənməyə məcbur etmək"], answer: 0 },
-    { q: "62. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsini dinləmək", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
-    { q: "63. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
-    { q: "64. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
-    { q: "65. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
-    { q: "66. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
-    { q: "67. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
-    { q: "68. Uşaqların ətraf aləmlə tanışlığı zamanı hansı müşahidə növündən istifadə olunur?", options: ["Məqsədyönlü və müntəzəm müşahidə", "Yalnız təsadüfi baxış", "Yalnız şəkillər üzrə müşahidə", "Müşahidə aparılmır"], answer: 0 },
-    { q: "69. Uşaqlarda sadə riyazi anlayışların formalaşdırılması üzrə məşğələlərdə ilk addım nədir?", options: ["Əşyaların miqdarını və ölçüsünü müqayisə etmək", "Vurma cədvəlini əzbərləmək", "Tənliklər həll etmək", "Kəsrlərlə işləmək"], answer: 0 },
-    { q: "70. Əşyaların böyüklük, uzunluq və hündürlüyünə görə müqayisəsi hansı yaş qrupundan başlanır?", options: ["2-ci kiçik qrupdan", "Yalnız məktəbəhazırlıq qrupundan", "Yalnız ibtidai sinifdə", "Körpələr qrupundan"], answer: 0 },
-    { q: "71. Uşaqlarda zaman anlayışlarını (dünən, bu gün, sabah) formalaşdırmaq hansı qrupda intensivləşir?", options: ["Orta və böyük qruplarda", "Yalnız 1-ci kiçik qrupda", "Körpələr evində", "Yalnız bağçadan sonra"], answer: 0 },
-    { q: "72. Geometrik fiqurların (dairə, kvadrat, üçbucaq) tanıdılması nə zaman başlanır?", options: ["2-ci kiçik qrupda", "Məktəbəhazırlıq bitəndən sonra", "Yalnız 6 yaşında", "Orta məktəbin 5-ci sinfində"], answer: 0 },
-    { q: "73. Məktəbəqədər təhsildə mənəvi-ətraf tərbiyənin əsas vasitəsi nədir?", options: ["Şəxsi nümunə və oyun fəaliyyəti", "Sərt cəza metodları", "Yalnız mühazirə oxumaq", "Qaydaları əzbərlətmək"], answer: 0 },
-    { q: "74. Uşaqlarda əmək tərbiyəsi hansı formada həyata keçirilir?", options: ["Növbətçilik, tapşırıqlar və birgə əmək", "Ağır fiziki işlər görməklə", "Yalnız məcburi təmizliklə", "Yalnız pul müqabilində"], answer: 0 },
-    { q: "75. Uşaq bağçasında nizam-intizam və rejim qaydalarının əsas məqsədi nədir?", options: ["Uşağın fiziki və psixi sağlamlığını qorumaq", "Uşaqların hərəkətini məhdudlaşdırmaq", "Müəllimin işini azaltmaq", "Valideynləri rahatlatmaq"], answer: 0 },
-    { q: "76. Tərbiyəçi müəllimin dərslərarası fasilədə (dinlənmə dəqiqələrində) etməli olduğu iş nədir?", options: ["Otağı havalandırmaq və uşaqların sərbəst istirahətini təmin etmək", "Uşaqları oturdub sakit saxlamaq", "Yalnız sənədləşmə ilə məşğul olmaq", "Otağı bağlamaq"], answer: 0 },
-    { q: "77. Uşağın sosiallaşmasında ən birinci mühit hansıdır?", options: ["Ailə", "Uşaq bağçası", "Məktəb", "Həyət dostları"], answer: 0 },
-    { q: "78. Məktəbəqədər müəssisədə inklyuziv təhsil nədir?", options: ["Xüsusi qayğıya ehtiyacı olan uşaqların sağlam uşaqlarla birgə təhsili", "Yalnız istedadlı uşaqların təhsili", "Özəl bağça təhsili", "Distant təhsil müəssisəsi"], answer: 0 },
-    { q: "79. Uşaqların psixoloji hazırlığı dedikdə nə nəzərdə tutulur?", options: ["Emosional, iradi və idrak proseslərinin məktəb təliminə hazır olması", "Yalnız oxumağı bilməsi", "Yalnız idmanla məşğul olması", "Partada düzgün oturması"], answer: 0 },
-    { q: "80. Tərbiyəçinin valideynlərlə əməkdaşlıq formalarına hansı daxil DEYİL?", options: ["Uşağın fərdi gizli məlumatlarını başqalarının yanında müzakirə etmək", "Valideyn iclasları keçirmək", "Fərdi söhbətlər aparmaq", "Açıq qapı günləri təşkil etmək"], answer: 0 }
+    // Mövzu 1: Nitq İnkişafı və Bədii Ədəbiyyatla Tanışlıq (1-20)
+    { topic: "Mövzu 1: Nitq inkişafı", q: "1. Məktəbəqədər təhsil müəssisələrində nitq inkişafı üzrə məşğələlərin əsas məqsədi nədir?", options: ["Uşaqlarda lüğət ehtiyatını zənginləşdirmək və rabitəli nitqi inkişaf etdirmək", "Yalnız hərfləri yazmağı öyrətmək", "Yalnız şeir əzbərlətmək", "Xarici dil öyrənməyə məcbur etmək"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "2. Uşaqlarda sərbəst nitq bacarıqlarını inkişaf etdirmək üçün hansı üsul daha effektivdir?", options: ["Süjetli-rollu oyunlar və dialoqlar", "Yalnız müəllimin mühazirəsini dinləmək", "Sakit oturub kitaba baxmaq", "Kopyalama yazıları yazmaq"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "3. Nitqin səs mədəniyyəti nəyi əhatə edir?", options: ["Düzgün tələffüz, intonasiya, temp və səs ucalığını", "Yalnız sürətli oxu bacarığını", "Yalnız yazılı ifadəni", "Sözlərin mənasını izah etməyi"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "4. Kiçik qrupda lüğət işinin əsas xüsusiyyəti nədir?", options: ["Ətrafdakı əşya və təzahürlərin adlarını öyrətmək", "Mürəkkəb elmi terminləri mənimsətmək", "Mətnlərin təhlilini aparmaq", "Yalnız mücərrəd anlayışları izah etmək"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "5. Rabitəli nitq hansı iki ana formaya bölünür?", options: ["Dialoji və Monoloji nitq", "Yazılı və Şifahi nitq", "Daxili və Xarici nitq", "Fəal və Passiv nitq"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "6. Uşaqların bədii təfəkkürünü və nitqini inkişaf etdirmək üçün istifadə olunan ən geniş yayılmış janr hansıdır?", options: ["Nağıl", "Elmi məqalə", "Bioqrafiya", "Hesabat"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "7. Məktəbəhazırlıq qrupunda savad təliminə hazırlıq zamanı ilk növbədə nə öyrədilir?", options: ["Səs və sözlərin səs təhlili", "Mürəkkəb cümlə strukturları", "Əlyazma hərflərinin yazılışı", "Kitab redaktəsi"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "8. Uşaqların passiv lüğətini aktiv lüğətə keçirmək üçün nə edilməlidir?", options: ["Sözlərin cümlə daxilində və fəaliyyətlərdə tez-tez işlədilməsini təmin etmək", "Sözləri dəftərə köçürtmək", "Sözləri yalnız əzbərlətmək", "Sözlərin mənasını izah etməmək"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "9. Uşaqlarda monolog nitqin formalaşdırılması hansı yaş mərhələsində daha fəal keçirilir?", options: ["Orta və böyük qruplarda", "Körpələr qrupunda", "Yalnız 1-ci kiçik qrupda", "Doğulduğu ilk aylarda"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "10. Şəkildən istifadə edərək nağıl uydurmaq hansı fəaliyyət türünə daxildir?", options: ["Yaradıcı nitq inkişafı", "Mexaniki yaddaş testi", "Yazı vərdişləri", "Riyaziyyat dərsliyi"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "11. Uşaqlara bədii əsər oxunarkən müəllimin hansı davranışı vacibdir?", options: ["Emosional, intonasiyalı və canlı oxumaq", "Monoton və sürətli oxumaq", "Mətni sadəcə pıçıldamaq", "Oxu zamanı uşaqları dinləməmək"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "12. Təkrar olunan şeirlərin əzbərlənməsi uşaqda ilk növbədə nəyi inkişaf etdirir?", options: ["Yaddaş və intonasiyalı nitqi", "Əl hərəkətlərini", "Bədən tərbiyəsini", "Rəsm qabiliyyətini"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "13. Tapmacaların məktəbəqədər yaşlı uşaqların nitqində rolu nədir?", options: ["Məntiqi təfəkkürü və təxəyyülü stimullaşdırır", "Yalnız sakit otuzdurur", "Riyazi tənlikləri əvəz edir", "Fiziki gücü artırır"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "14. Uşağın nitqindəki grammatik səhvləri necə düzəltmək lazımdır?", options: ["Uşağı utandırmadan, düzgün formanı nümunə kimi təkrarlamaqla", "Sərt şəkildə danlamaqla", "Uşağa qışqırmaqla", "Səhvi görməzdən gəlib heç düzəltməməklə"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "15. Nağılın səhnələşdirilməsi (teatrallaşdırılmış oyun) uşaqlarda nəyi gücləndirir?", options: ["Emosional ifadəliliyi və ünsiyyət bacarıqlarını", "Təklikdə oturmaq arzusunu", "Riyazi hesablamaları", "Yazı sürətini"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "16. Səs təhlili zamanı ilk növbədə uşaqlara hansı anlayışlar fərqləndirilir?", options: ["Sait və samit səslər", "Mürəkkəb və sadə cümlələr", "İsim və fel", "Fəal və passiv sözlər"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "17. Məktəbəqədər yaşda nitq inkişafında müəllimin rolu nədir?", options: ["Nümünəvi nitq modeli olmaq", "Yalnız tapşırıq verib kənarda durmaq", "Hər zaman uşaqları sakit saxlamaq", "Yalnız qaydaları oxumaq"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "18. Flaneleqraf və ya kukla teatrı hansı məqsədlə istifadə olunur?", options: ["Bədii əsərin daha fəal və əyani mənimsənilməsi üçün", "İdman hərəkətləri etmək üçün", "Yalnız vaxt öldürmək üçün", "Uşaqları cəzalandırmaq üçün"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "19. Atalar sözləri və məsəllərin tərbiyəvi əhəmiyyəti nədir?", options: ["Mənəvi dəyərləri və müdriklik ideyalarını aşılayır", "Sırf fiziki hərəkətləri inkişaf etdirir", "Hərflərin sırasını öyrədir", "Hesablama vərdişi yaradır"], answer: 0 },
+    { topic: "Mövzu 1: Nitq inkişafı", q: "20. Yanıltmacların əsas istifadə məqsədi nədir?", options: ["Diksiya və tələffüz aparatını inkişaf etdirmək", "Riyazi məsələ həll etmək", "Yazı səliqəsini artırmaq", "Uşağın yuxusunu gətirmək"], answer: 0 },
+
+    // Mövzu 2: Ətraf aləmlə tanışlıq və Sadə riyazi anlayışlar (21-40)
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "21. Uşaqların ətraf aləmlə tanışlığı zamanı hansı müşahidə növündən istifadə olunur?", options: ["Məqsədyönlü və müntəzəm müşahidə", "Yalnız təsadüfi baxış", "Yalnız şəkillər üzrə müşahidə", "Müşahidə aparılmır"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "22. Uşaqlarda sadə riyazi anlayışların formalaşdırılması üzrə məşğələlərdə ilk addım nədir?", options: ["Əşyaların miqdarını və ölçüsünü müqayisə etmək", "Vurma cədvəlini əzbərləmək", "Tənliklər həll etmək", "Kəsrlərlə işləmək"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "23. Əşyaların böyüklük, uzunluq və hündürlüyünə görə müqayisəsi hansı yaş qrupundan başlanır?", options: ["2-ci kiçik qrupdan", "Yalnız məktəbəhazırlıq qrupundan", "Yalnız ibtidai sinifdə", "Körpələr qrupundan"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "24. Uşaqlarda zaman anlayışlarını (dünən, bu gün, sabah) formalaşdırmaq hansı qrupda intensivləşir?", options: ["Orta və böyük qruplarda", "Yalnız 1-ci kiçik qrupda", "Körpələr evində", "Yalnız bağçadan sonra"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "25. Geometrik fiqurların (dairə, kvadrat, üçbucaq) tanıdılması nə zaman başlanır?", options: ["2-ci kiçik qrupda", "Məktəbəhazırlıq bitəndən sonra", "Yalnız 6 yaşında", "Orta məktəbin 5-ci sinfində"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "26. Ətraf aləmlə tanışlıqda canlı və cansız təbiət obyektləri uşaqlara necə aşılanır?", options: ["Təcrübə, ekskursiya və müşahidələr vasitəsilə", "Yalnız mühazirə oxumaqla", "Heç bir əyani vasitə olmadan", "Kitabları cırmaqla"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "27. Məkan anlayışlarının (sağ, sol, yuxarı, aşağı) mənimsənilməsi nə üçün vacibdir?", options: ["Oriyentasiya və hərəkət koordinasiyası üçün", "Sırf yazı yazmaq üçün", "Rəsm çəkməyə mane olmaq üçün", "Yalnız musiqi dinləmək üçün"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "28. Uşaqlara təbiət bucağında canlılara qulluq etmək nəyi aşılayır?", options: ["Məsuliyyət və qayğıkeşlik hissini", "Qorxu və çəkinkənliyi", "Fiziki yorğunluğu", "Yalnız təmizlik qaydalarını"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "29. Sadə riyazi hesablamalarda əyani materialların rolu nədir?", options: ["Konkret təfəkkürdən mücərrəd təfəkkürə keçidi təmin etmək", "Dərsi mürəkkəbləşdırmək", "Uşaqların diqqətini yayındırmaq", "Müəllimin işini çətinləşdirmək"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "30. Fəsillərin dəyişməsini öyrədərkən hansı vasitə daha əyanidir?", options: ["Mövsümi dəyişiklikləri əks etdirən müşahidələr və şəkillər", "Yalnız riyazi formulalar", "Xarici dildə audio yazılar", "Tarixi xəritələr"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "31. Əşyaları əlamətlərinə (rəng, forma, ölçü) görə qruplaşdırmaq nə adlanır?", options: ["Təsnifat (klassifikasiya)", "Səs analizi", "Sintez", "Diktant"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "32. Sayma vərdişləri aşılanarkən uşağa ilk növbədə neçə daxilində say öyrədilir?", options: ["10 daxilində", "100 daxilində", "1000 daxilində", "Məhdudiyyətsiz"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "33. Ekoloji tərbiyənin məktəbəqədər yaşda əsas məqsədi nədir?", options: ["Təbiətə sevgi və ekoloji mədəniyyət formalaşdırmaq", "Mürəkkəb biologiya qanunlarını öyrətmək", "Bitkiləri kəsməyi öyrətmək", "Heyvanlardan uzaq durmağı tapşırmaq"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "34. Həndəsi fiqur ilə həndəsi cisim arasında fərq uşaqlara necə izah olunur?", options: ["Fiqurun müstəvi, cismin həcmli olması nümunələrlə gösterilir", "Yalnız düsturla", "Məktəbə qədər izah edilmir", "Mühazirə yolu ilə"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "35. Uşaqların nəqliyyat vasitələri ilə tanış edilməsinin əsas praktik əhəmiyyəti nədir?", options: ["Yol hərəkəti və təhlükəsizlik qaydalarını öyrənmək", "Sürücülük vəsiqəsi almaq", "Yalnız maşın markalarını əzbərləmək", "Sürətli qaçmağı öyrənmək"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "36. Miqdar sayı ilə sıra sayı arasında fərq nədir?", options: ["Miqdar 'neçə?', sıra 'neçənci?' sualına cavab verir", "Heç bir fərq yoxdur", "Biri sözdür, biri fiqurdur", "Yalnız böyük ədədlərdə işlənir"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "37. Peşələrlə tanışlıq uşaqda nəyi inkişaf etdirir?", options: ["Əməyə hörmət və sosial rolu anlamaq", "Fiziki yorğunluq", "Yalnız pul qazanmaq arzusu", "İşləməkdən qorxu"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "38. Uşaqlar ilin fəsillərini və həftənin günlərini öyrənərkən nəyə əsaslanırlar?", options: ["Ardıcıllıq və dövrilik prinsiplərinə", "Təsadüfi seçimlərə", "Yalnız rəqəmlərə", "Sırf yaddaşa"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "39. Məktəbəqədər yaşda təcrübə və eksperimentlərin (məs. suyun donması) keçirilməsi nəyə xidmət edir?", options: ["Tədqiqatçılıq və idrak fəallığını artırmağa", "Sinifdə səs-küy salmağa", "Uşaqları yormağa", "Təhlükə yaratmağa"], answer: 0 },
+    { topic: "Mövzu 2: Ətraf aləm və Riyaziyyat", q: "40. Bütövü hissələrə bölmə (məsələn almanı yarıya bölmək) anlayışı nəyi formalaşdırır?", options: ["Hissə və bütöv münasibətini", "Səliqəsizliyi", "Yalnız yemək vərdişini", "Həndəsi fiqurların adını"], answer: 0 },
+
+    // Mövzu 3: Mənəvi-əmək tərbiyəsi, İnklüziv təhsil və Ailə ilə əməkdaşlıq (41-60)
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "41. Məktəbəqədər təhsildə mənəvi-ətraf tərbiyənin əsas vasitəsi nədir?", options: ["Şəxsi nümunə və oyun fəaliyyəti", "Sərt cəza metodları", "Yalnız mühazirə oxumaq", "Qaydaları əzbərlətmək"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "42. Uşaqlarda əmək tərbiyəsi hansı formada həyata keçirilir?", options: ["Növbətçilik, tapşırıqlar və birgə əmək", "Ağır fiziki işlər görməklə", "Yalnız məcburi təmizliklə", "Yalnız pul müqabilində"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "43. Uşaq bağçasında nizam-intizam və rejim qaydalarının əsas məqsədi nədir?", options: ["Uşağın fiziki və psixi sağlamlığını qorumaq", "Uşaqların hərəkətini məhdudlaşdırmaq", "Müəllimin işini azaltmaq", "Valideynləri rahatlatmaq"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "44. Tərbiyəçi müəllimin dərslərarası fasilədə (dinlənmə dəqiqələrində) etməli olduğu iş nədir?", options: ["Otağı havalandırmaq və uşaqların sərbəst istirahətini təmin etmək", "Uşaqları oturdub sakit saxlamaq", "Yalnız sənədləşmə ilə məşğul olmaq", "Otağı bağlamaq"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "45. Uşağın sosiallaşmasında ən birinci mühit hansıdır?", options: ["Ailə", "Uşaq bağçası", "Məktəb", "Həyət dostları"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "46. Məktəbəqədər müəssisədə inklyuziv təhsil nədir?", options: ["Xüsusi qayğıya ehtiyacı olan uşaqların sağlam uşaqlarla birgə təhsili", "Yalnız istedadlı uşaqların təhsili", "Özəl bağça təhsili", "Distant təhsil müəssisəsi"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "47. Uşaqların psixoloji hazırlığı dedikdə nə nəzərdə tutulur?", options: ["Emosional, iradi və idrak proseslərinin məktəb təliminə hazır olması", "Yalnız oxumağı bilməsi", "Yalnız idmanla məşğul olması", "Partada düzgün oturması"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "48. Tərbiyəçinin valideynlərlə əməkdaşlıq formalarına hansı daxil DEYİL?", options: ["Uşağın fərdi gizli məlumatlarını başqalarının yanında müzakirə etmək", "Valideyn iclasları keçirmək", "Fərdi söhbətlər aparmaq", "Açıq qapı günləri təşkil etmək"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "49. Uşaqlarda tolerantlıq və empatik hissləri necə formalaşdırmaq olar?", options: ["Bölüşmək, yardım etmək və fərqliliklərə hörmət oyunları ilə", "Yalnız tənqid etməklə", "Uşaqları bir-birindən təcrid etməklə", "Yalnız əmrlər verməklə"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "50. Bağçada yemək paylanması zamanı uşaqların növbətçilik etməsi hansı əmək növüdür?", options: ["Məişət-xidmət əməyi", "Təbiətdə əmək", "Ağır fiziki əmək", "Əl əməyi"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "51. Adaptasiya dövründə bağçaya yeni gələn uşağa necə yanaşılmalıdır?", options: ["Fərdi diqqət və emosional dəstək göstərərək tədricən öyrəşdirməli", "Sərt şəkildə valideyindən ayırmalı", "Otaqda tək qoyub getməli", "Ağlamasına məhəl qoymamalı"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "52. Məktəbəqədər müəssisədə gigiyenik tərbiyə nəyi əhatə edir?", options: ["Əllərin yuması, şəxsi gigiyena və səliqəlilik vərdişlərini", "Yalnız paltar seçməyi", "Otağı bəzəməyi", "Sırf idman etməyi"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "53. Uşaq hüquqlarının qorunmasında tərbiyəçi müəllimin əsas vəzifəsi nədir?", options: ["Uşağı hər cür zorakılıq və laqeydlikdən qorumaq", "Yalnız uşağın yeməyinə nəzarət etmək", "Valideynləri cəzalandırmaq", "Uşağın azadlığını tam məhdudlaşdırmaq"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "54. Oyun fəaliyyəti məktəbəqədər yaşlı uşaq üçün nə kəsb edir?", options: ["Aparıcı fəaliyyət növüdür", "Yalnız vaxt itkisidir", "İkinci dərəcəli məşğuliyyətdir", "Məcburi işdir"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "55. Qrupda aqressiv davranış göstərən uşaqla necə rəftar edilməlidir?", options: ["Səbəbi araşdırılmalı və sakit şəkildə yönləndirilməlidir", "Qrupdan qovulmalıdır", "Uşağa fiziki cəza verilməlidir", "Digər uşaqlara da ona hücum etmək tapşırılmalıdır"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "56. İnklüziv mühitdə sağlam uşaqların xüsusi qayğıya ehtiyacı olan uşaqlara münasibəti necə tənzimlənir?", options: ["Dostluq, qayğı və bərabərlik prinsipi ilə", "Ayrı-ayrı masalarda oturtmaqla", "Onlarla ünsiyyəti qadağan etməklə", "Xüsusi qayğılı uşağı təcrid etməklə"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "57. Uşağın özünəxidmət bacarıqları hansı yaşdan formalaşdırılmağa başlayır?", options: ["Erkən yaşlardan (1-3 yaş)", "Yalnız 6 yaşdan", "Məktəbə gedəndən sonra", "10 yaşından"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "58. Müəllim-valideyn münasibətlərində konfidentsiallıq nədir?", options: ["Uşaq və ailə haqqında özəl məlumatların gizli saxlanılması", "Bütün məlumatların sosial mediada paylaşılması", "Məlumatların digər valideynlərə danışılması", "Məlumatların gizlədilməməsi"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "59. Estetik tərbiyənin məqsədi nədir?", options: ["Gözəlliyi duymaq, qiymətləndirmək və yaradıcılıq bacarığını inkişaf etdirmək", "Yalnız rəssam hazırlamaq", "Uşaqları dəbli geyindirmək", "Sırf teatr biletləri satmaq"], answer: 0 },
+    { topic: "Mövzu 3: Mənəvi tərbiyə və İnklüziv təhsil", q: "60. Məktəbəqədər təhsilin yekun məqsədi uşağı nəyə hazırlamaqdır?", options: ["Məktəb təliminə və cəmiyyətdə sosial həyata", "Yalnız peşə seçiminə", "Sırf olimpida yarışlarına", "Yalnız evdə oturmağa"], answer: 0 }
 ];
 
 const optionPrefixes = ["A", "B", "C", "D"];
@@ -393,6 +447,7 @@ let isReviewMode = false;
 function startQuiz() {
     isReviewMode = false;
     currentQuestions = rawQuestions.map(qObj => ({
+        topic: qObj.topic,
         q: qObj.q,
         options: [...qObj.options],
         answer: qObj.answer
@@ -419,11 +474,12 @@ function showQuestion() {
     if (isReviewMode) {
         document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "NƏTİCƏLƏR" : "NÖVBƏTİ";
     } else {
-        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TАMАMLА" : "NÖVBƏTİ";
+        document.getElementById("next-btn").innerText = (currentQuestionIndex === total - 1) ? "TAMAMLA" : "NÖVBƏTİ";
     }
 
-    document.getElementById("question-number").innerText = `${currentQuestionIndex + 61} / ${total + 60}`;
+    document.getElementById("question-number").innerText = `${currentQuestionIndex + 1} / ${total}`;
     document.getElementById("progress-bar").style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+    document.getElementById("category-name").innerText = q.topic;
 
     document.getElementById("question-text").innerText = q.q;
 
@@ -455,19 +511,7 @@ function showQuestion() {
                 btn.classList.add("selected");
             }
 
-            if (selectedIdx !== null) {
-                if (idx === correctIdx) {
-                    btn.classList.add("correct");
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✓</span>`;
-                } else if (idx === selectedIdx) {
-                    btn.classList.add("wrong");
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div> <span>✗</span>`;
-                } else {
-                    btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
-                }
-            } else {
-                btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
-            }
+            btn.innerHTML = `<div><span class="option-prefix">${prefix}</span><span>${optText}</span></div>`;
             btn.onclick = () => selectOption(idx);
         }
 
@@ -564,4 +608,9 @@ window.onload = startQuiz;
 
 </body>
 </html>
+```eof
 
+### Əsas yeniliklər:
+1. **Mövzu bölgüsü**: 60 sual 3 əsas pedaqoji bloka ayrıldı (Nitq inkişafı, Ətraf aləm/Riyaziyyat, Mənəvi-əmək tərbiyəsi).
+2. **Vizual keçidlər**: Hər sualın yuxarısında hazırda hansı mövzuda olduğunuzu göstərən xüsusi **Mövzu Etiketi** (Category Badge) yerləşdirildi.
+3. **Məntiqi ardıcıllıq**: Suallar 1-dən 60-a qədər nömrələndi və mövzudan mövzuya keçid avtomatik baş verir.
